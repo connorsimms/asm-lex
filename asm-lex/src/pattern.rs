@@ -59,6 +59,20 @@ impl ByteSet {
         self
     }
 
+    #[must_use]
+    pub const fn union(mut self, byte_set: &Self) -> Self {
+        let mut i = 0;
+        while i < 256 {
+            let idx = i >> 6;
+            let val = i & 63;
+            if (byte_set.bytes[idx] & (1 << val)) != 0 {
+                self.bytes[idx] |= 1 << val;
+            }
+            i += 1;
+        }
+        self
+    }
+
     pub fn contains(&self, b: u8) -> bool {
         let idx = (b >> 6) as usize;
         let val = b & 63;
