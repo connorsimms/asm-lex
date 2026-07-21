@@ -1,6 +1,8 @@
 #[cfg(test)]
 mod tests;
 
+pub mod targets;
+
 use crate::Span;
 use crate::cursor::Cursor;
 use crate::pattern::ByteSet;
@@ -32,6 +34,8 @@ pub trait GasTarget {
 
     // Whether (55$:) is a valid label or not
     const LOCAL_LABELS_DOLLAR: bool = false;
+
+    const GAP_CHARS: ByteSet = ByteSet::from_bytes(b" \t\r\n").union(&Self::LINE_SEPARATOR_CHARS);
 }
 
 pub struct Gas<T: GasTarget> {
@@ -90,6 +94,10 @@ impl<T: GasTarget> Gas<T> {
             return None;
         }
         if !cursor.eat(b'#') {
+            cursor.restore(save);
+            return None;
+        }
+        if !T::LINE_COMMENT_CHARS.contains(b'#') {
             cursor.restore(save);
             return None;
         }

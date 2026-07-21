@@ -8,7 +8,7 @@ use crate::source;
 struct TestTarget {}
 impl GasTarget for TestTarget {
     const COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"#");
-    const LINE_COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"/");
+    const LINE_COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"#/");
     const MULTI_COMMENT_CHARS: &[&[u8]] = &[b"//"];
     const LINE_SEPARATOR_CHARS: ByteSet = ByteSet::from_bytes(b";");
     const SYMBOL_START_CHARS: ByteSet = ByteSet::from_bytes(b"._$")
@@ -125,9 +125,6 @@ fn test_is_line_comment() {
     let cursor = Cursor::new(b"This is not");
     assert!(!Gas::<TestTarget>::is_line_comment(&cursor));
 
-    let cursor = Cursor::new(b"# This is not");
-    assert!(!Gas::<TestTarget>::is_line_comment(&cursor));
-
     let cursor = Cursor::new(b"; This is not");
     assert!(!Gas::<TestTarget>::is_line_comment(&cursor));
 }
@@ -149,10 +146,6 @@ fn test_try_line_comment() {
     assert_eq!(cursor.pos(), 28);
 
     let mut cursor = Cursor::new(b"This is not");
-    assert_eq!(Gas::<TestTarget>::try_line_comment(&mut cursor), None);
-    assert_eq!(cursor.pos(), 0);
-
-    let mut cursor = Cursor::new(b"# This is not");
     assert_eq!(Gas::<TestTarget>::try_line_comment(&mut cursor), None);
     assert_eq!(cursor.pos(), 0);
 
