@@ -1,7 +1,7 @@
-use crate::Span;
-
 #[cfg(test)]
 mod tests;
+
+use crate::Span;
 
 pub struct Cursor<'a> {
     bytes: &'a [u8],
