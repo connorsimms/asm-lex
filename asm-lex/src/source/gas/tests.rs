@@ -383,29 +383,6 @@ fn test_try_symbol_kind() {
     check(b".=.+4", def(0..1, 1..2, Some(2..5)), 5);
 }
 
-fn assert_coverage(bytes: &[u8]) {
-    let gap_bytes = ByteSet::from_bytes(b" ;\t\r");
-    let mut cursor = Cursor::new(bytes);
-    let mut i = 0usize;
-    while let Some(item) = Gas::<TestTarget>::next_item(&mut cursor) {
-        assert!(item.span.start <= item.span.end);
-        assert!(item.span.end <= bytes.len());
-        while i < item.span.start {
-            assert!(bytes.get(i).copied().is_some_and(|b| gap_bytes.contains(b)));
-            i += 1;
-        }
-        while i < item.span.end {
-            assert!(
-                bytes
-                    .get(i)
-                    .copied()
-                    .is_some_and(|b| !gap_bytes.contains(b))
-            );
-            i += 1;
-        }
-    }
-}
-
 #[test]
 fn test_next_item_preprocessor() {
     let mut cursor = cursor::Cursor::new(
