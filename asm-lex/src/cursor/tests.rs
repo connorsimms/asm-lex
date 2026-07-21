@@ -1,3 +1,4 @@
+#[allow(unused)]
 use pretty_assertions::{assert_eq, assert_ne};
 
 use super::*;
