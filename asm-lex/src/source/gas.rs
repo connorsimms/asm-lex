@@ -20,8 +20,7 @@ pub trait GasTarget {
     const MULTI_COMMENT_CHARS: &[&[u8]];
 
     // The starting bytes of multi-byte comment sequence
-    const MULTI_COMMENT_START: ByteSet =
-        ByteSet::from_multibyte_start_chars(Self::MULTI_COMMENT_CHARS);
+    const MULTI_COMMENT_START: ByteSet = ByteSet::from_first_bytes(Self::MULTI_COMMENT_CHARS);
 
     // A statement ends at a newline or line separator
     const LINE_SEPARATOR_CHARS: ByteSet;

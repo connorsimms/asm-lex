@@ -1,82 +1,102 @@
 #[cfg(test)]
 mod tests;
 
-#[derive(Clone, Debug, Default, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Hash)]
 pub struct ByteSet {
     bytes: [u64; 4],
 }
 
 impl ByteSet {
+    pub const fn new() -> Self {
+        Self::empty()
+    }
+
     pub const fn empty() -> Self {
         Self { bytes: [0u64; 4] }
     }
 
+    pub const fn insert(&mut self, b: u8) {
+        let idx = (b >> 6) as usize;
+        let val = b & 63;
+        self.bytes[idx] |= 1 << val;
+    }
+
+    pub const fn contains(&self, b: u8) -> bool {
+        let idx = (b >> 6) as usize;
+        let val = b & 63;
+        self.bytes[idx] & (1 << val) != 0
+    }
+
     #[must_use]
     pub const fn from_bytes(input: &[u8]) -> Self {
-        let mut bytes = [0u64; 4];
-
+        let mut set = Self::empty();
         let mut i = 0usize;
         while i < input.len() {
             let b = input[i];
-            let idx = b >> 6;
-            let val = b & 63;
-            bytes[idx as usize] |= 1 << val;
+            set.insert(b);
             i += 1;
         }
-
-        Self { bytes }
+        set
     }
 
     #[must_use]
-    pub const fn from_multibyte_start_chars(input: &[&[u8]]) -> Self {
-        let mut bytes = [0u64; 4];
-
+    pub const fn from_first_bytes(input: &[&[u8]]) -> Self {
+        let mut set = Self::empty();
         let mut i = 0usize;
         while i < input.len() {
-            if !input[i].is_empty() {
-                let b = input[i][0];
-                let idx = b >> 6;
-                let val = b & 63;
-                bytes[idx as usize] |= 1 << val;
+            if let Some(b) = input[i].first().copied() {
+                set.insert(b);
             }
             i += 1;
         }
-
-        Self { bytes }
+        set
     }
 
     /// # Panics
+    /// Panics if `start` is greater than `end`.
     #[must_use]
     pub const fn with_range(mut self, start: u8, end: u8) -> Self {
         assert!(start <= end, "Start must not be greater than end");
-        // widening to usize avoids overflow
-        let mut b = start as usize;
-        while b <= end as usize {
-            let idx = b >> 6;
-            let val = b & 63;
-            self.bytes[idx] |= 1 << val;
+        let mut b = start;
+        loop {
+            self.insert(b);
+            if b == end {
+                break;
+            }
             b += 1;
         }
         self
     }
 
     #[must_use]
-    pub const fn union(mut self, byte_set: &Self) -> Self {
-        let mut i = 0;
-        while i < 256 {
-            let idx = i >> 6;
-            let val = i & 63;
-            if (byte_set.bytes[idx] & (1 << val)) != 0 {
-                self.bytes[idx] |= 1 << val;
-            }
+    pub const fn union(mut self, rhs: &Self) -> Self {
+        let mut i = 0usize;
+        while i < 4 {
+            self.bytes[i] |= rhs.bytes[i];
             i += 1;
         }
         self
     }
+}
 
-    pub fn contains(&self, b: u8) -> bool {
-        let idx = (b >> 6) as usize;
-        let val = b & 63;
-        self.bytes[idx] & (1 << val) != 0
+impl<T: AsRef<[u8]>> From<T> for ByteSet {
+    fn from(input: T) -> Self {
+        Self::from_bytes(input.as_ref())
+    }
+}
+
+impl core::ops::BitOr<Self> for ByteSet {
+    type Output = Self;
+
+    fn bitor(self, rhs: Self) -> Self::Output {
+        self.union(&rhs)
+    }
+}
+
+impl core::ops::BitOr<&Self> for ByteSet {
+    type Output = Self;
+
+    fn bitor(self, rhs: &Self) -> Self::Output {
+        self.union(rhs)
     }
 }
