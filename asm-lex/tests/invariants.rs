@@ -1,5 +1,3 @@
-mod common;
-
 use asm_lex::source::gas::GasTarget;
 
 #[allow(dead_code)]
