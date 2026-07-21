@@ -2,6 +2,7 @@ mod common;
 
 use asm_lex::source::gas::GasTarget;
 
+#[allow(dead_code)]
 fn assert_coverage<T: GasTarget>(bytes: &[u8]) {
     use asm_lex::Span;
     use asm_lex::cursor::Cursor;
