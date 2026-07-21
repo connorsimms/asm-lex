@@ -35,7 +35,7 @@ pub trait GasTarget {
 }
 
 pub struct Gas<T: GasTarget> {
-    marker: core::marker::PhantomData<T>,
+    _marker: core::marker::PhantomData<T>,
 }
 
 impl<T: GasTarget> Gas<T> {
