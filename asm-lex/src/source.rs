@@ -33,6 +33,20 @@ pub struct Item {
     starts_line: bool,
 }
 
+impl Item {
+    pub fn kind(&self) -> &Kind {
+        &self.kind
+    }
+
+    pub fn span(&self) -> Span {
+        self.span.clone()
+    }
+
+    pub fn starts_line(&self) -> bool {
+        self.starts_line
+    }
+}
+
 pub trait Dialect {
     fn next_item(cur: &mut crate::cursor::Cursor<'_>) -> Option<Item>;
 }
