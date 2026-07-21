@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests;
 
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct ByteSet {
     bytes: [u64; 4],
 }

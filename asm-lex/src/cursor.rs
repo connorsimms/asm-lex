@@ -3,6 +3,7 @@ mod tests;
 
 use crate::Span;
 
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct Cursor<'a> {
     bytes: &'a [u8],
     pos: usize,

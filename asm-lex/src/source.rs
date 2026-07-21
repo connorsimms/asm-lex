@@ -3,7 +3,7 @@ pub mod gas;
 use crate::Span;
 
 #[non_exhaustive]
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Kind {
     Label {
         name: Span,
@@ -26,7 +26,7 @@ pub enum Kind {
     Unknown,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Item {
     kind: Kind,
     span: Span,
