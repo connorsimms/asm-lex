@@ -86,7 +86,7 @@ proptest! {
     fn prop_test_from_bytes(bytes in vec(any::<u8>(), 0..300)) {
         let set = ByteSet::from_bytes(&bytes);
         for b in 0u8..=255 {
-            assert_eq!(set.contains(b), bytes.contains(&b));
+            prop_assert_eq!(set.contains(b), bytes.contains(&b));
         }
     }
 }
@@ -210,14 +210,14 @@ fn test_from() {
         assert_eq!(set.contains(b), bytes.contains(&b));
     }
 
-    let bytes = b"ABCDEF";
+    let bytes: &[u8] = b"ABCDEF";
     let set = ByteSet::from(bytes);
     for b in 0u8..=255 {
         assert_eq!(set.contains(b), bytes.contains(&b));
     }
 
-    let bytes = [b'A', b'B', b'C', b'D'];
-    let set = ByteSet::from(&bytes);
+    let bytes: &[u8; 4] = b"ABCD";
+    let set = ByteSet::from(bytes);
     for b in 0u8..=255 {
         assert_eq!(set.contains(b), bytes.contains(&b));
     }
