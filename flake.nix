@@ -26,14 +26,6 @@
             "clippy"
           ];
         };
-
-        nightlyToolchain = pkgs.rust-bin.nightly.latest.minimal.override {
-          extensions = [ "clippy" ];
-        };
-
-        nightlyClippy = pkgs.writeShellScriptBin "cargo-nightly-clippy" ''
-          exec ${nightlyToolchain}/bin/cargo-clippy "$@"
-        '';
       in
       {
         devShells.default = pkgs.mkShell {
@@ -48,7 +40,6 @@
             cargo-fuzz
 
             stableToolchain
-            nightlyClippy
           ];
 
           buildInputs = with pkgs; [
