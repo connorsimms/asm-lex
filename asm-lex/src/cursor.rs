@@ -24,6 +24,7 @@ impl<'a> Cursor<'a> {
     }
 
     /// # Panics
+    /// Panics if `pos` is greater than `bytes.len()`.
     pub fn restore(&mut self, pos: usize) {
         assert!(
             pos <= self.bytes.len(),
@@ -54,24 +55,20 @@ impl<'a> Cursor<'a> {
             .copied()
     }
 
-    pub fn starts_with(&self, seq: &[u8]) -> bool {
+    pub fn starts_with(&self, bytes: &[u8]) -> bool {
         self.bytes
             .get(self.pos()..)
-            .is_some_and(|slice| slice.starts_with(seq))
+            .is_some_and(|slice| slice.starts_with(bytes))
     }
 
     pub fn bump(&mut self) -> Option<u8> {
-        if self.pos < self.bytes.len() {
-            let b = self.bytes[self.pos];
-            self.pos += 1;
-            Some(b)
-        } else {
-            None
-        }
+        let b = self.peek()?;
+        self.pos += 1;
+        Some(b)
     }
 
     pub fn eat(&mut self, byte: u8) -> bool {
-        if self.peek() == Some(byte) {
+        if Some(byte) == self.peek() {
             self.pos += 1;
             true
         } else {

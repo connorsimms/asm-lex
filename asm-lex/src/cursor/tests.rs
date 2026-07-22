@@ -12,6 +12,38 @@ fn test_new() {
 }
 
 #[test]
+fn test_restore() {
+    let bytes = b"Some string";
+    let mut cursor = Cursor::new(bytes);
+    for i in 0..=bytes.len() {
+        cursor.restore(i);
+        assert_eq!(cursor.pos(), i);
+    }
+}
+
+#[test]
+#[should_panic(expected = "out of bounds")]
+fn test_restore_invalid() {
+    let bytes = b"Some string";
+    let mut cursor = Cursor::new(bytes);
+    cursor.restore(bytes.len() + 1);
+}
+
+#[test]
+fn test_advance() {
+    let bytes = &[b'a'; 100];
+    let mut cursor = Cursor::new(bytes);
+    let mut prev = 0;
+    for i in 0..=5 {
+        cursor.advance(i);
+        assert_eq!(cursor.pos(), prev + i);
+        prev = cursor.pos();
+    }
+    cursor.advance(usize::MAX);
+    assert_eq!(cursor.pos(), bytes.len());
+}
+
+#[test]
 fn test_peek() {
     let mut cursor = Cursor::new(b"Some string");
     for i in 0..cursor.bytes().len() {
@@ -19,16 +51,6 @@ fn test_peek() {
         cursor.advance(1);
     }
     assert_eq!(cursor.peek(), None);
-}
-
-#[test]
-fn test_is_eof() {
-    let mut cursor = Cursor::new(b"Some string");
-    assert!(!cursor.is_eof());
-    cursor.advance(5);
-    assert!(!cursor.is_eof());
-    cursor.advance(6);
-    assert!(cursor.is_eof());
 }
 
 #[test]
