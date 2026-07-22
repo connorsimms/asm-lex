@@ -18,14 +18,9 @@
           inherit system overlays;
         };
 
-        stableToolchain = pkgs.rust-bin.stable."1.70.0".default.override {
-          extensions = [
-            "rust-src"
-            "rust-analyzer"
-            "rustfmt"
-            "clippy"
-          ];
-        };
+        rustMsrv = pkgs.rust-bin.stable."1.70.0".default;
+        rustLatest = pkgs.rust-bin.stable.latest.default;
+        rustBeta = pkgs.rust-bin.beta.latest.default;
       in
       {
         devShells.default = pkgs.mkShell {
@@ -39,7 +34,11 @@
             cargo-watch
             cargo-fuzz
 
-            stableToolchain
+            rustMsrv
+            (pkgs.writeShellScriptBin "cargo-latest"
+              ''exec ${rustLatest}/bin/cargo "$@"'')
+            (pkgs.writeShellScriptBin "cargo-beta"
+              ''exec ${rustBeta}/bin/cargo "$@"'')
           ];
 
           buildInputs = with pkgs; [
