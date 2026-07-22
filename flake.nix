@@ -18,14 +18,22 @@
           inherit system overlays;
         };
 
-        rustToolchain = pkgs.rust-bin.nightly.latest.default.override {
+        stableToolchain = pkgs.rust-bin.stable."1.70.0".default.override {
           extensions = [
             "rust-src"
             "rust-analyzer"
-            "clippy"
             "rustfmt"
+            "clippy"
           ];
         };
+
+        nightlyToolchain = pkgs.rust-bin.nightly.latest.minimal.override {
+          extensions = [ "clippy" ];
+        };
+
+        nightlyClippy = pkgs.writeShellScriptBin "cargo-nightly-clippy" ''
+          exec ${nightlyToolchain}/bin/cargo-clippy "$@"
+        '';
       in
       {
         devShells.default = pkgs.mkShell {
@@ -38,10 +46,12 @@
             llvmPackages.llvm
             cargo-watch
             cargo-fuzz
+
+            stableToolchain
+            nightlyClippy
           ];
 
           buildInputs = with pkgs; [
-            rustToolchain
             libiconv
           ];
 
