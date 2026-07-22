@@ -3,13 +3,13 @@ mod tests;
 
 pub mod targets;
 
-use crate::Span;
 use crate::cursor::Cursor;
 use crate::pattern::ByteSet;
 use crate::source;
 use crate::source::{Dialect, Item};
+use crate::Span;
 
-pub trait GasTarget {
+pub trait GasTarget<'a> {
     // Anything from byte to newline is a comment, can be placed anywhere
     const COMMENT_CHARS: ByteSet;
 
@@ -17,7 +17,7 @@ pub trait GasTarget {
     const LINE_COMMENT_CHARS: ByteSet;
 
     // Anything from byte sequence to newline is a comment, can be placed anywhere
-    const MULTI_COMMENT_CHARS: &[&[u8]];
+    const MULTI_COMMENT_CHARS: &'a [&'a [u8]];
 
     // The starting bytes of multi-byte comment sequence
     const MULTI_COMMENT_START: ByteSet = ByteSet::from_first_bytes(Self::MULTI_COMMENT_CHARS);
@@ -37,11 +37,11 @@ pub trait GasTarget {
     const GAP_CHARS: ByteSet = ByteSet::from_bytes(b" \t\r\n").union(&Self::LINE_SEPARATOR_CHARS);
 }
 
-pub struct Gas<T: GasTarget> {
-    _marker: core::marker::PhantomData<T>,
+pub struct Gas<'a, T: GasTarget<'a>> {
+    _marker: core::marker::PhantomData<&'a T>,
 }
 
-impl<T: GasTarget> Gas<T> {
+impl<'a, T: GasTarget<'a> + 'a> Gas<'a, T> {
     fn is_horizontal_whitespace(b: u8) -> bool {
         matches!(b, b' ' | b'\t' | b'\r')
     }
@@ -70,11 +70,10 @@ impl<T: GasTarget> Gas<T> {
     fn lex_preamble(cursor: &mut Cursor<'_>) -> bool {
         let mut starts_line = cursor.pos() == 0;
 
-        while let Some(b) = cursor.peek()
-            && (b == b'\n'
-                || Self::is_horizontal_whitespace(b)
-                || T::LINE_SEPARATOR_CHARS.contains(b))
-        {
+        while let Some(b) = cursor.peek() {
+            if !T::GAP_CHARS.contains(b) {
+                break;
+            }
             if b == b'\n' {
                 starts_line = true;
             } else if T::LINE_SEPARATOR_CHARS.contains(b) {
@@ -169,35 +168,29 @@ impl<T: GasTarget> Gas<T> {
     fn is_multibyte_comment(cursor: &Cursor<'_>) -> bool {
         if cursor
             .peek()
-            .is_none_or(|b| !T::MULTI_COMMENT_START.contains(b))
+            .is_some_and(|b| T::MULTI_COMMENT_START.contains(b))
         {
-            return false;
-        }
-
-        for pattern in T::MULTI_COMMENT_CHARS {
-            if cursor.starts_with(pattern) {
-                return true;
+            for pattern in T::MULTI_COMMENT_CHARS {
+                if cursor.starts_with(pattern) {
+                    return true;
+                }
             }
         }
-
         false
     }
 
     fn try_multibyte_comment(cursor: &mut Cursor<'_>) -> Option<source::Kind> {
         if cursor
             .peek()
-            .is_none_or(|b| !T::MULTI_COMMENT_START.contains(b))
+            .is_some_and(|b| T::MULTI_COMMENT_START.contains(b))
         {
-            return None;
-        }
-
-        for pattern in T::MULTI_COMMENT_CHARS {
-            if cursor.starts_with(pattern) {
-                cursor.eat_while(|b| b != b'\n');
-                return Some(source::Kind::Comment);
+            for pattern in T::MULTI_COMMENT_CHARS {
+                if cursor.starts_with(pattern) {
+                    cursor.eat_while(|b| b != b'\n');
+                    return Some(source::Kind::Comment);
+                }
             }
         }
-
         None
     }
 
@@ -244,7 +237,11 @@ impl<T: GasTarget> Gas<T> {
             i -= 1;
             end -= 1;
         }
-        if start == end { None } else { Some(start..end) }
+        if start == end {
+            None
+        } else {
+            Some(start..end)
+        }
     }
 
     fn try_symbol_kind(cursor: &mut Cursor<'_>) -> Option<source::Kind> {
@@ -332,7 +329,7 @@ impl<T: GasTarget> Gas<T> {
     }
 }
 
-impl<T: GasTarget> Dialect for Gas<T> {
+impl<'a, T: GasTarget<'a> + 'a> Dialect for Gas<'a, T> {
     fn next_item(cur: &mut Cursor<'_>) -> Option<Item> {
         let is_first = Self::lex_preamble(cur);
 

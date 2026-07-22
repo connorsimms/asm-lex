@@ -37,10 +37,6 @@ impl<'a> Cursor<'a> {
         self.pos = core::cmp::min(self.bytes.len(), self.pos.saturating_add(n));
     }
 
-    pub fn is_eof(&self) -> bool {
-        self.pos == self.bytes.len()
-    }
-
     pub fn at_line_start(&self) -> bool {
         self.pos() == 0 || self.seek(-1).is_some_and(|b| b == b'\n')
     }

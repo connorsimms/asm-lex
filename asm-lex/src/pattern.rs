@@ -11,7 +11,7 @@ impl ByteSet {
         Self { bytes: [0u64; 4] }
     }
 
-    pub const fn insert(&mut self, b: u8) {
+    pub fn insert(&mut self, b: u8) {
         let idx = (b >> 6) as usize;
         let val = b & 63;
         self.bytes[idx] |= 1 << val;
@@ -29,7 +29,9 @@ impl ByteSet {
         let mut i = 0usize;
         while i < input.len() {
             let b = input[i];
-            set.insert(b);
+            let idx = (b >> 6) as usize;
+            let val = b & 63;
+            set.bytes[idx] |= 1 << val;
             i += 1;
         }
         set
@@ -40,8 +42,10 @@ impl ByteSet {
         let mut set = Self::new();
         let mut i = 0usize;
         while i < input.len() {
-            if let Some(b) = input[i].first().copied() {
-                set.insert(b);
+            if let Some(&b) = input[i].first() {
+                let idx = (b >> 6) as usize;
+                let val = b & 63;
+                set.bytes[idx] |= 1 << val;
             }
             i += 1;
         }
@@ -55,7 +59,9 @@ impl ByteSet {
         assert!(start <= end, "Start must not be greater than end");
         let mut b = start;
         loop {
-            self.insert(b);
+            let idx = (b >> 6) as usize;
+            let val = b & 63;
+            self.bytes[idx] |= 1 << val;
             if b == end {
                 break;
             }
