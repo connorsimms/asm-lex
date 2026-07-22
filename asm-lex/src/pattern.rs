@@ -8,10 +8,6 @@ pub struct ByteSet {
 
 impl ByteSet {
     pub const fn new() -> Self {
-        Self::empty()
-    }
-
-    pub const fn empty() -> Self {
         Self { bytes: [0u64; 4] }
     }
 
@@ -29,7 +25,7 @@ impl ByteSet {
 
     #[must_use]
     pub const fn from_bytes(input: &[u8]) -> Self {
-        let mut set = Self::empty();
+        let mut set = Self::new();
         let mut i = 0usize;
         while i < input.len() {
             let b = input[i];
@@ -41,7 +37,7 @@ impl ByteSet {
 
     #[must_use]
     pub const fn from_first_bytes(input: &[&[u8]]) -> Self {
-        let mut set = Self::empty();
+        let mut set = Self::new();
         let mut i = 0usize;
         while i < input.len() {
             if let Some(b) = input[i].first().copied() {
@@ -79,9 +75,15 @@ impl ByteSet {
     }
 }
 
-impl<T: AsRef<[u8]>> From<T> for ByteSet {
-    fn from(input: T) -> Self {
-        Self::from_bytes(input.as_ref())
+impl From<&[u8]> for ByteSet {
+    fn from(bytes: &[u8]) -> Self {
+        Self::from_bytes(bytes)
+    }
+}
+
+impl<const N: usize> From<&[u8; N]> for ByteSet {
+    fn from(bytes: &[u8; N]) -> Self {
+        Self::from_bytes(bytes)
     }
 }
 
