@@ -18,9 +18,9 @@
           inherit system overlays;
         };
 
-        rustMsrv = pkgs.rust-bin.stable."1.70.0".default;
+        rustMsrv = pkgs.rust-bin.stable."1.70.0".minimal;
         rustLatest = pkgs.rust-bin.stable.latest.default;
-        rustBeta = pkgs.rust-bin.beta.latest.default;
+        rustBeta = pkgs.rust-bin.beta.latest.minimal;
       in
       {
         devShells.default = pkgs.mkShell {
@@ -34,7 +34,12 @@
             cargo-watch
             cargo-fuzz
 
+            rustLatest
             rustMsrv
+            rustBeta
+
+            (pkgs.writeShellScriptBin "cargo-msrv"
+              ''exec ${rustMsrv}/bin/cargo "$@"'')
             (pkgs.writeShellScriptBin "cargo-latest"
               ''exec ${rustLatest}/bin/cargo "$@"'')
             (pkgs.writeShellScriptBin "cargo-beta"
