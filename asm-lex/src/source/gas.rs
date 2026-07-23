@@ -9,7 +9,7 @@ use crate::source;
 use crate::source::{Dialect, Item};
 use crate::Span;
 
-pub trait GasTarget<'a> {
+pub trait GasTarget {
     // Anything from byte to newline is a comment, can be placed anywhere
     const COMMENT_CHARS: ByteSet;
 
@@ -17,7 +17,7 @@ pub trait GasTarget<'a> {
     const LINE_COMMENT_CHARS: ByteSet;
 
     // Anything from byte sequence to newline is a comment, can be placed anywhere
-    const MULTI_COMMENT_CHARS: &'a [&'a [u8]];
+    const MULTI_COMMENT_CHARS: &'static [&'static [u8]];
 
     // The starting bytes of multi-byte comment sequence
     const MULTI_COMMENT_START: ByteSet = ByteSet::from_first_bytes(Self::MULTI_COMMENT_CHARS);
@@ -38,11 +38,11 @@ pub trait GasTarget<'a> {
     const GAP_CHARS: ByteSet = ByteSet::from_bytes(b" \t\r\n").union(&Self::LINE_SEPARATOR_CHARS);
 }
 
-pub struct Gas<'a, T: GasTarget<'a>> {
-    _marker: core::marker::PhantomData<&'a T>,
+pub struct Gas<T: GasTarget> {
+    _marker: core::marker::PhantomData<T>,
 }
 
-impl<'a, T: GasTarget<'a> + 'a> Gas<'a, T> {
+impl<T: GasTarget> Gas<T> {
     fn is_horizontal_whitespace(b: u8) -> bool {
         matches!(b, b' ' | b'\t' | b'\r')
     }
@@ -326,7 +326,7 @@ impl<'a, T: GasTarget<'a> + 'a> Gas<'a, T> {
     }
 }
 
-impl<'a, T: GasTarget<'a> + 'a> Dialect for Gas<'a, T> {
+impl<T: GasTarget> Dialect for Gas<T> {
     fn next_item(cur: &mut Cursor<'_>) -> Option<Item> {
         let is_first = Self::lex_preamble(cur);
 

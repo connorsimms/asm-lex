@@ -1,7 +1,7 @@
 use asm_lex::source::gas::GasTarget;
 
 #[allow(dead_code)]
-fn assert_coverage<'a, T: GasTarget<'a> + 'a>(bytes: &[u8]) {
+fn assert_coverage<T: GasTarget>(bytes: &[u8]) {
     use asm_lex::cursor::Cursor;
     use asm_lex::source::gas::Gas;
     use asm_lex::source::Dialect;

@@ -6,10 +6,10 @@ use crate::cursor;
 use crate::source;
 
 struct TestTarget {}
-impl<'a> GasTarget<'a> for TestTarget {
+impl GasTarget for TestTarget {
     const COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"#");
     const LINE_COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"#/");
-    const MULTI_COMMENT_CHARS: &'a [&'a [u8]] = &[b"//"];
+    const MULTI_COMMENT_CHARS: &[&[u8]] = &[b"//"];
     const LINE_SEPARATOR_CHARS: ByteSet = ByteSet::from_bytes(b";");
     const SYMBOL_START_CHARS: ByteSet = ByteSet::from_bytes(b"._$")
         .with_range(b'a', b'z')
