@@ -1,3 +1,6 @@
+#[cfg(test)]
+pub mod tests;
+
 pub mod gas;
 
 use crate::Span;
@@ -38,8 +41,8 @@ impl Item {
         &self.kind
     }
 
-    pub fn span(&self) -> Span {
-        self.span.clone()
+    pub fn span(&self) -> &Span {
+        &self.span
     }
 
     pub fn starts_line(&self) -> bool {

@@ -12,7 +12,7 @@ fn assert_coverage<T: GasTarget>(bytes: &[u8]) {
     let mut i = 0;
 
     while let Some(item) = Gas::<T>::next_item(&mut cursor) {
-        let Span { start, end } = item.span();
+        let Span { start, end } = item.span().clone();
 
         assert!(start <= end);
         assert!(end <= bytes.len());
