@@ -42,29 +42,22 @@ fn test_eat_string() {
 
 #[test]
 fn test_lex_preamble() {
-    let mut cursor = Cursor::new(b"First Item");
-    assert!(Gas::<TestTarget>::lex_preamble(&mut cursor));
-    assert_eq!(cursor.pos(), 0);
+    let check = |bytes, s_pos, starts, e_pos| {
+        let mut cursor = Cursor::new(bytes);
+        cursor.advance(s_pos);
+        assert_eq!(Gas::<TestTarget>::lex_preamble(&mut cursor), starts);
+        assert_eq!(cursor.pos(), e_pos);
+    };
 
-    let mut cursor = Cursor::new(b"\nFirst Item");
-    assert!(Gas::<TestTarget>::lex_preamble(&mut cursor));
-    assert_eq!(cursor.pos(), 1);
-
-    let mut cursor = Cursor::new(b"\t ; \t \nFirst Item");
-    assert!(Gas::<TestTarget>::lex_preamble(&mut cursor));
-    assert_eq!(cursor.pos(), 7);
-
-    let mut cursor = Cursor::new(b"; \n;\t \n;;;\nFirst Item");
-    assert!(Gas::<TestTarget>::lex_preamble(&mut cursor));
-    assert_eq!(cursor.pos(), 11);
-
-    let mut cursor = Cursor::new(b";Not First Item");
-    assert!(!Gas::<TestTarget>::lex_preamble(&mut cursor));
-    assert_eq!(cursor.pos(), 1);
-
-    let mut cursor = Cursor::new(b"\t\n\n;Not First Item");
-    assert!(!Gas::<TestTarget>::lex_preamble(&mut cursor));
-    assert_eq!(cursor.pos(), 4);
+    check(b"", 0, true, 0);
+    check(b"Item", 0, true, 0);
+    check(b";Item", 0, true, 1);
+    check(b"\n\t Item", 0, true, 3);
+    check(b"Item1;Item2", 0, true, 0);
+    check(b"Item1;Item2", 5, false, 6);
+    check(b"Item1\nItem2", 5, true, 6);
+    check(b"Item1;\n;Item2", 5, true, 8);
+    check(b"Item1;;\nItem2", 5, true, 8);
 }
 
 #[test]

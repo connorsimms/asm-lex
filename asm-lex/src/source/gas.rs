@@ -34,6 +34,7 @@ pub trait GasTarget<'a> {
     // Whether (55$:) is a valid label or not
     const LOCAL_LABELS_DOLLAR: bool = false;
 
+    // Characters not included in the spans of Items
     const GAP_CHARS: ByteSet = ByteSet::from_bytes(b" \t\r\n").union(&Self::LINE_SEPARATOR_CHARS);
 }
 
@@ -46,8 +47,8 @@ impl<'a, T: GasTarget<'a> + 'a> Gas<'a, T> {
         matches!(b, b' ' | b'\t' | b'\r')
     }
 
-    // should handle escape quotes e.g. "abc \" def" "abc def\\"
-    // assumption: non-terminated strings go to eof
+    // Handles escape quotes.
+    // Non-terminated strings go to EOF.
     fn eat_string(cursor: &mut Cursor<'_>) -> Span {
         let start = cursor.pos();
         if cursor.eat(b'"') {
@@ -65,23 +66,19 @@ impl<'a, T: GasTarget<'a> + 'a> Gas<'a, T> {
         start..cursor.pos()
     }
 
-    // Eats leading whitespace, newlines, line separators
-    // Returns true if next item is the first on its physical line
+    // Eats leading gap chars.
+    // Returns true if next item is the first on its physical line.
     fn lex_preamble(cursor: &mut Cursor<'_>) -> bool {
         let mut starts_line = cursor.pos() == 0;
-
         while let Some(b) = cursor.peek() {
             if !T::GAP_CHARS.contains(b) {
                 break;
             }
             if b == b'\n' {
                 starts_line = true;
-            } else if T::LINE_SEPARATOR_CHARS.contains(b) {
-                starts_line = false;
             }
             cursor.bump();
         }
-
         starts_line
     }
 
