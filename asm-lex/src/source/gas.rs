@@ -35,7 +35,8 @@ pub trait GasTarget {
     const LOCAL_LABELS_DOLLAR: bool = false;
 
     // Characters not included in the spans of Items
-    const GAP_CHARS: ByteSet = ByteSet::from_bytes(b" \t\r\n").union(&Self::LINE_SEPARATOR_CHARS);
+    const GAP_CHARS: ByteSet =
+        ByteSet::from_bytes(b" \t\r\n").with_set(&Self::LINE_SEPARATOR_CHARS);
 }
 
 pub struct Gas<T: GasTarget> {
