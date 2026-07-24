@@ -306,10 +306,8 @@ fn bitor() {
     let set1 = ByteSet::from_bytes(bytes1);
     let set2 = ByteSet::from_bytes(bytes2);
     let set3 = set1 | set2;
-    let set4 = set1 | &set2;
     for b in 0u8..=255 {
         assert_eq!(set3.contains(b), bytes1.contains(&b) || bytes2.contains(&b));
-        assert_eq!(set4.contains(b), bytes1.contains(&b) || bytes2.contains(&b));
     }
 }
 
@@ -318,12 +316,9 @@ fn bitor_assign() {
     let bytes1 = b"ABC";
     let bytes2 = b"XYZ";
     let mut set1 = ByteSet::from_bytes(bytes1);
-    let mut set2 = ByteSet::from_bytes(bytes1);
-    let set3 = ByteSet::from_bytes(bytes2);
-    set1 |= set3;
-    set2 |= &set3;
+    let set2 = ByteSet::from_bytes(bytes2);
+    set1 |= set2;
     for b in 0u8..=255 {
         assert_eq!(set1.contains(b), bytes1.contains(&b) || bytes2.contains(&b));
-        assert_eq!(set2.contains(b), bytes1.contains(&b) || bytes2.contains(&b));
     }
 }

@@ -111,22 +111,8 @@ impl core::ops::BitOr<Self> for ByteSet {
     }
 }
 
-impl core::ops::BitOr<&Self> for ByteSet {
-    type Output = Self;
-
-    fn bitor(self, rhs: &Self) -> Self::Output {
-        Self::new().with_set(&self).with_set(rhs)
-    }
-}
-
 impl core::ops::BitOrAssign<Self> for ByteSet {
     fn bitor_assign(&mut self, rhs: Self) {
         self.union(&rhs);
-    }
-}
-
-impl core::ops::BitOrAssign<&Self> for ByteSet {
-    fn bitor_assign(&mut self, rhs: &Self) {
-        self.union(rhs);
     }
 }
