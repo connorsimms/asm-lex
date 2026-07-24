@@ -19,8 +19,9 @@
         };
 
         rustMsrv = pkgs.rust-bin.stable."1.70.0".minimal;
-        rustLatest = pkgs.rust-bin.stable.latest.default;
+        rustLatest = pkgs.rust-bin.stable.latest.default.override { extensions = [ "llvm-tools" "rust-analyzer" "rust-src" ]; };
         rustBeta = pkgs.rust-bin.beta.latest.minimal;
+        rustNightly = pkgs.rust-bin.beta.latest.minimal;
       in
       {
         devShells.default = pkgs.mkShell {
@@ -33,17 +34,23 @@
             llvmPackages.llvm
             cargo-watch
             cargo-fuzz
+            cargo-llvm-cov
+            cargo-mutants
+            cargo-audit
 
             rustLatest
             rustMsrv
             rustBeta
+            rustNightly
 
-            (pkgs.writeShellScriptBin "cargo-msrv"
-              ''exec ${rustMsrv}/bin/cargo "$@"'')
-            (pkgs.writeShellScriptBin "cargo-latest"
+            (pkgs.writeShellScriptBin "cargoLatest"
               ''exec ${rustLatest}/bin/cargo "$@"'')
-            (pkgs.writeShellScriptBin "cargo-beta"
+            (pkgs.writeShellScriptBin "cargoMsrv"
+              ''exec ${rustMsrv}/bin/cargo "$@"'')
+            (pkgs.writeShellScriptBin "cargoBeta"
               ''exec ${rustBeta}/bin/cargo "$@"'')
+            (pkgs.writeShellScriptBin "cargoNightly"
+              ''exec ${rustNightly}/bin/cargo "$@"'')
           ];
 
           buildInputs = with pkgs; [
