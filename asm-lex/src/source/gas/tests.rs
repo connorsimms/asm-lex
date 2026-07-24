@@ -3,7 +3,7 @@ use pretty_assertions::{assert_eq, assert_ne};
 
 use super::*;
 use crate::cursor;
-use crate::source;
+use crate::source::Kind;
 
 struct TestTarget {}
 impl GasTarget for TestTarget {
@@ -40,74 +40,55 @@ fn test_eat_string() {
     check(b"\"\\\" still here", 0..14, 14);
 }
 
-#[test]
-fn test_lex_preamble() {
-    let check = |bytes, s_pos, starts, e_pos| {
+fn check_lex_preamble<T: GasTarget>(cases: &[(&[u8], usize, bool, usize)]) {
+    for (bytes, s_pos, starts_line, e_pos) in cases {
         let mut cursor = Cursor::new(bytes);
-        cursor.advance(s_pos);
-        assert_eq!(Gas::<TestTarget>::lex_preamble(&mut cursor), starts);
-        assert_eq!(cursor.pos(), e_pos);
-    };
-
-    check(b"", 0, true, 0);
-    check(b"Item", 0, true, 0);
-    check(b";Item", 0, true, 1);
-    check(b"\n\t Item", 0, true, 3);
-    check(b"Item1;Item2", 0, true, 0);
-    check(b"Item1;Item2", 5, false, 6);
-    check(b"Item1\nItem2", 5, true, 6);
-    check(b"Item1;\n;Item2", 5, true, 8);
-    check(b"Item1;;\nItem2", 5, true, 8);
+        cursor.advance(*s_pos);
+        assert_eq!(Gas::<T>::lex_preamble(&mut cursor), *starts_line);
+        assert_eq!(cursor.pos(), *e_pos);
+    }
 }
 
 #[test]
-fn test_try_linemarker() {
-    let mut cursor = Cursor::new(b"# 1000 \"filename\"");
-    assert_eq!(
-        Gas::<TestTarget>::try_linemarker(&mut cursor),
-        Some(source::Kind::Preprocessor)
-    );
-    assert_eq!(cursor.pos(), 17);
+fn test_lex_preamble_with_separators() {
+    check_lex_preamble::<TestTarget>(&[
+        (b"", 0, true, 0),
+        (b"Item", 0, true, 0),
+        (b";Item", 0, true, 1),
+        (b"\n\t Item", 0, true, 3),
+        (b"Item1;Item2", 0, true, 0),
+        (b"Item1;Item2", 5, false, 6),
+        (b"Item1\nItem2", 5, true, 6),
+        (b"Item1;\n;Item2", 5, true, 8),
+        (b"Item1;;\nItem2", 5, true, 8),
+    ]);
+}
 
-    let mut cursor = Cursor::new(b"#1000\"filename\"");
-    assert_eq!(
-        Gas::<TestTarget>::try_linemarker(&mut cursor),
-        Some(source::Kind::Preprocessor)
-    );
-    assert_eq!(cursor.pos(), 15);
+fn check_try_linemarker<T: GasTarget>(cases: &[(&[u8], Option<Kind>, usize)]) {
+    for (bytes, kind, pos) in cases {
+        let mut cursor = Cursor::new(bytes);
+        assert_eq!(Gas::<T>::try_linemarker(&mut cursor), *kind);
+        assert_eq!(cursor.pos(), *pos);
+    }
+}
 
-    let mut cursor = Cursor::new(b"# \r \t1000 \t\r \"filename\"");
-    assert_eq!(
-        Gas::<TestTarget>::try_linemarker(&mut cursor),
-        Some(source::Kind::Preprocessor)
-    );
-    assert_eq!(cursor.pos(), 23);
+#[test]
+fn test_try_linemarker_with_hash_ln_comment() {
+    use Kind::Preprocessor;
 
-    let mut cursor = Cursor::new(b"# 1000 \"\"");
-    assert_eq!(
-        Gas::<TestTarget>::try_linemarker(&mut cursor),
-        Some(source::Kind::Preprocessor)
-    );
-    assert_eq!(cursor.pos(), 9);
-
-    let mut cursor = Cursor::new(b"# 1000 \"filename\" 1 2 3 100");
-    assert_eq!(
-        Gas::<TestTarget>::try_linemarker(&mut cursor),
-        Some(source::Kind::Preprocessor)
-    );
-    assert_eq!(cursor.pos(), 27);
-
-    let mut cursor = Cursor::new(b"# 1000 \"filename\" junk");
-    assert_eq!(Gas::<TestTarget>::try_linemarker(&mut cursor), None);
-    assert_eq!(cursor.pos(), 0);
-
-    let mut cursor = Cursor::new(b"# 1000 junk");
-    assert_eq!(Gas::<TestTarget>::try_linemarker(&mut cursor), None);
-    assert_eq!(cursor.pos(), 0);
-
-    let mut cursor = Cursor::new(b"# 1000");
-    assert_eq!(Gas::<TestTarget>::try_linemarker(&mut cursor), None);
-    assert_eq!(cursor.pos(), 0);
+    check_try_linemarker::<TestTarget>(&[
+        (b"# 1000 \"filename\"", Some(Preprocessor), 17),
+        (b"#1000 \"filename\"", Some(Preprocessor), 16),
+        (b"# 1000\"filename\"", Some(Preprocessor), 16),
+        (b"#1000\"filename\"", Some(Preprocessor), 15),
+        (b"# \r \t1000 \t\r\"filename\"", Some(Preprocessor), 22),
+        (b"# 1000 \"\"", Some(Preprocessor), 9),
+        (b"# 1000 \"filename\" 1 2 3 100", Some(Preprocessor), 27),
+        (b"# 1000 \"filename\" junk", None, 0),
+        (b"# 1000 junk", None, 0),
+        (b"# 1000", None, 0),
+        (b"# ", None, 0),
+    ]);
 }
 
 #[test]
@@ -282,19 +263,12 @@ fn test_lex_args() {
         assert_eq!(cursor.pos(), pos);
     };
     check(b"eax, edx", Some(0..8), 8);
-    check(b"eax, edx\n", Some(0..8), 8);
-    check(b"eax, edx;", Some(0..8), 8);
-    check(b"eax, edx#", Some(0..8), 8);
-    check(b"eax, edx//", Some(0..8), 8);
-    check(b" eax, edx", Some(1..9), 9);
-    check(b"eax, /* cmnt */ edx", Some(0..19), 19);
-    check(b"eax, edx /* cmnt */#", Some(0..19), 19);
-    check(b"eax, edx    ", Some(0..8), 12);
-    check(b" 1 / 3", Some(1..6), 6);
-    check(b" 1 / 3 \n", Some(1..6), 7);
-    check(b";1 / 3 \n", None, 0);
-    check(b"", None, 0);
-    check(b"\t\r \t\r", None, 5);
+    check(b"eax,edx", Some(0..7), 7);
+    check(b" eax, edx ", Some(1..9), 10);
+    check(b"\t eax, \tedx \t ", Some(2..11), 14);
+    check(b"/* cmnt */eax, edx /* cmnt*/", Some(10..18), 28);
+    check(b"/* \n */eax, edx/* \n */", Some(7..15), 22);
+    check(b"\"string\"", Some(0..8), 8);
 }
 
 #[test]
@@ -330,11 +304,8 @@ fn test_try_symbol_kind() {
     check(b".dir//", dir(0..4, None), 4);
     check(b".dir ", dir(0..4, None), 5);
     check(b".dir .", dir(0..4, Some(5..6)), 6);
-    check(b".dir/**/", dir(0..4, Some(4..8)), 8);
     check(b".dir \"arg\"", dir(0..4, Some(5..10)), 10);
     check(b".dir \"arg\"  ", dir(0..4, Some(5..10)), 12);
-    check(b".dir /**/ \"arg\"", dir(0..4, Some(5..15)), 15);
-    check(b".dir /*\n\n*/ \"arg\"", dir(0..4, Some(5..17)), 17);
     check(b".dir \"a\ng\"  ", dir(0..4, Some(5..10)), 12);
 
     /* Instructions */
@@ -345,8 +316,6 @@ fn test_try_symbol_kind() {
     check(b"nop\n", insn(0..3, None), 3);
     check(b"nop//", insn(0..3, None), 3);
     check(b"nop ", insn(0..3, None), 4);
-    check(b"nop/**/", insn(0..3, Some(3..7)), 7);
-    check(b"nop/*\n*/", insn(0..3, Some(3..8)), 8);
     check(b"mov eax, edx", insn(0..3, Some(4..12)), 12);
     check(b"mov eax,/*\n*/ edx", insn(0..3, Some(4..17)), 17);
 

@@ -193,47 +193,59 @@ impl<T: GasTarget> Gas<T> {
     }
 
     fn lex_args(cursor: &mut Cursor<'_>) -> Option<Span> {
-        let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
-        let start = cursor.pos();
         loop {
-            let _ = cursor.eat_while(|b| {
-                b != b'\n'
-                            && b != b'"' // string literals
-                            && b != b'/' // slash star comments
+            if !cursor
+                .eat_while(|b| Self::is_horizontal_whitespace(b))
+                .is_empty()
+            {
+                continue;
+            }
+            if Self::is_slash_star_comment(cursor) {
+                let _ = Self::try_slash_star_comment(cursor);
+                continue;
+            }
+            break;
+        }
+
+        let start = cursor.pos();
+        let mut end = start;
+
+        while let Some(b) = cursor.peek() {
+            match b {
+                b'\n' => {
+                    break;
+                }
+                _ if T::LINE_SEPARATOR_CHARS.contains(b) => {
+                    break;
+                }
+                _ if T::COMMENT_CHARS.contains(b) => {
+                    break;
+                }
+                _ if Self::is_multibyte_comment(cursor) => {
+                    break;
+                }
+                b'"' => {
+                    Self::eat_string(cursor);
+                    end = cursor.pos();
+                }
+                _ if Self::is_slash_star_comment(cursor) => {
+                    Self::try_slash_star_comment(cursor);
+                }
+                _ if Self::is_horizontal_whitespace(b) => {
+                    cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
+                }
+                _ => {
+                    cursor.bump();
+                    cursor.eat_while(|b| {
+                        !matches!(b, b'\n' | b'"' | b'/')
+                            && !Self::is_horizontal_whitespace(b)
                             && !T::LINE_SEPARATOR_CHARS.contains(b)
                             && !T::COMMENT_CHARS.contains(b)
                             && !T::MULTI_COMMENT_START.contains(b)
-            });
-
-            match cursor.peek() {
-                None | Some(b'\n') => break,
-                Some(b'"') => {
-                    let _ = Self::eat_string(cursor);
-                    continue;
+                    });
+                    end = cursor.pos();
                 }
-                Some(b'/') if Self::is_slash_star_comment(cursor) => {
-                    let _ = Self::try_slash_star_comment(cursor);
-                    continue;
-                }
-                Some(b) if T::LINE_SEPARATOR_CHARS.contains(b) => break,
-                Some(b) if T::COMMENT_CHARS.contains(b) => break,
-                _ if Self::is_multibyte_comment(cursor) => break,
-                _ => {}
             }
-
-            if cursor.bump().is_none() {
-                break;
-            }
-        }
-        let mut end = cursor.pos();
-        let mut i = -1isize;
-        while end > start
-            && cursor
-                .seek(i)
-                .is_some_and(|b| Self::is_horizontal_whitespace(b))
-        {
-            i -= 1;
-            end -= 1;
         }
         if start == end {
             None
