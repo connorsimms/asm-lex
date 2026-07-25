@@ -18,13 +18,16 @@ impl ByteSet {
     }
 
     #[must_use]
+    /// # Panics
+    /// Panics if a multibyte comment sequence is empty.
     pub const fn from_first_bytes(input: &[&[u8]]) -> Self {
         let mut set = Self::new();
         let mut i = 0usize;
         while i < input.len() {
-            if let Some(&b) = input[i].first() {
-                set = set.with_byte(b);
-            }
+            let &b = input[i]
+                .first()
+                .expect("Multibyte comment sequences should not be empty");
+            set = set.with_byte(b);
             i += 1;
         }
         set

@@ -70,6 +70,13 @@ fn from_first_bytes_empty() {
 }
 
 #[test]
+#[should_panic(expected = "sequences should not be empty")]
+fn from_first_bytes_invalid() {
+    let words: &[&[u8]] = &[b""];
+    let _set = ByteSet::from_first_bytes(words);
+}
+
+#[test]
 fn from_first_bytes_repeat() {
     const WORDS: &[&[u8]] = &[b"Apple", b"Banana", b"Broccoli"];
     const SET: ByteSet = ByteSet::from_first_bytes(WORDS);
@@ -80,7 +87,7 @@ fn from_first_bytes_repeat() {
 
 proptest! {
     #[test]
-    fn prop_from_first_bytes(bytes in vec(vec(any::<u8>(), 0..50), 0..300)) {
+    fn prop_from_first_bytes(bytes in vec(vec(any::<u8>(), 1..50), 0..300)) {
         let bytes: Vec<&[u8]> = bytes.iter().map(Vec::as_slice).collect();
         let set = ByteSet::from_first_bytes(&bytes);
         for b in 0u8..=255 {
