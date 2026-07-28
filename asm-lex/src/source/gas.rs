@@ -140,7 +140,7 @@ impl<T: GasTarget> Gas<T> {
                     let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
                 }
                 _ => {
-                    let _ = cursor.eat_while(|b| !Self::is_horizontal_whitespace(b));
+                    let _ = cursor.eat_while(|b| b != b'\n' && !Self::is_horizontal_whitespace(b));
                     line_comment_end = cursor.pos();
                 }
             }
@@ -166,7 +166,7 @@ impl<T: GasTarget> Gas<T> {
                     let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
                 }
                 _ => {
-                    let _ = cursor.eat_while(|b| !Self::is_horizontal_whitespace(b));
+                    let _ = cursor.eat_while(|b| b != b'\n' && !Self::is_horizontal_whitespace(b));
                     comment_end = cursor.pos();
                 }
             }
