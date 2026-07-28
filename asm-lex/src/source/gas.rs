@@ -193,22 +193,8 @@ impl<T: GasTarget> Gas<T> {
     }
 
     fn lex_args(cursor: &mut Cursor<'_>) -> Option<Span> {
-        loop {
-            if !cursor
-                .eat_while(|b| Self::is_horizontal_whitespace(b))
-                .is_empty()
-            {
-                continue;
-            }
-            if Self::is_slash_star_comment(cursor) {
-                let _ = Self::try_slash_star_comment(cursor);
-                continue;
-            }
-            break;
-        }
-
-        let start = cursor.pos();
-        let mut end = start;
+        let save = cursor.pos();
+        let mut content: Option<Span> = None;
 
         while let Some(b) = cursor.peek() {
             match b {
@@ -225,8 +211,9 @@ impl<T: GasTarget> Gas<T> {
                     break;
                 }
                 b'"' => {
+                    let span = content.get_or_insert(cursor.pos()..cursor.pos());
                     Self::eat_string(cursor);
-                    end = cursor.pos();
+                    span.end = cursor.pos();
                 }
                 _ if Self::is_slash_star_comment(cursor) => {
                     Self::try_slash_star_comment(cursor);
@@ -235,6 +222,7 @@ impl<T: GasTarget> Gas<T> {
                     cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
                 }
                 _ => {
+                    let span = content.get_or_insert(cursor.pos()..cursor.pos());
                     cursor.bump();
                     cursor.eat_while(|b| {
                         !matches!(b, b'\n' | b'"' | b'/')
@@ -243,14 +231,19 @@ impl<T: GasTarget> Gas<T> {
                             && !T::COMMENT_CHARS.contains(b)
                             && !T::MULTI_COMMENT_START.contains(b)
                     });
-                    end = cursor.pos();
+                    span.end = cursor.pos();
                 }
             }
         }
-        if start == end {
-            None
-        } else {
-            Some(start..end)
+        match content {
+            None => {
+                cursor.restore(save);
+                None
+            }
+            Some(span) => {
+                cursor.restore(span.end);
+                Some(span)
+            }
         }
     }
 
@@ -317,6 +310,7 @@ impl<T: GasTarget> Gas<T> {
                     });
                 }
 
+                cursor.restore(symbol_end);
                 let args = Self::lex_args(cursor);
 
                 if b == b'.' {
