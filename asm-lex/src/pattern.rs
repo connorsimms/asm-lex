@@ -22,11 +22,12 @@ impl ByteSet {
     /// Panics if a multibyte comment sequence is empty.
     pub const fn from_first_bytes(input: &[&[u8]]) -> Self {
         let mut set = Self::new();
-        let mut i = 0usize;
+        let mut i = 0;
         while i < input.len() {
-            let &b = input[i]
-                .first()
-                .expect("Multibyte comment sequences should not be empty");
+            let b = match input[i] {
+                [first, ..] => *first,
+                [] => panic!("Multibyte comment sequences should not be empty"),
+            };
             set = set.with_byte(b);
             i += 1;
         }
