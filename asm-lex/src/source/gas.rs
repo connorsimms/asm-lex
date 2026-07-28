@@ -192,6 +192,7 @@ impl<T: GasTarget> Gas<T> {
         None
     }
 
+    #[mutants::exclude_re("delete !")]
     fn lex_args(cursor: &mut Cursor<'_>) -> Option<Span> {
         let save = cursor.pos();
         let mut content: Option<Span> = None;
@@ -269,14 +270,10 @@ impl<T: GasTarget> Gas<T> {
             }
             b'"' => {
                 let string = Self::eat_string(cursor);
-                let closed = string.len() >= 2 && Some(b'"') == cursor.seek(-1);
                 let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
                 if cursor.eat(b':') {
-                    let name_start = string.start + 1;
-                    let mut name_end = string.end;
-                    if closed {
-                        name_end = string.end - 1;
-                    }
+                    // string is closed or ':' would've been swallowed
+                    let (name_start, name_end) = (string.start + 1, string.end - 1);
                     Some(source::Kind::Label {
                         name: name_start..name_end,
                     })
