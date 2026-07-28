@@ -147,6 +147,8 @@ fn try_linemarker_with_hash_ln_comment() {
         (b"# 100\"file\"", Some(Preprocessor), 11),
         (b"#100\"file\"", Some(Preprocessor), 10),
         (b"#\t100\t\"file\"", Some(Preprocessor), 12),
+        (b"# 100 \"file\"  ", Some(Preprocessor), 12),
+        (b"# 100 \"file\"\t ", Some(Preprocessor), 12),
         // inner string
         (b"# 100 \"\"", Some(Preprocessor), 8),
         (b"# 100 \"\n\"", Some(Preprocessor), 9),
@@ -155,11 +157,6 @@ fn try_linemarker_with_hash_ln_comment() {
         (b"# 100 \"filename\" 1", Some(Preprocessor), 18),
         (b"# 100 \"filename\"1", Some(Preprocessor), 17),
         (b"# 100 \"filename\" 1 2 3", Some(Preprocessor), 22),
-        // invalid
-        (b"# junk 100 \"filename\"", None, 0),
-        (b"# 100 junk \"filename\"", None, 0),
-        (b"# 100 \"filename\" junk", None, 0),
-        (b"# 100 \"filename\" 1 junk", None, 0),
     ];
     check_try_linemarker::<X86_64LinuxElf>(cases);
     check_try_linemarker::<Aarch64LinuxElf>(cases);
@@ -186,6 +183,27 @@ fn try_linemarker_no_hash_ln_comment() {
         (b"# 1000 \"filename\"", None, 0),
     ];
     check_try_linemarker::<NoHashLineComment>(cases);
+}
+
+#[test]
+fn try_linemarker_invalid() {
+    let cases: &[(&[u8], Option<Kind>, usize)] = &[
+        (b"", None, 0),
+        (b"#", None, 0),
+        (b"# 100", None, 0),
+        (b"# junk", None, 0),
+        (b"# junk 100 \"filename\"", None, 0),
+        (b"# 100 junk \"filename\"", None, 0),
+        (b"# 100 \"filename\" junk", None, 0),
+        (b"# 100 \"filename\" 1 junk", None, 0),
+    ];
+    check_try_linemarker::<X86_64LinuxElf>(cases);
+    check_try_linemarker::<Aarch64LinuxElf>(cases);
+    check_try_linemarker::<ArmLinuxEabi>(cases);
+    check_try_linemarker::<Riscv64Elf>(cases);
+    check_try_linemarker::<NoHashLineComment>(cases);
+    check_try_linemarker::<NonSlashMultibyte>(cases);
+    check_try_linemarker::<NoLineSeparator>(cases);
 }
 
 fn check_is_line_comment<T: GasTarget>(cases: &[(&[u8], bool)]) {
@@ -239,9 +257,17 @@ fn try_line_comment_with_hash_ln_comment() {
     use Kind::Comment;
     let cases: &[(&[u8], Option<Kind>, usize)] = &[
         (b"# ...", Some(Comment), 5),
+        (b"# ... ", Some(Comment), 5),
+        (b"# ...\t ", Some(Comment), 5),
         (b"## ...", Some(Comment), 6),
+        (b"## ... ", Some(Comment), 6),
+        (b"## ... \t", Some(Comment), 6),
         (b"### ...", Some(Comment), 7),
+        (b"### ... ", Some(Comment), 7),
+        (b"### ... \t", Some(Comment), 7),
         (b"#...", Some(Comment), 4),
+        (b"#... ", Some(Comment), 4),
+        (b"#... \t", Some(Comment), 4),
         (b"nop", None, 0),
         (b"nop#", None, 0),
     ];
@@ -324,9 +350,17 @@ fn try_comment_with_hash_comment() {
     use Kind::Comment;
     let cases: &[(&[u8], Option<Kind>, usize)] = &[
         (b"#...", Some(Comment), 4),
+        (b"#... ", Some(Comment), 4),
+        (b"#... \t", Some(Comment), 4),
         (b"# ...", Some(Comment), 5),
+        (b"# ... ", Some(Comment), 5),
+        (b"# ... \t", Some(Comment), 5),
         (b"## ...", Some(Comment), 6),
+        (b"## ... ", Some(Comment), 6),
+        (b"## ... \t", Some(Comment), 6),
         (b"### ...", Some(Comment), 7),
+        (b"### ... ", Some(Comment), 7),
+        (b"### ... \t", Some(Comment), 7),
         (b"@...", None, 0),
         (b"@ ...", None, 0),
         (b"@@ ...", None, 0),
@@ -615,7 +649,6 @@ fn check_try_symbol_kind<T: GasTarget>(cases: &[(&[u8], Option<Kind>, usize)]) {
 #[test]
 fn try_symbol_kind_label() {
     use Kind::Label;
-    use Kind::Unknown;
     let cases: &[(&[u8], Option<Kind>, usize)] = &[
         (b"Label:", Some(Label { name: 0..5 }), 6),
         // whitespace
@@ -634,11 +667,6 @@ fn try_symbol_kind_label() {
         (b"\"\":", Some(Label { name: 1..1 }), 3),
         (b"\"\n\":", Some(Label { name: 1..2 }), 4),
         (b"\"\t\":", Some(Label { name: 1..2 }), 4),
-        // invalid
-        (b"123Label:", Some(Unknown), 9),
-        (b"123.:", Some(Unknown), 5),
-        (b"123_:", Some(Unknown), 5),
-        (b"^^^:", Some(Unknown), 4),
     ];
     check_try_symbol_kind::<X86_64LinuxElf>(&cases);
     check_try_symbol_kind::<Aarch64LinuxElf>(&cases);
@@ -870,6 +898,25 @@ fn try_symbol_kind_definition() {
         (b"Sym == Val", defn(0..3, 4..6, Some(7..10)), 10),
         // real examples
         (b". = .+4", defn(0..1, 2..3, Some(4..7)), 7),
+    ];
+    check_try_symbol_kind::<X86_64LinuxElf>(&cases);
+    check_try_symbol_kind::<Aarch64LinuxElf>(&cases);
+    check_try_symbol_kind::<ArmLinuxEabi>(&cases);
+    check_try_symbol_kind::<Riscv64Elf>(&cases);
+    check_try_symbol_kind::<NoHashLineComment>(&cases);
+    check_try_symbol_kind::<NonSlashMultibyte>(&cases);
+    check_try_symbol_kind::<NoLineSeparator>(&cases);
+}
+
+#[test]
+fn try_symbol_kind_unknown() {
+    use Kind::Unknown;
+    let cases: &[(&[u8], Option<Kind>, usize)] = &[
+        (b"123Label:", Some(Unknown), 9),
+        (b"123.:", Some(Unknown), 5),
+        (b"123_:", Some(Unknown), 5),
+        (b"\"...\"", Some(Unknown), 5),
+        (b"^^^:", Some(Unknown), 4),
     ];
     check_try_symbol_kind::<X86_64LinuxElf>(&cases);
     check_try_symbol_kind::<Aarch64LinuxElf>(&cases);

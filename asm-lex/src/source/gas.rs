@@ -107,11 +107,14 @@ impl<T: GasTarget> Gas<T> {
             cursor.restore(save);
             return None;
         }
+        let mut linemarker_end = cursor.pos();
         let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
         while !cursor.eat_while(|b| b.is_ascii_digit()).is_empty() {
+            linemarker_end = cursor.pos();
             let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
         }
         if matches!(cursor.peek(), Some(b'\n') | None) {
+            cursor.restore(linemarker_end);
             Some(source::Kind::Preprocessor)
         } else {
             cursor.restore(save);
@@ -126,12 +129,24 @@ impl<T: GasTarget> Gas<T> {
     }
 
     fn try_line_comment(cursor: &mut Cursor<'_>) -> Option<source::Kind> {
-        if Self::is_line_comment(cursor) {
-            let _trivia = cursor.eat_while(|b| b != b'\n');
-            Some(source::Kind::Comment)
-        } else {
-            None
+        if !Self::is_line_comment(cursor) {
+            return None;
         }
+        let mut line_comment_end = cursor.pos();
+        while let Some(b) = cursor.peek() {
+            match b {
+                b'\n' => break,
+                b if Self::is_horizontal_whitespace(b) => {
+                    let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
+                }
+                _ => {
+                    let _ = cursor.eat_while(|b| !Self::is_horizontal_whitespace(b));
+                    line_comment_end = cursor.pos();
+                }
+            }
+        }
+        cursor.restore(line_comment_end);
+        Some(source::Kind::Comment)
     }
 
     fn is_comment(cursor: &Cursor<'_>) -> bool {
@@ -142,7 +157,21 @@ impl<T: GasTarget> Gas<T> {
         if !Self::is_comment(cursor) {
             return None;
         }
-        let _trivia = cursor.eat_while(|b| b != b'\n');
+
+        let mut comment_end = cursor.pos();
+        while let Some(b) = cursor.peek() {
+            match b {
+                b'\n' => break,
+                b if Self::is_horizontal_whitespace(b) => {
+                    let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
+                }
+                _ => {
+                    let _ = cursor.eat_while(|b| !Self::is_horizontal_whitespace(b));
+                    comment_end = cursor.pos();
+                }
+            }
+        }
+        cursor.restore(comment_end);
         Some(source::Kind::Comment)
     }
 
