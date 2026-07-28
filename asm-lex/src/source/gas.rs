@@ -192,7 +192,6 @@ impl<T: GasTarget> Gas<T> {
         None
     }
 
-    #[mutants::exclude_re("delete !")]
     fn lex_args(cursor: &mut Cursor<'_>) -> Option<Span> {
         let save = cursor.pos();
         let mut content: Option<Span> = None;
