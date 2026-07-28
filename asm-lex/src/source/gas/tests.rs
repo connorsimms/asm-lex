@@ -507,7 +507,7 @@ fn check_lex_args<T: GasTarget>(cases: &[(&[u8], Option<Span>, usize)]) {
 }
 
 #[test]
-fn lex_args_slash_star_comments() {
+fn lex_args() {
     let cases: &[(&[u8], Option<Span>, usize)] = &[
         // no args
         (b"", None, 0),
@@ -638,6 +638,7 @@ fn try_symbol_kind_label() {
         (b"123Label:", Some(Unknown), 9),
         (b"123.:", Some(Unknown), 5),
         (b"123_:", Some(Unknown), 5),
+        (b"^^^:", Some(Unknown), 4),
     ];
     check_try_symbol_kind::<X86_64LinuxElf>(&cases);
     check_try_symbol_kind::<Aarch64LinuxElf>(&cases);
@@ -716,6 +717,7 @@ fn try_symbol_kind_directive() {
         (b". \"a\"", directive(0..1, Some(2..5)), 5),
         (b". \"\n\"", directive(0..1, Some(2..5)), 5),
         (b".dir \"a\"", directive(0..4, Some(5..8)), 8),
+        (b".dir \"a", directive(0..4, Some(5..7)), 7),
         (b".dir \"\n\"", directive(0..4, Some(5..8)), 8),
         // arg + trivia
         (b".dir arg ", directive(0..4, Some(5..8)), 8),
