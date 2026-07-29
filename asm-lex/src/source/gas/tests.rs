@@ -71,13 +71,13 @@ fn test_eat_string() {
         (b"\"\\\\\"...", 0..4, 4),
         (b"\"@#/**///\"...", 0..10, 10),
     ];
-    check_eat_string::<X86_64LinuxElf>(&cases);
-    check_eat_string::<Aarch64LinuxElf>(&cases);
-    check_eat_string::<ArmLinuxEabi>(&cases);
-    check_eat_string::<Riscv64Elf>(&cases);
-    check_eat_string::<NoHashLineComment>(&cases);
-    check_eat_string::<NonSlashMultibyte>(&cases);
-    check_eat_string::<NoLineSeparator>(&cases);
+    check_eat_string::<X86_64LinuxElf>(cases);
+    check_eat_string::<Aarch64LinuxElf>(cases);
+    check_eat_string::<ArmLinuxEabi>(cases);
+    check_eat_string::<Riscv64Elf>(cases);
+    check_eat_string::<NoHashLineComment>(cases);
+    check_eat_string::<NonSlashMultibyte>(cases);
+    check_eat_string::<NoLineSeparator>(cases);
 }
 
 fn check_lex_preamble<T: GasTarget>(cases: &[(&[u8], usize, bool, usize)]) {
@@ -420,13 +420,13 @@ fn is_slash_star_comment() {
         (b"#/* ... */", false),
         (b"@/* ... */", false),
     ];
-    check_is_slash_star_comment::<X86_64LinuxElf>(&cases);
-    check_is_slash_star_comment::<Aarch64LinuxElf>(&cases);
-    check_is_slash_star_comment::<ArmLinuxEabi>(&cases);
-    check_is_slash_star_comment::<Riscv64Elf>(&cases);
-    check_is_slash_star_comment::<NoHashLineComment>(&cases);
-    check_is_slash_star_comment::<NonSlashMultibyte>(&cases);
-    check_is_slash_star_comment::<NoLineSeparator>(&cases);
+    check_is_slash_star_comment::<X86_64LinuxElf>(cases);
+    check_is_slash_star_comment::<Aarch64LinuxElf>(cases);
+    check_is_slash_star_comment::<ArmLinuxEabi>(cases);
+    check_is_slash_star_comment::<Riscv64Elf>(cases);
+    check_is_slash_star_comment::<NoHashLineComment>(cases);
+    check_is_slash_star_comment::<NonSlashMultibyte>(cases);
+    check_is_slash_star_comment::<NoLineSeparator>(cases);
 }
 
 fn check_try_slash_star_comment<T: GasTarget>(cases: &[(&[u8], Option<Kind>, usize)]) {
@@ -450,13 +450,13 @@ fn try_slash_star_comment() {
         (b"#/* ... */", None, 0),
         (b"@/* ... */", None, 0),
     ];
-    check_try_slash_star_comment::<X86_64LinuxElf>(&cases);
-    check_try_slash_star_comment::<Aarch64LinuxElf>(&cases);
-    check_try_slash_star_comment::<ArmLinuxEabi>(&cases);
-    check_try_slash_star_comment::<Riscv64Elf>(&cases);
-    check_try_slash_star_comment::<NoHashLineComment>(&cases);
-    check_try_slash_star_comment::<NonSlashMultibyte>(&cases);
-    check_try_slash_star_comment::<NoLineSeparator>(&cases);
+    check_try_slash_star_comment::<X86_64LinuxElf>(cases);
+    check_try_slash_star_comment::<Aarch64LinuxElf>(cases);
+    check_try_slash_star_comment::<ArmLinuxEabi>(cases);
+    check_try_slash_star_comment::<Riscv64Elf>(cases);
+    check_try_slash_star_comment::<NoHashLineComment>(cases);
+    check_try_slash_star_comment::<NonSlashMultibyte>(cases);
+    check_try_slash_star_comment::<NoLineSeparator>(cases);
 }
 
 fn check_is_multibyte_comment<T: GasTarget>(cases: &[(&[u8], bool)]) {
@@ -478,8 +478,8 @@ fn is_slash_multibyte_comment() {
         (b"nop ...", false),
         (b"nop//...", false),
     ];
-    check_is_multibyte_comment::<Aarch64LinuxElf>(&cases);
-    check_is_multibyte_comment::<ArmLinuxEabi>(&cases);
+    check_is_multibyte_comment::<Aarch64LinuxElf>(cases);
+    check_is_multibyte_comment::<ArmLinuxEabi>(cases);
 }
 
 #[test]
@@ -495,7 +495,7 @@ fn is_nonslash_multibyte_comment() {
         (b"nop ...", false),
         (b"nop@@...", false),
     ];
-    check_is_multibyte_comment::<NonSlashMultibyte>(&cases);
+    check_is_multibyte_comment::<NonSlashMultibyte>(cases);
 }
 
 fn check_try_multibyte_comment<T: GasTarget>(cases: &[(&[u8], Option<Kind>, usize)]) {
@@ -519,8 +519,8 @@ fn try_slash_multibyte_comment() {
         (b"nop ...", None, 0),
         (b"nop//...", None, 0),
     ];
-    check_try_multibyte_comment::<Aarch64LinuxElf>(&cases);
-    check_try_multibyte_comment::<ArmLinuxEabi>(&cases);
+    check_try_multibyte_comment::<Aarch64LinuxElf>(cases);
+    check_try_multibyte_comment::<ArmLinuxEabi>(cases);
 }
 
 #[test]
@@ -537,7 +537,7 @@ fn try_nonslash_multibyte_comment() {
         (b"nop ...", None, 0),
         (b"nop@@...", None, 0),
     ];
-    check_try_multibyte_comment::<NonSlashMultibyte>(&cases);
+    check_try_multibyte_comment::<NonSlashMultibyte>(cases);
 }
 
 fn check_lex_args<T: GasTarget>(cases: &[(&[u8], Option<Span>, usize)]) {
@@ -569,13 +569,13 @@ fn lex_args() {
         (b"arg/*...*/arg", Some(0..13), 13),
         (b"arg/*...*/arg/*...*/", Some(0..13), 13),
     ];
-    check_lex_args::<X86_64LinuxElf>(&cases);
-    check_lex_args::<Aarch64LinuxElf>(&cases);
-    check_lex_args::<ArmLinuxEabi>(&cases);
-    check_lex_args::<Riscv64Elf>(&cases);
-    check_lex_args::<NoHashLineComment>(&cases);
-    check_lex_args::<NonSlashMultibyte>(&cases);
-    check_lex_args::<NoLineSeparator>(&cases);
+    check_lex_args::<X86_64LinuxElf>(cases);
+    check_lex_args::<Aarch64LinuxElf>(cases);
+    check_lex_args::<ArmLinuxEabi>(cases);
+    check_lex_args::<Riscv64Elf>(cases);
+    check_lex_args::<NoHashLineComment>(cases);
+    check_lex_args::<NonSlashMultibyte>(cases);
+    check_lex_args::<NoLineSeparator>(cases);
 }
 
 #[test]
@@ -589,11 +589,11 @@ fn lex_args_hash_comments() {
         (b"arg arg#", Some(0..7), 7),
         (b"arg/*.#.*/arg #", Some(0..13), 13),
     ];
-    check_lex_args::<X86_64LinuxElf>(&cases);
-    check_lex_args::<Riscv64Elf>(&cases);
-    check_lex_args::<NoHashLineComment>(&cases);
-    check_lex_args::<NonSlashMultibyte>(&cases);
-    check_lex_args::<NoLineSeparator>(&cases);
+    check_lex_args::<X86_64LinuxElf>(cases);
+    check_lex_args::<Riscv64Elf>(cases);
+    check_lex_args::<NoHashLineComment>(cases);
+    check_lex_args::<NonSlashMultibyte>(cases);
+    check_lex_args::<NoLineSeparator>(cases);
 }
 
 #[test]
@@ -607,12 +607,12 @@ fn lex_args_line_separators() {
         (b"arg arg;", Some(0..7), 7),
         (b"arg/*.;.*/arg ;", Some(0..13), 13),
     ];
-    check_lex_args::<X86_64LinuxElf>(&cases);
-    check_lex_args::<Aarch64LinuxElf>(&cases);
-    check_lex_args::<ArmLinuxEabi>(&cases);
-    check_lex_args::<Riscv64Elf>(&cases);
-    check_lex_args::<NoHashLineComment>(&cases);
-    check_lex_args::<NonSlashMultibyte>(&cases);
+    check_lex_args::<X86_64LinuxElf>(cases);
+    check_lex_args::<Aarch64LinuxElf>(cases);
+    check_lex_args::<ArmLinuxEabi>(cases);
+    check_lex_args::<Riscv64Elf>(cases);
+    check_lex_args::<NoHashLineComment>(cases);
+    check_lex_args::<NonSlashMultibyte>(cases);
 }
 
 #[test]
@@ -626,8 +626,8 @@ fn lex_args_slash_multibyte_comment() {
         (b"arg arg//", Some(0..7), 7),
         (b"arg/*.//.*/arg //", Some(0..14), 14),
     ];
-    check_lex_args::<Aarch64LinuxElf>(&cases);
-    check_lex_args::<ArmLinuxEabi>(&cases);
+    check_lex_args::<Aarch64LinuxElf>(cases);
+    check_lex_args::<ArmLinuxEabi>(cases);
 }
 
 #[test]
@@ -642,8 +642,8 @@ fn lex_args_hash_line_comment() {
         (b"arg arg#", Some(0..8), 8),
         (b"arg/*.#.*/arg #", Some(0..15), 15),
     ];
-    check_lex_args::<Aarch64LinuxElf>(&cases);
-    check_lex_args::<ArmLinuxEabi>(&cases);
+    check_lex_args::<Aarch64LinuxElf>(cases);
+    check_lex_args::<ArmLinuxEabi>(cases);
 }
 
 fn check_try_symbol_kind<T: GasTarget>(cases: &[(&[u8], Option<Kind>, usize)]) {
@@ -676,13 +676,13 @@ fn try_symbol_kind_label() {
         (b"\"\n\":", Some(Label { name: 1..2 }), 4),
         (b"\"\t\":", Some(Label { name: 1..2 }), 4),
     ];
-    check_try_symbol_kind::<X86_64LinuxElf>(&cases);
-    check_try_symbol_kind::<Aarch64LinuxElf>(&cases);
-    check_try_symbol_kind::<ArmLinuxEabi>(&cases);
-    check_try_symbol_kind::<Riscv64Elf>(&cases);
-    check_try_symbol_kind::<NoHashLineComment>(&cases);
-    check_try_symbol_kind::<NonSlashMultibyte>(&cases);
-    check_try_symbol_kind::<NoLineSeparator>(&cases);
+    check_try_symbol_kind::<X86_64LinuxElf>(cases);
+    check_try_symbol_kind::<Aarch64LinuxElf>(cases);
+    check_try_symbol_kind::<ArmLinuxEabi>(cases);
+    check_try_symbol_kind::<Riscv64Elf>(cases);
+    check_try_symbol_kind::<NoHashLineComment>(cases);
+    check_try_symbol_kind::<NonSlashMultibyte>(cases);
+    check_try_symbol_kind::<NoLineSeparator>(cases);
 }
 
 // It seems nearly all targets use local labels, but
@@ -695,13 +695,13 @@ fn try_symbol_kind_local_label() {
         (b"22:", Some(Label { name: 0..2 }), 3),
         (b"333:", Some(Label { name: 0..3 }), 4),
     ];
-    check_try_symbol_kind::<X86_64LinuxElf>(&cases);
-    check_try_symbol_kind::<Aarch64LinuxElf>(&cases);
-    check_try_symbol_kind::<ArmLinuxEabi>(&cases);
-    check_try_symbol_kind::<Riscv64Elf>(&cases);
-    check_try_symbol_kind::<NoHashLineComment>(&cases);
-    check_try_symbol_kind::<NonSlashMultibyte>(&cases);
-    check_try_symbol_kind::<NoLineSeparator>(&cases);
+    check_try_symbol_kind::<X86_64LinuxElf>(cases);
+    check_try_symbol_kind::<Aarch64LinuxElf>(cases);
+    check_try_symbol_kind::<ArmLinuxEabi>(cases);
+    check_try_symbol_kind::<Riscv64Elf>(cases);
+    check_try_symbol_kind::<NoHashLineComment>(cases);
+    check_try_symbol_kind::<NonSlashMultibyte>(cases);
+    check_try_symbol_kind::<NoLineSeparator>(cases);
 }
 
 #[test]
@@ -712,7 +712,7 @@ fn try_symbol_kind_local_dollar_label() {
         (b"22$:", Some(Label { name: 0..3 }), 4),
         (b"333$:", Some(Label { name: 0..4 }), 5),
     ];
-    check_try_symbol_kind::<Riscv64Elf>(&cases);
+    check_try_symbol_kind::<Riscv64Elf>(cases);
 }
 
 #[test]
@@ -723,12 +723,12 @@ fn try_symbol_kind_no_local_dollar_label() {
         (b"22$:", Some(Unknown), 4),
         (b"333$:", Some(Unknown), 5),
     ];
-    check_try_symbol_kind::<X86_64LinuxElf>(&cases);
-    check_try_symbol_kind::<Aarch64LinuxElf>(&cases);
-    check_try_symbol_kind::<ArmLinuxEabi>(&cases);
-    check_try_symbol_kind::<NoHashLineComment>(&cases);
-    check_try_symbol_kind::<NonSlashMultibyte>(&cases);
-    check_try_symbol_kind::<NoLineSeparator>(&cases);
+    check_try_symbol_kind::<X86_64LinuxElf>(cases);
+    check_try_symbol_kind::<Aarch64LinuxElf>(cases);
+    check_try_symbol_kind::<ArmLinuxEabi>(cases);
+    check_try_symbol_kind::<NoHashLineComment>(cases);
+    check_try_symbol_kind::<NonSlashMultibyte>(cases);
+    check_try_symbol_kind::<NoLineSeparator>(cases);
 }
 
 #[test]
@@ -773,13 +773,13 @@ fn try_symbol_kind_directive() {
         (b".dir a a /*...*/", directive(0..4, Some(5..8)), 8),
         (b".dir a /*...*/a/*...*/", directive(0..4, Some(5..15)), 15),
     ];
-    check_try_symbol_kind::<X86_64LinuxElf>(&cases);
-    check_try_symbol_kind::<Aarch64LinuxElf>(&cases);
-    check_try_symbol_kind::<ArmLinuxEabi>(&cases);
-    check_try_symbol_kind::<Riscv64Elf>(&cases);
-    check_try_symbol_kind::<NoHashLineComment>(&cases);
-    check_try_symbol_kind::<NonSlashMultibyte>(&cases);
-    check_try_symbol_kind::<NoLineSeparator>(&cases);
+    check_try_symbol_kind::<X86_64LinuxElf>(cases);
+    check_try_symbol_kind::<Aarch64LinuxElf>(cases);
+    check_try_symbol_kind::<ArmLinuxEabi>(cases);
+    check_try_symbol_kind::<Riscv64Elf>(cases);
+    check_try_symbol_kind::<NoHashLineComment>(cases);
+    check_try_symbol_kind::<NonSlashMultibyte>(cases);
+    check_try_symbol_kind::<NoLineSeparator>(cases);
 }
 
 #[test]
@@ -795,12 +795,12 @@ fn try_symbol_kind_directive_line_separator() {
         (b".dir a a ;", directive(0..4, Some(5..8)), 8),
         (b".dir a a ; ...", directive(0..4, Some(5..8)), 8),
     ];
-    check_try_symbol_kind::<X86_64LinuxElf>(&cases);
-    check_try_symbol_kind::<Aarch64LinuxElf>(&cases);
-    check_try_symbol_kind::<ArmLinuxEabi>(&cases);
-    check_try_symbol_kind::<Riscv64Elf>(&cases);
-    check_try_symbol_kind::<NoHashLineComment>(&cases);
-    check_try_symbol_kind::<NonSlashMultibyte>(&cases);
+    check_try_symbol_kind::<X86_64LinuxElf>(cases);
+    check_try_symbol_kind::<Aarch64LinuxElf>(cases);
+    check_try_symbol_kind::<ArmLinuxEabi>(cases);
+    check_try_symbol_kind::<Riscv64Elf>(cases);
+    check_try_symbol_kind::<NoHashLineComment>(cases);
+    check_try_symbol_kind::<NonSlashMultibyte>(cases);
 }
 
 #[test]
@@ -816,11 +816,11 @@ fn try_symbol_kind_directive_hash_comment() {
         (b".dir a a #", directive(0..4, Some(5..8)), 8),
         (b".dir a a # ...", directive(0..4, Some(5..8)), 8),
     ];
-    check_try_symbol_kind::<X86_64LinuxElf>(&cases);
-    check_try_symbol_kind::<Riscv64Elf>(&cases);
-    check_try_symbol_kind::<NoHashLineComment>(&cases);
-    check_try_symbol_kind::<NonSlashMultibyte>(&cases);
-    check_try_symbol_kind::<NoLineSeparator>(&cases);
+    check_try_symbol_kind::<X86_64LinuxElf>(cases);
+    check_try_symbol_kind::<Riscv64Elf>(cases);
+    check_try_symbol_kind::<NoHashLineComment>(cases);
+    check_try_symbol_kind::<NonSlashMultibyte>(cases);
+    check_try_symbol_kind::<NoLineSeparator>(cases);
 }
 
 #[test]
@@ -836,8 +836,8 @@ fn try_symbol_kind_directive_slash_multibyte_comment() {
         (b".dir a a //", directive(0..4, Some(5..8)), 8),
         (b".dir a a // ...", directive(0..4, Some(5..8)), 8),
     ];
-    check_try_symbol_kind::<Aarch64LinuxElf>(&cases);
-    check_try_symbol_kind::<ArmLinuxEabi>(&cases);
+    check_try_symbol_kind::<Aarch64LinuxElf>(cases);
+    check_try_symbol_kind::<ArmLinuxEabi>(cases);
 }
 
 #[test]
@@ -874,13 +874,13 @@ fn try_symbol_kind_instruction() {
         // real examples
         (b"movb $'A', %al", insn(0..4, Some(5..14)), 14),
     ];
-    check_try_symbol_kind::<X86_64LinuxElf>(&cases);
-    check_try_symbol_kind::<Aarch64LinuxElf>(&cases);
-    check_try_symbol_kind::<ArmLinuxEabi>(&cases);
-    check_try_symbol_kind::<Riscv64Elf>(&cases);
-    check_try_symbol_kind::<NoHashLineComment>(&cases);
-    check_try_symbol_kind::<NonSlashMultibyte>(&cases);
-    check_try_symbol_kind::<NoLineSeparator>(&cases);
+    check_try_symbol_kind::<X86_64LinuxElf>(cases);
+    check_try_symbol_kind::<Aarch64LinuxElf>(cases);
+    check_try_symbol_kind::<ArmLinuxEabi>(cases);
+    check_try_symbol_kind::<Riscv64Elf>(cases);
+    check_try_symbol_kind::<NoHashLineComment>(cases);
+    check_try_symbol_kind::<NonSlashMultibyte>(cases);
+    check_try_symbol_kind::<NoLineSeparator>(cases);
 }
 
 #[test]
@@ -907,13 +907,13 @@ fn try_symbol_kind_definition() {
         // real examples
         (b". = .+4", defn(0..1, 2..3, Some(4..7)), 7),
     ];
-    check_try_symbol_kind::<X86_64LinuxElf>(&cases);
-    check_try_symbol_kind::<Aarch64LinuxElf>(&cases);
-    check_try_symbol_kind::<ArmLinuxEabi>(&cases);
-    check_try_symbol_kind::<Riscv64Elf>(&cases);
-    check_try_symbol_kind::<NoHashLineComment>(&cases);
-    check_try_symbol_kind::<NonSlashMultibyte>(&cases);
-    check_try_symbol_kind::<NoLineSeparator>(&cases);
+    check_try_symbol_kind::<X86_64LinuxElf>(cases);
+    check_try_symbol_kind::<Aarch64LinuxElf>(cases);
+    check_try_symbol_kind::<ArmLinuxEabi>(cases);
+    check_try_symbol_kind::<Riscv64Elf>(cases);
+    check_try_symbol_kind::<NoHashLineComment>(cases);
+    check_try_symbol_kind::<NonSlashMultibyte>(cases);
+    check_try_symbol_kind::<NoLineSeparator>(cases);
 }
 
 #[test]
@@ -926,11 +926,11 @@ fn try_symbol_kind_unknown() {
         (b"\"...\"", Some(Unknown), 5),
         (b"^^^:", Some(Unknown), 4),
     ];
-    check_try_symbol_kind::<X86_64LinuxElf>(&cases);
-    check_try_symbol_kind::<Aarch64LinuxElf>(&cases);
-    check_try_symbol_kind::<ArmLinuxEabi>(&cases);
-    check_try_symbol_kind::<Riscv64Elf>(&cases);
-    check_try_symbol_kind::<NoHashLineComment>(&cases);
-    check_try_symbol_kind::<NonSlashMultibyte>(&cases);
-    check_try_symbol_kind::<NoLineSeparator>(&cases);
+    check_try_symbol_kind::<X86_64LinuxElf>(cases);
+    check_try_symbol_kind::<Aarch64LinuxElf>(cases);
+    check_try_symbol_kind::<ArmLinuxEabi>(cases);
+    check_try_symbol_kind::<Riscv64Elf>(cases);
+    check_try_symbol_kind::<NoHashLineComment>(cases);
+    check_try_symbol_kind::<NonSlashMultibyte>(cases);
+    check_try_symbol_kind::<NoLineSeparator>(cases);
 }
