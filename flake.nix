@@ -37,6 +37,7 @@
             cargo-llvm-cov
             cargo-mutants
             cargo-audit
+            cargo-insta
 
             rustLatest
             rustMsrv
