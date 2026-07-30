@@ -1,5 +1,4 @@
 use asm_lex::pattern::ByteSet;
-pub use asm_lex::source::gas::targets::*;
 use asm_lex::source::gas::GasTarget;
 
 #[allow(unused)]
