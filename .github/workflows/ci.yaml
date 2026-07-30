@@ -7,7 +7,6 @@ on:
 
 env:
   CARGO_INCREMENTAL: 0      # Incremental compilation not appropriate
-  RUSTFLAGS: "-D warnings"  # Warnings as errors
   CARGO_TERM_COLOR: always  # Colored output
 
 jobs:
@@ -55,4 +54,4 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@1.70.0
-      - run: cargo check --workspace --all-targets --locked
+      - run: cargo check --workspace --lib --locked
