@@ -1,5 +1,5 @@
 {
-  description = "Development environment for asm-tools";
+  description = "Development environment for asm-parse";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -18,10 +18,26 @@
           inherit system overlays;
         };
 
-        rustMsrv = pkgs.rust-bin.stable."1.70.0".minimal;
         rustLatest = pkgs.rust-bin.stable.latest.default.override { extensions = [ "llvm-tools" "rust-analyzer" "rust-src" ]; };
+        rustMsrv = pkgs.rust-bin.stable."1.70.0".minimal;
         rustBeta = pkgs.rust-bin.beta.latest.minimal;
-        rustNightly = pkgs.rust-bin.beta.latest.minimal;
+        rustNightly = pkgs.rust-bin.selectLatestNightlyWith (toolchain: toolchain.minimal);
+
+        nightlyRustPlatform = pkgs.makeRustPlatform {
+          cargo = rustNightly;
+          rustc = rustNightly;
+        };
+
+        cargo-minimal-versions = nightlyRustPlatform.buildRustPackage rec {
+          pname = "cargo-minimal-versions";
+          version = "0.1.37";
+          src = pkgs.fetchCrate {
+            inherit pname version;
+            hash = "sha256-J1dA3tfTqiFKGdMfZwgXvAoPY8QcWrP1kkD+HTbMwPI=";
+          };
+          cargoHash = "sha256-J9eInyzbvVRz9SDEKaJoLCNe2zNym2t/unPh0CrZxzQ=";
+          doCheck = false;
+        };
       in
       {
         devShells.default = pkgs.mkShell {
@@ -32,12 +48,12 @@
             gcc
             clang
             llvmPackages.llvm
-            cargo-watch
-            cargo-fuzz
+
             cargo-llvm-cov
             cargo-mutants
-            cargo-audit
             cargo-insta
+            cargo-hack
+            cargo-minimal-versions
 
             rustLatest
             rustMsrv
