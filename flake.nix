@@ -45,9 +45,16 @@
             pkg-config
             cmake
             gnumake
-            gcc
-            clang
             llvmPackages.llvm
+
+            pkgsCross.gnu64.buildPackages.gcc
+            pkgsCross.gnu64.buildPackages.binutils
+            pkgsCross.aarch64-multiplatform.buildPackages.gcc
+            pkgsCross.aarch64-multiplatform.buildPackages.binutils
+            pkgsCross.armv7l-hf-multiplatform.buildPackages.gcc
+            pkgsCross.armv7l-hf-multiplatform.buildPackages.binutils
+            pkgsCross.riscv64.buildPackages.gcc
+            pkgsCross.riscv64.buildPackages.binutils
 
             cargo-llvm-cov
             cargo-mutants

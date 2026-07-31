@@ -2,8 +2,8 @@ use super::*;
 
 pub struct X86_64LinuxElf;
 pub struct Aarch64LinuxElf;
-pub struct ArmLinuxEabi;
-pub struct Riscv64Elf;
+pub struct ArmLinuxEabiElf;
+pub struct Riscv64LinuxElf;
 
 impl GasTarget for X86_64LinuxElf {
     const COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"#");
@@ -33,7 +33,7 @@ impl GasTarget for Aarch64LinuxElf {
         .with_range(b'0', b'9');
 }
 
-impl GasTarget for ArmLinuxEabi {
+impl GasTarget for ArmLinuxEabiElf {
     const COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"@");
     const LINE_COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"#");
     const MULTI_COMMENT_CHARS: &'static [&'static [u8]] = &[b"//"];
@@ -47,7 +47,7 @@ impl GasTarget for ArmLinuxEabi {
         .with_range(b'0', b'9');
 }
 
-impl GasTarget for Riscv64Elf {
+impl GasTarget for Riscv64LinuxElf {
     const COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"#");
     const LINE_COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"#");
     const MULTI_COMMENT_CHARS: &'static [&'static [u8]] = &[];
