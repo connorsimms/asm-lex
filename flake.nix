@@ -40,50 +40,51 @@
         };
       in
       {
-        devShells.default = pkgs.mkShell {
-          nativeBuildInputs = with pkgs; [
-            pkg-config
-            cmake
-            gnumake
-            llvmPackages.llvm
+        devShells = {
+          default = pkgs.mkShell {
+            nativeBuildInputs = with pkgs; [
+              cargo-llvm-cov
+              cargo-mutants
+              cargo-insta
+              cargo-hack
+              cargo-minimal-versions
 
-            pkgsCross.gnu64.buildPackages.gcc
-            pkgsCross.gnu64.buildPackages.binutils
-            pkgsCross.aarch64-multiplatform.buildPackages.gcc
-            pkgsCross.aarch64-multiplatform.buildPackages.binutils
-            pkgsCross.armv7l-hf-multiplatform.buildPackages.gcc
-            pkgsCross.armv7l-hf-multiplatform.buildPackages.binutils
-            pkgsCross.riscv64.buildPackages.gcc
-            pkgsCross.riscv64.buildPackages.binutils
+              rustLatest
+              rustMsrv
+              rustBeta
+              rustNightly
 
-            cargo-llvm-cov
-            cargo-mutants
-            cargo-insta
-            cargo-hack
-            cargo-minimal-versions
+              (pkgs.writeShellScriptBin "cargoLatest"
+                ''exec ${rustLatest}/bin/cargo "$@"'')
+              (pkgs.writeShellScriptBin "cargoMsrv"
+                ''exec ${rustMsrv}/bin/cargo "$@"'')
+              (pkgs.writeShellScriptBin "cargoBeta"
+                ''exec ${rustBeta}/bin/cargo "$@"'')
+              (pkgs.writeShellScriptBin "cargoNightly"
+                ''exec ${rustNightly}/bin/cargo "$@"'')
+            ];
 
-            rustLatest
-            rustMsrv
-            rustBeta
-            rustNightly
+            buildInputs = with pkgs; [
+              libiconv
+            ];
 
-            (pkgs.writeShellScriptBin "cargoLatest"
-              ''exec ${rustLatest}/bin/cargo "$@"'')
-            (pkgs.writeShellScriptBin "cargoMsrv"
-              ''exec ${rustMsrv}/bin/cargo "$@"'')
-            (pkgs.writeShellScriptBin "cargoBeta"
-              ''exec ${rustBeta}/bin/cargo "$@"'')
-            (pkgs.writeShellScriptBin "cargoNightly"
-              ''exec ${rustNightly}/bin/cargo "$@"'')
-          ];
+            shellHook = ''
+              export RUST_BACKTRACE=1
+            '';
+          };
 
-          buildInputs = with pkgs; [
-            libiconv
-          ];
-
-          shellHook = ''
-            export RUST_BACKTRACE=1
-          '';
+          cross = pkgs.mkShell {
+            nativeBuildInputs = with pkgs; [
+              pkgsCross.gnu64.buildPackages.gcc
+              pkgsCross.gnu64.buildPackages.binutils
+              pkgsCross.aarch64-multiplatform.buildPackages.gcc
+              pkgsCross.aarch64-multiplatform.buildPackages.binutils
+              pkgsCross.armv7l-hf-multiplatform.buildPackages.gcc
+              pkgsCross.armv7l-hf-multiplatform.buildPackages.binutils
+              pkgsCross.riscv64.buildPackages.gcc
+              pkgsCross.riscv64.buildPackages.binutils
+            ];
+          };
         };
       }
     );
