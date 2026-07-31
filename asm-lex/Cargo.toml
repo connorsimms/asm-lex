@@ -8,7 +8,7 @@ rust-version.workspace = true
 
 [dev-dependencies]
 pretty_assertions = "1.0.0"
-proptest = "1.0.0"
+proptest = { version = "1.11.0", features = ["std"] }
 insta = { version = "1.48.0", features = ["glob"] }
 
 [profile.dev.package]
