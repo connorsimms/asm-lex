@@ -1,14 +1,18 @@
+#![allow(clippy::incompatible_msrv)]
+
 mod common;
 
-use asm_lex::source::gas::targets::*;
-use asm_lex::source::gas::Gas;
-use asm_lex::source::Item;
+use asm_lex::source::{
+    gas::{targets::*, Gas},
+    Item,
+};
 use common::invariants;
 use common::*;
-use proptest::collection::vec;
-use proptest::prelude::*;
-use proptest::test_runner::Config;
-use proptest::test_runner::FileFailurePersistence;
+use proptest::{
+    collection::vec,
+    prelude::*,
+    test_runner::{Config, FileFailurePersistence},
+};
 
 fn config_file(file: &'static str) -> Config {
     Config {

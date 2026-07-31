@@ -1,13 +1,13 @@
+#![allow(dead_code)]
+#![allow(clippy::incompatible_msrv)]
+
 use super::*;
-use asm_lex::source::Item;
-use asm_lex::source::Kind;
-use asm_lex::Span;
+use asm_lex::{source::Item, Span};
 
 // Item spans are
 // - monotonically increasing,
 // - nonempty (start < end)
 // - contained in 0..bytes.len()
-#[allow(unused)]
 pub fn monotonic_valid_spans(bytes: &[u8], items: &[Item]) {
     let mut prev_end = 0usize;
     for item in items {
@@ -32,7 +32,6 @@ pub fn monotonic_valid_spans(bytes: &[u8], items: &[Item]) {
 
 // An Item starts a physical line iff it is the first item in the file OR
 // there is at least one newline between itself and the previous Item.
-#[allow(unused)]
 pub fn starts_line_iff_newline(bytes: &[u8], items: &[Item]) {
     let mut prev_end = 0usize;
     for item in items {
@@ -57,9 +56,7 @@ pub fn starts_line_iff_newline(bytes: &[u8], items: &[Item]) {
 }
 
 // An Item's span must completely contain the subspans of its member `kind`
-#[allow(unused)]
 pub fn containing_item_spans(items: &[Item]) {
-    use Kind::*;
     for item in items {
         let span = item.span();
         for_each_span(item.kind(), |field, sub_span| {

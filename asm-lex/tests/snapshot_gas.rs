@@ -1,7 +1,8 @@
+#![allow(clippy::incompatible_msrv)]
+
 mod common;
 
-use asm_lex::source::gas::targets::*;
-use asm_lex::source::gas::*;
+use asm_lex::source::gas::{targets::*, *};
 use common::snapshot;
 
 #[test]
