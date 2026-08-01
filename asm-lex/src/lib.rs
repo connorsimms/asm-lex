@@ -2,7 +2,8 @@
 #![allow(clippy::must_use_candidate)]
 
 pub mod cursor;
-mod listing;
+pub mod lexer;
+pub mod listing;
 pub mod pattern;
 pub mod source;
 

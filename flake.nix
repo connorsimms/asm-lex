@@ -48,6 +48,7 @@
               cargo-insta
               cargo-hack
               cargo-minimal-versions
+              cargo-flamegraph
 
               rustLatest
               rustMsrv
@@ -83,6 +84,7 @@
               pkgsCross.armv7l-hf-multiplatform.buildPackages.binutils
               pkgsCross.riscv64.buildPackages.gcc
               pkgsCross.riscv64.buildPackages.binutils
+              csmith
             ];
           };
         };
