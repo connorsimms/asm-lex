@@ -53,7 +53,7 @@ proptest! {
 
 #[test]
 fn from_first_bytes() {
-    const WORDS: &[&[u8]] = &[b"Apple", b"Banana", b"Cherry"];
+    const WORDS: &[[u8; 2]] = &[*b"AA", *b"BB", *b"CC"];
     const SET: ByteSet = ByteSet::from_first_bytes(WORDS);
     for b in 0u8..=255 {
         assert_eq!(SET.contains(b), (b'A'..=b'C').contains(&b));
@@ -62,7 +62,7 @@ fn from_first_bytes() {
 
 #[test]
 fn from_first_bytes_empty() {
-    const WORDS: &[&[u8]] = &[];
+    const WORDS: &[[u8; 2]] = &[];
     const SET: ByteSet = ByteSet::from_first_bytes(WORDS);
     for b in 0u8..=255 {
         assert!(!SET.contains(b));
@@ -70,15 +70,8 @@ fn from_first_bytes_empty() {
 }
 
 #[test]
-#[should_panic(expected = "sequences should not be empty")]
-fn from_first_bytes_invalid() {
-    let words: &[&[u8]] = &[b""];
-    let _set = ByteSet::from_first_bytes(words);
-}
-
-#[test]
 fn from_first_bytes_repeat() {
-    const WORDS: &[&[u8]] = &[b"Apple", b"Banana", b"Broccoli"];
+    const WORDS: &[[u8; 2]] = &[*b"AA", *b"BB", *b"BB"];
     const SET: ByteSet = ByteSet::from_first_bytes(WORDS);
     for b in 0u8..=255 {
         assert_eq!(SET.contains(b), (b'A'..=b'B').contains(&b));
@@ -87,8 +80,7 @@ fn from_first_bytes_repeat() {
 
 proptest! {
     #[test]
-    fn prop_from_first_bytes(bytes in vec(vec(any::<u8>(), 1..50), 0..300)) {
-        let bytes: Vec<&[u8]> = bytes.iter().map(Vec::as_slice).collect();
+    fn prop_from_first_bytes(bytes in vec(proptest::array::uniform2(1u8..), 0..300)) {
         let set = ByteSet::from_first_bytes(&bytes);
         for b in 0u8..=255 {
             prop_assert_eq!(set.contains(b), bytes.iter().any(|w| w.first() == Some(&b)));

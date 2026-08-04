@@ -17,7 +17,7 @@ pub trait GasTarget {
     const LINE_COMMENT_CHARS: ByteSet;
 
     // Anything from byte sequence to newline is a comment, can be placed anywhere
-    const MULTI_COMMENT_CHARS: &'static [&'static [u8]];
+    const MULTI_COMMENT_CHARS: &'static [[u8; 2]];
 
     // The starting bytes of multi-byte comment sequence
     const MULTI_COMMENT_START: ByteSet = ByteSet::from_first_bytes(Self::MULTI_COMMENT_CHARS);
@@ -198,7 +198,7 @@ impl<T: GasTarget> Gas<T> {
             .is_some_and(|b| T::MULTI_COMMENT_START.contains(b))
         {
             for pattern in T::MULTI_COMMENT_CHARS {
-                if cursor.starts_with(pattern) {
+                if cursor.peek() == Some(pattern[0]) && cursor.seek(1) == Some(pattern[1]) {
                     return true;
                 }
             }
@@ -212,7 +212,7 @@ impl<T: GasTarget> Gas<T> {
             .is_some_and(|b| T::MULTI_COMMENT_START.contains(b))
         {
             for pattern in T::MULTI_COMMENT_CHARS {
-                if cursor.starts_with(pattern) {
+                if cursor.peek() == Some(pattern[0]) && cursor.seek(1) == Some(pattern[1]) {
                     cursor.eat_while(|b| b != b'\n');
                     return Some(source::Kind::Comment);
                 }

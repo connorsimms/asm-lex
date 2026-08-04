@@ -8,7 +8,7 @@ pub struct Riscv64LinuxElf;
 impl GasTarget for X86_64LinuxElf {
     const COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"#");
     const LINE_COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"#/");
-    const MULTI_COMMENT_CHARS: &'static [&'static [u8]] = &[];
+    const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[];
     const LINE_SEPARATOR_CHARS: ByteSet = ByteSet::from_bytes(b";");
     const SYMBOL_START_CHARS: ByteSet = ByteSet::from_bytes(b"._$")
         .with_range(b'a', b'z')
@@ -22,7 +22,7 @@ impl GasTarget for X86_64LinuxElf {
 impl GasTarget for Aarch64LinuxElf {
     const COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"");
     const LINE_COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"#");
-    const MULTI_COMMENT_CHARS: &'static [&'static [u8]] = &[b"//"];
+    const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[*b"//"];
     const LINE_SEPARATOR_CHARS: ByteSet = ByteSet::from_bytes(b";");
     const SYMBOL_START_CHARS: ByteSet = ByteSet::from_bytes(b"._$")
         .with_range(b'a', b'z')
@@ -36,7 +36,7 @@ impl GasTarget for Aarch64LinuxElf {
 impl GasTarget for ArmLinuxEabiElf {
     const COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"@");
     const LINE_COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"#");
-    const MULTI_COMMENT_CHARS: &'static [&'static [u8]] = &[b"//"];
+    const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[*b"//"];
     const LINE_SEPARATOR_CHARS: ByteSet = ByteSet::from_bytes(b";");
     const SYMBOL_START_CHARS: ByteSet = ByteSet::from_bytes(b"._$")
         .with_range(b'a', b'z')
@@ -50,7 +50,7 @@ impl GasTarget for ArmLinuxEabiElf {
 impl GasTarget for Riscv64LinuxElf {
     const COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"#");
     const LINE_COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"#");
-    const MULTI_COMMENT_CHARS: &'static [&'static [u8]] = &[];
+    const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[];
     const LINE_SEPARATOR_CHARS: ByteSet = ByteSet::from_bytes(b";");
     const SYMBOL_START_CHARS: ByteSet = ByteSet::from_bytes(b"._$")
         .with_range(b'a', b'z')

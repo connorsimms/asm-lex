@@ -12,7 +12,7 @@ struct NoLineSeparator {}
 impl GasTarget for NoHashLineComment {
     const COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"#");
     const LINE_COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"/");
-    const MULTI_COMMENT_CHARS: &'static [&'static [u8]] = &[];
+    const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[];
     const LINE_SEPARATOR_CHARS: ByteSet = ByteSet::from_bytes(b";");
     const SYMBOL_START_CHARS: ByteSet = ByteSet::from_bytes(b"._$")
         .with_range(b'a', b'z')
@@ -26,7 +26,7 @@ impl GasTarget for NoHashLineComment {
 impl GasTarget for NonSlashMultibyte {
     const COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"#");
     const LINE_COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"#/");
-    const MULTI_COMMENT_CHARS: &'static [&'static [u8]] = &[b"@@"];
+    const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[*b"@@"];
     const LINE_SEPARATOR_CHARS: ByteSet = ByteSet::from_bytes(b";");
     const SYMBOL_START_CHARS: ByteSet = ByteSet::from_bytes(b"._$")
         .with_range(b'a', b'z')
@@ -40,7 +40,7 @@ impl GasTarget for NonSlashMultibyte {
 impl GasTarget for NoLineSeparator {
     const COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"#");
     const LINE_COMMENT_CHARS: ByteSet = ByteSet::from_bytes(b"#/");
-    const MULTI_COMMENT_CHARS: &'static [&'static [u8]] = &[];
+    const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[];
     const LINE_SEPARATOR_CHARS: ByteSet = ByteSet::from_bytes(b"");
     const SYMBOL_START_CHARS: ByteSet = ByteSet::from_bytes(b"._$")
         .with_range(b'a', b'z')
