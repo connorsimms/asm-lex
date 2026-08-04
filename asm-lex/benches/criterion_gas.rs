@@ -3,7 +3,9 @@ use asm_lex::source::{
     gas::{targets::*, Gas},
     Dialect, Item,
 };
-use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
+use criterion::{
+    criterion_group, criterion_main, BenchmarkId, Criterion, SamplingMode, Throughput,
+};
 use std::hint::black_box;
 
 fn path(file: &str) -> std::path::PathBuf {
@@ -15,7 +17,9 @@ fn path(file: &str) -> std::path::PathBuf {
 fn bench_target<D: Dialect>(c: &mut Criterion, group_name: &str, dir: &str) {
     let mut group = c.benchmark_group(group_name);
 
-    for file in ["small.s", "medium.s", "large.s"].iter() {
+    group.sampling_mode(SamplingMode::Flat);
+
+    for file in ["small.s", "medium.s", "large.s"] {
         let bytes = std::fs::read(path(&format!("{dir}/{file}"))).unwrap();
         group.throughput(Throughput::Bytes(bytes.len() as u64));
         group.bench_with_input(BenchmarkId::new("lex_drain", file), &bytes, |b, bytes| {

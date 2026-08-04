@@ -13,5 +13,5 @@ insta = { version = "1.48.0", features = ["glob"] }
 criterion = "0.8.2"
 
 [[bench]]
-name = "benchmark_gas"
+name = "criterion_gas"
 harness = false
