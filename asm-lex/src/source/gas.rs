@@ -4,7 +4,7 @@ mod tests;
 pub mod targets;
 
 use crate::cursor::Cursor;
-use crate::pattern::ByteSet;
+use crate::pattern::{ByteSet, Class, ClassTable};
 use crate::source;
 use crate::source::{Dialect, Item};
 use crate::Span;
@@ -34,9 +34,8 @@ pub trait GasTarget {
     // Whether (55$:) is a valid label or not
     const LOCAL_LABELS_DOLLAR: bool = false;
 
-    // Characters not included in the spans of Items
-    const GAP_CHARS: ByteSet =
-        ByteSet::from_bytes(b" \t\r\n").with_set(&Self::LINE_SEPARATOR_CHARS);
+    // Whether linemarker preprocessor directives are enabled
+    const HAS_LINEMARKERS: bool = Self::LINE_COMMENT_CHARS.contains(b'#');
 }
 
 pub struct Gas<T: GasTarget> {
@@ -44,6 +43,55 @@ pub struct Gas<T: GasTarget> {
 }
 
 impl<T: GasTarget> Gas<T> {
+    // Characters not included in the spans of Items
+    const GAP_CHARS: ByteSet = ByteSet::from_bytes(b" \t\r\n").with_set(&T::LINE_SEPARATOR_CHARS);
+
+    // Horizontal whitespace characters
+    const HSPACE_CHARS: ByteSet = ByteSet::from_bytes(b" \t\r");
+
+    // Characters at which lex_args may be interrupted
+    const ARG_STOP_CHARS: ByteSet = ByteSet::from_bytes(b"\n\"/")
+        .with_set(&Self::HSPACE_CHARS) // will be removed
+        .with_set(&T::LINE_SEPARATOR_CHARS)
+        .with_set(&T::COMMENT_CHARS)
+        .with_set(&T::MULTI_COMMENT_START);
+
+    // Characters that comments or linemarkers start with
+    const TRIVIA_START_CHARS: ByteSet = ByteSet::from_bytes(b"/")
+        .with_set(&T::MULTI_COMMENT_START)
+        .with_set(&T::LINE_COMMENT_CHARS)
+        .with_set(&T::COMMENT_CHARS);
+
+    const COMMENT: Class = Class::with_bit(0);
+    const LINE_COMMENT: Class = Class::with_bit(1);
+    const MULTI_START: Class = Class::with_bit(2);
+    const LINE_SEPARATOR: Class = Class::with_bit(3);
+    const SYMBOL_START: Class = Class::with_bit(4);
+    const SYMBOL_CONTINUE: Class = Class::with_bit(5);
+    const GAP: Class = Class::with_bit(6);
+    const HSPACE: Class = Class::with_bit(7);
+    const ARG_STOP: Class = Class::with_bit(8);
+    const TRIVIA_START: Class = Class::with_bit(9);
+
+    const TABLE: ClassTable = ClassTable::build(&[
+        (Self::COMMENT, &T::COMMENT_CHARS),
+        (Self::LINE_COMMENT, &T::LINE_COMMENT_CHARS),
+        (Self::MULTI_START, &T::MULTI_COMMENT_START),
+        (Self::LINE_SEPARATOR, &T::LINE_SEPARATOR_CHARS),
+        (Self::SYMBOL_START, &T::SYMBOL_START_CHARS),
+        (Self::SYMBOL_CONTINUE, &T::SYMBOL_CONTINUE_CHARS),
+        (Self::GAP, &Self::GAP_CHARS),
+        (Self::HSPACE, &Self::HSPACE_CHARS),
+        (Self::ARG_STOP, &Self::ARG_STOP_CHARS),
+        (Self::TRIVIA_START, &Self::TRIVIA_START_CHARS),
+    ]);
+
+    #[inline]
+    fn class(b: u8) -> Class {
+        Self::TABLE.classify(b)
+    }
+
+    #[inline]
     fn is_horizontal_whitespace(b: u8) -> bool {
         matches!(b, b' ' | b'\t' | b'\r')
     }
@@ -72,7 +120,7 @@ impl<T: GasTarget> Gas<T> {
     fn lex_preamble(cursor: &mut Cursor<'_>) -> bool {
         let mut starts_line = cursor.pos() == 0;
         while let Some(b) = cursor.peek() {
-            if !T::GAP_CHARS.contains(b) {
+            if !Self::class(b).contains(Self::GAP) {
                 break;
             }
             if b == b'\n' {
@@ -93,7 +141,7 @@ impl<T: GasTarget> Gas<T> {
             cursor.restore(save);
             return None;
         }
-        if !T::LINE_COMMENT_CHARS.contains(b'#') {
+        if !T::HAS_LINEMARKERS {
             cursor.restore(save);
             return None;
         }
@@ -125,7 +173,7 @@ impl<T: GasTarget> Gas<T> {
     fn is_line_comment(cursor: &Cursor<'_>) -> bool {
         cursor
             .peek()
-            .is_some_and(|b| T::LINE_COMMENT_CHARS.contains(b))
+            .is_some_and(|b| Self::class(b).contains(Self::LINE_COMMENT))
     }
 
     fn try_line_comment(cursor: &mut Cursor<'_>) -> Option<source::Kind> {
@@ -150,7 +198,9 @@ impl<T: GasTarget> Gas<T> {
     }
 
     fn is_comment(cursor: &Cursor<'_>) -> bool {
-        cursor.peek().is_some_and(|b| T::COMMENT_CHARS.contains(b))
+        cursor
+            .peek()
+            .is_some_and(|b| Self::class(b).contains(Self::COMMENT))
     }
 
     fn try_comment(cursor: &mut Cursor<'_>) -> Option<source::Kind> {
@@ -195,7 +245,7 @@ impl<T: GasTarget> Gas<T> {
     fn is_multibyte_comment(cursor: &Cursor<'_>) -> bool {
         if cursor
             .peek()
-            .is_some_and(|b| T::MULTI_COMMENT_START.contains(b))
+            .is_some_and(|b| Self::class(b).contains(Self::MULTI_START))
         {
             for pattern in T::MULTI_COMMENT_CHARS {
                 if cursor.peek() == Some(pattern[0]) && cursor.seek(1) == Some(pattern[1]) {
@@ -209,7 +259,7 @@ impl<T: GasTarget> Gas<T> {
     fn try_multibyte_comment(cursor: &mut Cursor<'_>) -> Option<source::Kind> {
         if cursor
             .peek()
-            .is_some_and(|b| T::MULTI_COMMENT_START.contains(b))
+            .is_some_and(|b| Self::class(b).contains(Self::MULTI_START))
         {
             for pattern in T::MULTI_COMMENT_CHARS {
                 if cursor.peek() == Some(pattern[0]) && cursor.seek(1) == Some(pattern[1]) {
@@ -230,10 +280,10 @@ impl<T: GasTarget> Gas<T> {
                 b'\n' => {
                     break;
                 }
-                _ if T::LINE_SEPARATOR_CHARS.contains(b) => {
+                _ if Self::class(b).contains(Self::LINE_SEPARATOR) => {
                     break;
                 }
-                _ if T::COMMENT_CHARS.contains(b) => {
+                _ if Self::class(b).contains(Self::COMMENT) => {
                     break;
                 }
                 _ if Self::is_multibyte_comment(cursor) => {
@@ -253,13 +303,7 @@ impl<T: GasTarget> Gas<T> {
                 _ => {
                     let span = content.get_or_insert(cursor.pos()..cursor.pos());
                     cursor.bump();
-                    cursor.eat_while(|b| {
-                        !matches!(b, b'\n' | b'"' | b'/')
-                            && !Self::is_horizontal_whitespace(b)
-                            && !T::LINE_SEPARATOR_CHARS.contains(b)
-                            && !T::COMMENT_CHARS.contains(b)
-                            && !T::MULTI_COMMENT_START.contains(b)
-                    });
+                    cursor.eat_while(|b| !Self::class(b).contains(Self::ARG_STOP));
                     span.end = cursor.pos();
                 }
             }
@@ -312,7 +356,7 @@ impl<T: GasTarget> Gas<T> {
             }
             b if T::SYMBOL_START_CHARS.contains(b) => {
                 cursor.bump();
-                let _ = cursor.eat_while(|b| T::SYMBOL_CONTINUE_CHARS.contains(b));
+                let _ = cursor.eat_while(|b| Self::class(b).contains(Self::SYMBOL_CONTINUE));
                 let symbol_end = cursor.pos();
                 let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
                 if cursor.eat(b':') {

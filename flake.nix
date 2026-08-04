@@ -49,6 +49,7 @@
               cargo-hack
               cargo-minimal-versions
               cargo-flamegraph
+              cargo-show-asm
 
               rustLatest
               rustMsrv

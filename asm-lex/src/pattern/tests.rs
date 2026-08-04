@@ -5,7 +5,6 @@ use proptest::collection::vec;
 use proptest::prelude::*;
 
 extern crate alloc;
-use alloc::vec::Vec;
 
 #[test]
 fn new() {

@@ -1,6 +1,53 @@
 #[cfg(test)]
 mod tests;
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
+pub struct Class(u16);
+
+impl Class {
+    /// # Panics
+    /// Panics if `bit` is greater than or equal to `u16::BITS`
+    pub const fn with_bit(bit: u32) -> Self {
+        assert!(bit < u16::BITS);
+        Self(1 << bit)
+    }
+
+    pub const fn contains(&self, other: Self) -> bool {
+        self.0 & other.0 != 0
+    }
+}
+
+pub struct ClassTable {
+    table: [u16; 256],
+}
+
+impl ClassTable {
+    pub const fn build(entries: &[(Class, &ByteSet)]) -> Self {
+        let mut table = [0u16; 256];
+        let mut i = 0;
+        while i < entries.len() {
+            let (class, set) = entries[i];
+            let mut b = 0u8;
+            loop {
+                if set.contains(b) {
+                    table[b as usize] |= class.0;
+                }
+                if b == 255 {
+                    break;
+                }
+                b += 1;
+            }
+            i += 1;
+        }
+        Self { table }
+    }
+
+    #[inline]
+    pub fn classify(&self, b: u8) -> Class {
+        Class(self.table[b as usize])
+    }
+}
+
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Hash)]
 pub struct ByteSet {
     bytes: [u64; 4],
