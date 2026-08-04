@@ -18,7 +18,6 @@ impl<'a> Cursor<'a> {
         self.pos
     }
 
-    #[cfg(test)]
     pub fn bytes(&self) -> &[u8] {
         self.bytes
     }
@@ -26,7 +25,7 @@ impl<'a> Cursor<'a> {
     /// # Panics
     /// Panics if `pos` is greater than `bytes.len()`.
     pub fn restore(&mut self, pos: usize) {
-        assert!(
+        debug_assert!(
             pos <= self.bytes.len(),
             "Attempted to restore out of bounds"
         );
@@ -73,14 +72,14 @@ impl<'a> Cursor<'a> {
     }
 
     pub fn eat_while(&mut self, mut predicate: impl FnMut(u8) -> bool) -> Span {
+        let bytes = self.bytes();
+        let len = bytes.len();
         let start = self.pos();
-        while let Some(b) = self.peek() {
-            if predicate(b) {
-                self.pos += 1;
-            } else {
-                break;
-            }
+        let mut i = start;
+        while i < len && predicate(bytes[i]) {
+            i += 1;
         }
+        self.restore(i);
         start..self.pos()
     }
 }
