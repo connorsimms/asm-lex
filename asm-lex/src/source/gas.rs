@@ -151,6 +151,43 @@ impl<T: GasTarget> Gas<T> {
         starts_line
     }
 
+    fn try_linemarker(cursor: &mut Cursor<'_>) -> Option<source::Kind> {
+        if !T::HAS_LINEMARKERS || cursor.peek() != Some(b'#') || !cursor.at_line_start() {
+            return None;
+        }
+
+        let save = cursor.pos();
+        cursor.bump();
+
+        cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
+        if cursor.eat_while(|b| b.is_ascii_digit()).is_empty() {
+            cursor.restore(save);
+            return None;
+        }
+
+        cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
+        if Self::eat_string(cursor).is_empty() {
+            cursor.restore(save);
+            return None;
+        }
+
+        let mut linemarker_end = cursor.pos();
+        cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
+
+        while !cursor.eat_while(|b| b.is_ascii_digit()).is_empty() {
+            linemarker_end = cursor.pos();
+            cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
+        }
+
+        if matches!(cursor.peek(), Some(b'\n') | None) {
+            cursor.restore(linemarker_end);
+            return Some(source::Kind::Preprocessor);
+        }
+
+        cursor.restore(save);
+        None
+    }
+
     fn try_line_comment(cursor: &mut Cursor<'_>) -> Option<source::Kind> {
         let b = cursor.peek()?;
 
@@ -158,28 +195,13 @@ impl<T: GasTarget> Gas<T> {
             return None;
         }
 
-        let mut is_linemarker = b == b'#' && cursor.at_line_start();
-        cursor.bump();
-        let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
-        is_linemarker &= !cursor.eat_while(|b| b.is_ascii_digit()).is_empty();
-        let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
-        is_linemarker &= !Self::eat_string(cursor).is_empty();
-        let mut linemarker_end = cursor.pos();
-        let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
-
-        while !cursor.eat_while(|b| b.is_ascii_digit()).is_empty() {
-            linemarker_end = cursor.pos();
-            let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
+        if let Some(kind) = Self::try_linemarker(cursor) {
+            return Some(kind);
         }
 
-        if is_linemarker && matches!(cursor.peek(), Some(b'\n') | None) {
-            cursor.restore(linemarker_end);
-            Some(source::Kind::Preprocessor)
-        } else {
-            let _ = cursor.eat_while(|b| b != b'\n');
-            cursor.restore(Self::trim_trailing_hspace(cursor));
-            Some(source::Kind::Comment)
-        }
+        cursor.eat_while(|b| b != b'\n');
+        cursor.restore(Self::trim_trailing_hspace(cursor));
+        Some(source::Kind::Comment)
     }
 
     fn is_comment(cursor: &Cursor<'_>) -> bool {
