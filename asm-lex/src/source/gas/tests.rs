@@ -129,83 +129,6 @@ fn lex_preamble_semicolon_separators() {
     check_lex_preamble::<NonSlashMultibyte>(cases);
 }
 
-// fn check_try_linemarker<T: GasTarget>(cases: &[(&[u8], Option<Kind>, usize)]) {
-//     for (bytes, kind, pos) in cases {
-//         let mut cursor = Cursor::new(bytes);
-//         assert_eq!(Gas::<T>::try_linemarker(&mut cursor), *kind);
-//         assert_eq!(cursor.pos(), *pos);
-//     }
-// }
-
-// #[test]
-// fn try_linemarker_with_hash_ln_comment() {
-//     use Kind::Preprocessor;
-//     let cases: &[(&[u8], Option<Kind>, usize)] = &[
-//         // whitespace
-//         (b"# 100 \"file\"", Some(Preprocessor), 12),
-//         (b"#100 \"file\"", Some(Preprocessor), 11),
-//         (b"# 100\"file\"", Some(Preprocessor), 11),
-//         (b"#100\"file\"", Some(Preprocessor), 10),
-//         (b"#\t100\t\"file\"", Some(Preprocessor), 12),
-//         (b"# 100 \"file\"  ", Some(Preprocessor), 12),
-//         (b"# 100 \"file\"\t ", Some(Preprocessor), 12),
-//         // inner string
-//         (b"# 100 \"\"", Some(Preprocessor), 8),
-//         (b"# 100 \"\n\"", Some(Preprocessor), 9),
-//         (b"# 100 \";@#//\"", Some(Preprocessor), 13),
-//         // flags
-//         (b"# 100 \"filename\" 1", Some(Preprocessor), 18),
-//         (b"# 100 \"filename\"1", Some(Preprocessor), 17),
-//         (b"# 100 \"filename\" 1 2 3", Some(Preprocessor), 22),
-//     ];
-//     check_try_linemarker::<X86_64LinuxElf>(cases);
-//     check_try_linemarker::<Aarch64LinuxElf>(cases);
-//     check_try_linemarker::<ArmLinuxEabiElf>(cases);
-//     check_try_linemarker::<Riscv64LinuxElf>(cases);
-//     check_try_linemarker::<NonSlashMultibyte>(cases);
-//     check_try_linemarker::<NoLineSeparator>(cases);
-// }
-
-// #[test]
-// fn try_linemarker_no_hash_ln_comment() {
-//     let cases: &[(&[u8], Option<Kind>, usize)] = &[
-//         (b"# 100 \"file\"", None, 0),
-//         (b"#100 \"file\"", None, 0),
-//         (b"# 100\"file\"", None, 0),
-//         (b"#100\"file\"", None, 0),
-//         (b"#\t100\t\"file\"", None, 0),
-//         (b"# 100 \"\"", None, 0),
-//         (b"# 100 \"\n\"", None, 0),
-//         (b"# 100 \";@#//\"", None, 0),
-//         (b"# 100 \"filename\" 1", None, 0),
-//         (b"# 100 \"filename\"1", None, 0),
-//         (b"# 100 \"filename\" 1 2 3", None, 0),
-//         (b"# 1000 \"filename\"", None, 0),
-//     ];
-//     check_try_linemarker::<NoHashLineComment>(cases);
-// }
-
-// #[test]
-// fn try_linemarker_invalid() {
-//     let cases: &[(&[u8], Option<Kind>, usize)] = &[
-//         (b"", None, 0),
-//         (b"#", None, 0),
-//         (b"# 100", None, 0),
-//         (b"# junk", None, 0),
-//         (b"# junk 100 \"filename\"", None, 0),
-//         (b"# 100 junk \"filename\"", None, 0),
-//         (b"# 100 \"filename\" junk", None, 0),
-//         (b"# 100 \"filename\" 1 junk", None, 0),
-//     ];
-//     check_try_linemarker::<X86_64LinuxElf>(cases);
-//     check_try_linemarker::<Aarch64LinuxElf>(cases);
-//     check_try_linemarker::<ArmLinuxEabiElf>(cases);
-//     check_try_linemarker::<Riscv64LinuxElf>(cases);
-//     check_try_linemarker::<NoHashLineComment>(cases);
-//     check_try_linemarker::<NonSlashMultibyte>(cases);
-//     check_try_linemarker::<NoLineSeparator>(cases);
-// }
-
 fn check_is_line_comment<T: GasTarget>(cases: &[(&[u8], bool)]) {
     for (bytes, is_ln_cmnt) in cases {
         let cursor = Cursor::new(bytes);
@@ -254,8 +177,32 @@ fn check_try_line_comment<T: GasTarget>(cases: &[(&[u8], Option<Kind>, usize)]) 
 
 #[test]
 fn try_line_comment_with_hash_ln_comment() {
-    use Kind::Comment;
+    use Kind::{Comment, Preprocessor};
     let cases: &[(&[u8], Option<Kind>, usize)] = &[
+        // whitespace
+        (b"# 100 \"file\"", Some(Preprocessor), 12),
+        (b"#100 \"file\"", Some(Preprocessor), 11),
+        (b"# 100\"file\"", Some(Preprocessor), 11),
+        (b"#100\"file\"", Some(Preprocessor), 10),
+        (b"#\t100\t\"file\"", Some(Preprocessor), 12),
+        (b"# 100 \"file\"  ", Some(Preprocessor), 12),
+        (b"# 100 \"file\"\t ", Some(Preprocessor), 12),
+        // inner string
+        (b"# 100 \"\"", Some(Preprocessor), 8),
+        (b"# 100 \"\n\"", Some(Preprocessor), 9),
+        (b"# 100 \";@#//\"", Some(Preprocessor), 13),
+        // flags
+        (b"# 100 \"filename\" 1", Some(Preprocessor), 18),
+        (b"# 100 \"filename\"1", Some(Preprocessor), 17),
+        (b"# 100 \"filename\" 1 2 3", Some(Preprocessor), 22),
+        // comments
+        (b"#", Some(Comment), 1),
+        (b"# 100", Some(Comment), 5),
+        (b"# junk", Some(Comment), 6),
+        (b"# junk 100 \"filename\"", Some(Comment), 21),
+        (b"# 100 junk \"filename\"", Some(Comment), 21),
+        (b"# 100 \"filename\" junk", Some(Comment), 21),
+        (b"# 100 \"filename\" 1 junk", Some(Comment), 23),
         (b"# ...", Some(Comment), 5),
         (b"# ... ", Some(Comment), 5),
         (b"# ...\t ", Some(Comment), 5),
@@ -272,6 +219,7 @@ fn try_line_comment_with_hash_ln_comment() {
         (b"#... ", Some(Comment), 4),
         (b"#... \t", Some(Comment), 4),
         (b"#... \n...", Some(Comment), 4),
+        (b"", None, 0),
         (b"nop", None, 0),
         (b"nop#", None, 0),
     ];
@@ -286,6 +234,18 @@ fn try_line_comment_with_hash_ln_comment() {
 #[test]
 fn try_line_comment_no_hash_ln_comment() {
     let cases: &[(&[u8], Option<Kind>, usize)] = &[
+        (b"# 100 \"file\"", None, 0),
+        (b"#100 \"file\"", None, 0),
+        (b"# 100\"file\"", None, 0),
+        (b"#100\"file\"", None, 0),
+        (b"#\t100\t\"file\"", None, 0),
+        (b"# 100 \"\"", None, 0),
+        (b"# 100 \"\n\"", None, 0),
+        (b"# 100 \";@#//\"", None, 0),
+        (b"# 100 \"filename\" 1", None, 0),
+        (b"# 100 \"filename\"1", None, 0),
+        (b"# 100 \"filename\" 1 2 3", None, 0),
+        (b"# 1000 \"filename\"", None, 0),
         (b"# ...", None, 0),
         (b"## ...", None, 0),
         (b"### ...", None, 0),
