@@ -56,6 +56,11 @@ impl<T: GasTarget> Gas<T> {
         .with_set(&T::COMMENT_CHARS)
         .with_set(&T::MULTI_COMMENT_START);
 
+    // Characters at which lex_args may end
+    const STATEMENT_END_CHARS: ByteSet = ByteSet::from_bytes(b"\n")
+        .with_set(&T::LINE_SEPARATOR_CHARS)
+        .with_set(&T::COMMENT_CHARS);
+
     // Characters that comments or linemarkers start with
     const TRIVIA_START_CHARS: ByteSet = ByteSet::from_bytes(b"/")
         .with_set(&T::MULTI_COMMENT_START)
@@ -71,7 +76,8 @@ impl<T: GasTarget> Gas<T> {
     const GAP: Class = Class::with_bit(6);
     const HSPACE: Class = Class::with_bit(7);
     const ARG_STOP: Class = Class::with_bit(8);
-    const TRIVIA_START: Class = Class::with_bit(9);
+    const STATEMENT_END: Class = Class::with_bit(9);
+    const TRIVIA_START: Class = Class::with_bit(10);
 
     const TABLE: ClassTable = ClassTable::build(&[
         (Self::COMMENT, &T::COMMENT_CHARS),
@@ -83,6 +89,7 @@ impl<T: GasTarget> Gas<T> {
         (Self::GAP, &Self::GAP_CHARS),
         (Self::HSPACE, &Self::HSPACE_CHARS),
         (Self::ARG_STOP, &Self::ARG_STOP_CHARS),
+        (Self::STATEMENT_END, &Self::STATEMENT_END_CHARS),
         (Self::TRIVIA_START, &Self::TRIVIA_START_CHARS),
     ]);
 
@@ -129,6 +136,7 @@ impl<T: GasTarget> Gas<T> {
 
     // Eats leading gap chars.
     // Returns true if next item is the first on its physical line.
+    #[inline]
     fn lex_preamble(cursor: &mut Cursor<'_>) -> bool {
         let mut starts_line = cursor.pos() == 0;
         while let Some(b) = cursor.peek() {
@@ -256,13 +264,7 @@ impl<T: GasTarget> Gas<T> {
         while let Some(b) = cursor.peek() {
             let class = Self::class(b);
             match b {
-                b'\n' => {
-                    break;
-                }
-                _ if class.contains(Self::LINE_SEPARATOR) => {
-                    break;
-                }
-                _ if class.contains(Self::COMMENT) => {
+                _ if class.contains(Self::STATEMENT_END) => {
                     break;
                 }
                 _ if Self::is_multibyte_comment(cursor) => {
@@ -273,9 +275,7 @@ impl<T: GasTarget> Gas<T> {
                     Self::eat_string(cursor);
                     span.end = cursor.pos();
                 }
-                _ if Self::is_slash_star_comment(cursor) => {
-                    Self::try_slash_star_comment(cursor);
-                }
+                _ if Self::try_slash_star_comment(cursor).is_some() => {}
                 _ if Self::is_horizontal_whitespace(b) => {
                     cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
                 }
