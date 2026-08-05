@@ -96,6 +96,18 @@ impl<T: GasTarget> Gas<T> {
         matches!(b, b' ' | b'\t' | b'\r')
     }
 
+    // return position of last non-whitespace byte
+    fn trim_trailing_hspace(cursor: &Cursor) -> usize {
+        let mut i = -1;
+        while cursor
+            .seek(i)
+            .is_some_and(|b| Self::is_horizontal_whitespace(b))
+        {
+            i -= 1;
+        }
+        cursor.pos().wrapping_add_signed(i + 1)
+    }
+
     // Handles escape quotes.
     // Non-terminated strings go to EOF.
     fn eat_string(cursor: &mut Cursor<'_>) -> Span {
@@ -131,45 +143,6 @@ impl<T: GasTarget> Gas<T> {
         starts_line
     }
 
-    fn try_linemarker(cursor: &mut Cursor<'_>) -> Option<source::Kind> {
-        let save = cursor.pos();
-        if !cursor.at_line_start() {
-            cursor.restore(save);
-            return None;
-        }
-        if !cursor.eat(b'#') {
-            cursor.restore(save);
-            return None;
-        }
-        if !T::HAS_LINEMARKERS {
-            cursor.restore(save);
-            return None;
-        }
-        let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
-        if cursor.eat_while(|b| b.is_ascii_digit()).is_empty() {
-            cursor.restore(save);
-            return None;
-        }
-        let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
-        if Self::eat_string(cursor).is_empty() {
-            cursor.restore(save);
-            return None;
-        }
-        let mut linemarker_end = cursor.pos();
-        let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
-        while !cursor.eat_while(|b| b.is_ascii_digit()).is_empty() {
-            linemarker_end = cursor.pos();
-            let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
-        }
-        if matches!(cursor.peek(), Some(b'\n') | None) {
-            cursor.restore(linemarker_end);
-            Some(source::Kind::Preprocessor)
-        } else {
-            cursor.restore(save);
-            None
-        }
-    }
-
     fn is_line_comment(cursor: &Cursor<'_>) -> bool {
         cursor
             .peek()
@@ -177,24 +150,34 @@ impl<T: GasTarget> Gas<T> {
     }
 
     fn try_line_comment(cursor: &mut Cursor<'_>) -> Option<source::Kind> {
-        if !Self::is_line_comment(cursor) {
+        let b = cursor.peek()?;
+
+        if !Self::class(b).contains(Self::LINE_COMMENT) {
             return None;
         }
-        let mut line_comment_end = cursor.pos();
-        while let Some(b) = cursor.peek() {
-            match b {
-                b'\n' => break,
-                b if Self::is_horizontal_whitespace(b) => {
-                    let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
-                }
-                _ => {
-                    let _ = cursor.eat_while(|b| b != b'\n' && !Self::is_horizontal_whitespace(b));
-                    line_comment_end = cursor.pos();
-                }
-            }
+
+        let mut is_linemarker = b == b'#' && cursor.at_line_start();
+        cursor.bump();
+        let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
+        is_linemarker &= !cursor.eat_while(|b| b.is_ascii_digit()).is_empty();
+        let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
+        is_linemarker &= !Self::eat_string(cursor).is_empty();
+        let mut linemarker_end = cursor.pos();
+        let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
+
+        while !cursor.eat_while(|b| b.is_ascii_digit()).is_empty() {
+            linemarker_end = cursor.pos();
+            let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
         }
-        cursor.restore(line_comment_end);
-        Some(source::Kind::Comment)
+
+        if is_linemarker && matches!(cursor.peek(), Some(b'\n') | None) {
+            cursor.restore(linemarker_end);
+            Some(source::Kind::Preprocessor)
+        } else {
+            let _ = cursor.eat_while(|b| b != b'\n');
+            cursor.restore(Self::trim_trailing_hspace(cursor));
+            Some(source::Kind::Comment)
+        }
     }
 
     fn is_comment(cursor: &Cursor<'_>) -> bool {
@@ -408,10 +391,9 @@ impl<T: GasTarget> Dialect for Gas<T> {
 
         let start = cur.pos();
 
-        let kind = Self::try_linemarker(cur)
-            .or_else(|| Self::try_slash_star_comment(cur))
-            .or_else(|| Self::try_multibyte_comment(cur))
+        let kind = Self::try_slash_star_comment(cur)
             .or_else(|| Self::try_line_comment(cur))
+            .or_else(|| Self::try_multibyte_comment(cur))
             .or_else(|| Self::try_comment(cur))
             .or_else(|| Self::try_symbol_kind(cur))?;
 
