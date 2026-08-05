@@ -143,12 +143,6 @@ impl<T: GasTarget> Gas<T> {
         starts_line
     }
 
-    fn is_line_comment(cursor: &Cursor<'_>) -> bool {
-        cursor
-            .peek()
-            .is_some_and(|b| Self::class(b).contains(Self::LINE_COMMENT))
-    }
-
     fn try_line_comment(cursor: &mut Cursor<'_>) -> Option<source::Kind> {
         let b = cursor.peek()?;
 

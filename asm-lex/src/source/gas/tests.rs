@@ -129,44 +129,6 @@ fn lex_preamble_semicolon_separators() {
     check_lex_preamble::<NonSlashMultibyte>(cases);
 }
 
-fn check_is_line_comment<T: GasTarget>(cases: &[(&[u8], bool)]) {
-    for (bytes, is_ln_cmnt) in cases {
-        let cursor = Cursor::new(bytes);
-        assert_eq!(Gas::<T>::is_line_comment(&cursor), *is_ln_cmnt);
-    }
-}
-
-#[test]
-fn is_line_comment_with_hash_ln_comment() {
-    let cases: &[(&[u8], bool)] = &[
-        (b"# ...", true),
-        (b"## ...", true),
-        (b"### ...", true),
-        (b"#...", true),
-        (b"nop", false),
-        (b"nop #", false),
-    ];
-    check_is_line_comment::<X86_64LinuxElf>(cases);
-    check_is_line_comment::<Aarch64LinuxElf>(cases);
-    check_is_line_comment::<ArmLinuxEabiElf>(cases);
-    check_is_line_comment::<Riscv64LinuxElf>(cases);
-    check_is_line_comment::<NonSlashMultibyte>(cases);
-    check_is_line_comment::<NoLineSeparator>(cases);
-}
-
-#[test]
-fn is_line_comment_no_hash_ln_comment() {
-    let cases: &[(&[u8], bool)] = &[
-        (b"# ...", false),
-        (b"## ...", false),
-        (b"### ...", false),
-        (b"#...", false),
-        (b"nop", false),
-        (b"nop #", false),
-    ];
-    check_is_line_comment::<NoHashLineComment>(cases);
-}
-
 fn check_try_line_comment<T: GasTarget>(cases: &[(&[u8], Option<Kind>, usize)]) {
     for (bytes, kind, pos) in cases {
         let mut cursor = Cursor::new(bytes);
