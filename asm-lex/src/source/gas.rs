@@ -204,7 +204,7 @@ impl<T: GasTarget> Gas<T> {
 
     // assumption: /* runs to eof if not closed
     fn is_slash_star_comment(cursor: &Cursor<'_>) -> bool {
-        cursor.starts_with(b"/*")
+        cursor.peek() == Some(b'/') && cursor.seek(1) == Some(b'*')
     }
 
     fn try_slash_star_comment(cursor: &mut Cursor<'_>) -> Option<source::Kind> {
@@ -241,6 +241,7 @@ impl<T: GasTarget> Gas<T> {
             for pattern in T::MULTI_COMMENT_CHARS {
                 if cursor.peek() == Some(pattern[0]) && cursor.seek(1) == Some(pattern[1]) {
                     cursor.eat_while(|b| b != b'\n');
+                    cursor.restore(Self::trim_trailing_hspace(cursor));
                     return Some(source::Kind::Comment);
                 }
             }
@@ -253,14 +254,15 @@ impl<T: GasTarget> Gas<T> {
         let mut content: Option<Span> = None;
 
         while let Some(b) = cursor.peek() {
+            let class = Self::class(b);
             match b {
                 b'\n' => {
                     break;
                 }
-                _ if Self::class(b).contains(Self::LINE_SEPARATOR) => {
+                _ if class.contains(Self::LINE_SEPARATOR) => {
                     break;
                 }
-                _ if Self::class(b).contains(Self::COMMENT) => {
+                _ if class.contains(Self::COMMENT) => {
                     break;
                 }
                 _ if Self::is_multibyte_comment(cursor) => {
@@ -331,7 +333,7 @@ impl<T: GasTarget> Gas<T> {
                     Some(source::Kind::Unknown)
                 }
             }
-            b if T::SYMBOL_START_CHARS.contains(b) => {
+            b if Self::class(b).contains(Self::SYMBOL_START) => {
                 cursor.bump();
                 let _ = cursor.eat_while(|b| Self::class(b).contains(Self::SYMBOL_CONTINUE));
                 let symbol_end = cursor.pos();
