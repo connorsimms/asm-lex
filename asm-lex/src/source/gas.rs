@@ -51,7 +51,6 @@ impl<T: GasTarget> Gas<T> {
 
     // Characters at which lex_args may be interrupted
     const ARG_STOP_CHARS: ByteSet = ByteSet::from_bytes(b"\n\"/")
-        .with_set(&Self::HSPACE_CHARS) // will be removed
         .with_set(&T::LINE_SEPARATOR_CHARS)
         .with_set(&T::COMMENT_CHARS)
         .with_set(&T::MULTI_COMMENT_START);
@@ -279,13 +278,25 @@ impl<T: GasTarget> Gas<T> {
         None
     }
 
+    // this function does more than it looks
+    // This function is responsible for finding the first
+    // valid argument byte, and the last valid argument byte.
+    // It must include any slash-star comments that fall between
+    // the first and last argument bytes. It stops at all trailing comments.
     fn lex_args(cursor: &mut Cursor<'_>) -> Option<Span> {
         let save = cursor.pos();
         let mut content: Option<Span> = None;
+        cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
 
         while let Some(b) = cursor.peek() {
             let class = Self::class(b);
             match b {
+                _ if !class.contains(Self::ARG_STOP) => {
+                    let span = content.get_or_insert(cursor.pos()..cursor.pos());
+                    cursor.bump();
+                    cursor.eat_while(|b| !Self::class(b).contains(Self::ARG_STOP));
+                    span.end = cursor.pos();
+                }
                 _ if class.contains(Self::STATEMENT_END) => {
                     break;
                 }
@@ -298,9 +309,6 @@ impl<T: GasTarget> Gas<T> {
                     span.end = cursor.pos();
                 }
                 _ if Self::try_slash_star_comment(cursor).is_some() => {}
-                _ if Self::is_horizontal_whitespace(b) => {
-                    cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
-                }
                 _ => {
                     let span = content.get_or_insert(cursor.pos()..cursor.pos());
                     cursor.bump();
@@ -314,7 +322,9 @@ impl<T: GasTarget> Gas<T> {
                 cursor.restore(save);
                 None
             }
-            Some(span) => {
+            Some(mut span) => {
+                cursor.restore(span.end);
+                span.end = Self::trim_trailing_hspace(cursor);
                 cursor.restore(span.end);
                 Some(span)
             }
