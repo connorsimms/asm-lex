@@ -5,6 +5,12 @@ edition.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+memchr = { version = "2.8.0", default-features = false, optional = true }
+
+[features]
+default = ["std", "memchr"]
+std = ["memchr?/std"]
+memchr = ["dep:memchr"]
 
 [dev-dependencies]
 pretty_assertions = "1.0.0"
