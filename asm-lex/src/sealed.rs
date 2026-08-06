@@ -1,3 +1,3 @@
 pub trait PatternType {}
 
-impl PatternType for u8 {}
+impl<const N: usize> PatternType for crate::pattern::AnyOf<N> {}
