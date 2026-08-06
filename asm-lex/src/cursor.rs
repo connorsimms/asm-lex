@@ -94,4 +94,16 @@ impl<'a> Cursor<'a> {
         self.restore(i);
         start..self.pos()
     }
+
+    pub fn eat_until(&mut self, pattern: &impl crate::pattern::Pattern) -> Span {
+        let start = self.pos();
+        let haystack = &self.bytes()[start..];
+        let offset = pattern.find(haystack);
+        let end = match offset {
+            Some(offset) => start + offset,
+            None => self.bytes().len(),
+        };
+        self.restore(end);
+        start..end
+    }
 }

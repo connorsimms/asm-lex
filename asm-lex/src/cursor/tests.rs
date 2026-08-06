@@ -240,3 +240,27 @@ proptest! {
         prop_assert!(!cursor.peek().is_some_and(|b| set.contains(&b)));
     }
 }
+
+#[test]
+fn eat_until_any_of_1() {
+    use crate::pattern::AnyOf;
+    let mut cursor = Cursor::new(b"Some string");
+    assert_eq!(cursor.eat_until(&AnyOf(*b"S")), 0..0);
+    assert_eq!(cursor.pos(), 0);
+    assert_eq!(cursor.eat_until(&AnyOf(*b"t")), 0..6);
+    assert_eq!(cursor.pos(), 6);
+    assert_eq!(cursor.eat_until(&AnyOf(*b"z")), 6..11);
+    assert_eq!(cursor.pos(), 11);
+}
+
+#[test]
+fn eat_until_any_of_2() {
+    use crate::pattern::AnyOf;
+    let mut cursor = Cursor::new(b"Some string");
+    assert_eq!(cursor.eat_until(&AnyOf(*b"So")), 0..0);
+    assert_eq!(cursor.pos(), 0);
+    assert_eq!(cursor.eat_until(&AnyOf(*b"tr")), 0..6);
+    assert_eq!(cursor.pos(), 6);
+    assert_eq!(cursor.eat_until(&AnyOf(*b"So")), 6..11);
+    assert_eq!(cursor.pos(), 11);
+}
