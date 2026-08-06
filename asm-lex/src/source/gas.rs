@@ -3,8 +3,8 @@ mod tests;
 
 pub mod targets;
 
+use crate::byte::{ByteSet, Class, ClassTable};
 use crate::cursor::Cursor;
-use crate::pattern::{ByteSet, Class, ClassTable};
 use crate::source;
 use crate::source::{Dialect, Item};
 use crate::Span;
