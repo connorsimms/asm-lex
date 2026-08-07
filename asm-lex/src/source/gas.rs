@@ -20,7 +20,7 @@ pub trait GasTarget {
     const MULTI_COMMENT_CHARS: &'static [[u8; 2]];
 
     // The starting bytes of multi-byte comment sequence
-    const MULTI_COMMENT_START: ByteSet = ByteSet::from_first_bytes(Self::MULTI_COMMENT_CHARS);
+    const MULTI_COMMENT_START_CHARS: ByteSet = ByteSet::from_first_bytes(Self::MULTI_COMMENT_CHARS);
 
     // A statement ends at a newline or line separator
     const LINE_SEPARATOR_CHARS: ByteSet;
@@ -53,7 +53,7 @@ impl<T: GasTarget> Gas<T> {
     const ARG_STOP_CHARS: ByteSet = ByteSet::from_bytes(b"\n\"/")
         .with_set(&T::LINE_SEPARATOR_CHARS)
         .with_set(&T::COMMENT_CHARS)
-        .with_set(&T::MULTI_COMMENT_START);
+        .with_set(&T::MULTI_COMMENT_START_CHARS);
 
     // Characters at which lex_args may end
     const STATEMENT_END_CHARS: ByteSet = ByteSet::from_bytes(b"\n")
@@ -62,7 +62,7 @@ impl<T: GasTarget> Gas<T> {
 
     // Characters that comments or linemarkers start with
     const TRIVIA_START_CHARS: ByteSet = ByteSet::from_bytes(b"/")
-        .with_set(&T::MULTI_COMMENT_START)
+        .with_set(&T::MULTI_COMMENT_START_CHARS)
         .with_set(&T::LINE_COMMENT_CHARS)
         .with_set(&T::COMMENT_CHARS);
 
@@ -81,7 +81,7 @@ impl<T: GasTarget> Gas<T> {
     const TABLE: ClassTable = ClassTable::build(&[
         (Self::COMMENT, &T::COMMENT_CHARS),
         (Self::LINE_COMMENT, &T::LINE_COMMENT_CHARS),
-        (Self::MULTI_START, &T::MULTI_COMMENT_START),
+        (Self::MULTI_START, &T::MULTI_COMMENT_START_CHARS),
         (Self::LINE_SEPARATOR, &T::LINE_SEPARATOR_CHARS),
         (Self::SYMBOL_START, &T::SYMBOL_START_CHARS),
         (Self::SYMBOL_CONTINUE, &T::SYMBOL_CONTINUE_CHARS),
@@ -283,6 +283,7 @@ impl<T: GasTarget> Gas<T> {
     // valid argument byte, and the last valid argument byte.
     // It must include any slash-star comments that fall between
     // the first and last argument bytes. It stops at all trailing comments.
+    #[inline(never)]
     fn lex_args(cursor: &mut Cursor<'_>) -> Option<Span> {
         let save = cursor.pos();
         let mut content: Option<Span> = None;
@@ -293,7 +294,6 @@ impl<T: GasTarget> Gas<T> {
             match b {
                 _ if !class.contains(Self::ARG_STOP) => {
                     let span = content.get_or_insert(cursor.pos()..cursor.pos());
-                    cursor.bump();
                     cursor.eat_while(|b| !Self::class(b).contains(Self::ARG_STOP));
                     span.end = cursor.pos();
                 }
