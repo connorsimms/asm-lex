@@ -2,6 +2,7 @@
 pub mod tests;
 
 pub mod gas;
+pub mod llvm;
 
 use crate::Span;
 

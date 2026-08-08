@@ -13,6 +13,11 @@ pub struct ClassTable {
     table: [u16; 256],
 }
 
+pub const ASCII_ALPHA_LOWER: ByteSet = ByteSet::from_range(b'a', b'z');
+pub const ASCII_ALPHA_UPPER: ByteSet = ByteSet::from_range(b'A', b'Z');
+pub const ASCII_ALPHA: ByteSet = ASCII_ALPHA_LOWER.with_set(&ASCII_ALPHA_UPPER);
+pub const ASCII_DIGIT: ByteSet = ByteSet::from_range(b'0', b'9');
+
 impl ByteSet {
     #[must_use]
     pub const fn new() -> Self {
@@ -38,6 +43,22 @@ impl ByteSet {
         set
     }
 
+    /// # Panics
+    /// Panics if `start` is greater than `end`.
+    pub const fn from_range(start: u8, end: u8) -> Self {
+        assert!(start <= end, "Start must not be greater than end");
+        let mut set = Self::new();
+        let mut b = start;
+        loop {
+            set = set.with_byte(b);
+            if b == end {
+                break;
+            }
+            b += 1;
+        }
+        set
+    }
+
     pub const fn contains(&self, byte: u8) -> bool {
         self.bytes[(byte >> 6) as usize] & (1 << (byte & 63)) != 0
     }
@@ -57,6 +78,14 @@ impl ByteSet {
     #[must_use]
     pub const fn with_byte(mut self, byte: u8) -> Self {
         self.bytes[(byte >> 6) as usize] |= 1 << (byte & 63);
+        self
+    }
+
+    #[must_use]
+    pub const fn with_byte_if(mut self, byte: u8, cond: bool) -> Self {
+        if cond {
+            self.bytes[(byte >> 6) as usize] |= 1 << (byte & 63);
+        }
         self
     }
 
