@@ -11,9 +11,16 @@ mod swar {
 
 pub struct AnyOf<const N: usize>(pub [u8; N]);
 
+pub struct Substring<const N: usize>(pub [u8; N]);
+
 impl<const N: usize> AnyOf<N> {
     #[allow(unused)]
     const SUPPORTED: () = assert!(N >= 1 && N <= 3, "AnyOf supports 1 to 3 bytes");
+}
+
+impl<const N: usize> Substring<N> {
+    #[allow(unused)]
+    const SUPPORTED: () = assert!(N == 2, "Substring supports 2 bytes");
 }
 
 pub trait Pattern: crate::sealed::PatternType {
@@ -63,6 +70,36 @@ fn find_any<const N: usize>(bytes: &[u8; N], haystack: &[u8]) -> Option<usize> {
         .map(|i| offset + i)
 }
 
+#[cfg(feature = "memchr")]
+#[inline]
+fn find_memmem<const N: usize>(needle: &[u8; N], haystack: &[u8]) -> Option<usize> {
+    memchr::memmem::find(haystack, needle)
+}
+
+#[inline]
+fn find_substr<const N: usize>(substr: &[u8; N], haystack: &[u8]) -> Option<usize> {
+    let shifted = &haystack[substr.len() - 1..];
+    let n1 = u64::from(*substr.first()?) * swar::LO;
+    let n2 = u64::from(*substr.last()?) * swar::LO;
+    let mut chunks = haystack.chunks_exact(8);
+    let mut shifted_chunks = shifted.chunks_exact(8);
+    let mut offset: usize = 0;
+
+    for (chk, shf) in &mut chunks.zip(shifted_chunks) {
+        let chk = u64::from_le_bytes(chk.try_into().unwrap());
+        let shf = u64::from_le_bytes(shf.try_into().unwrap());
+        let hits = check(chk ^ n1) | check(shf ^ n2);
+        if hits != 0 {
+            return Some(offset + hits.trailing_zeros() as usize / 8);
+        }
+        offset += 8;
+    }
+
+    haystack[offset..]
+        .windows(substr.len())
+        .position(|sub| sub == substr)
+}
+
 impl<const N: usize> Pattern for AnyOf<N> {
     fn find(&self, haystack: &[u8]) -> Option<usize> {
         #[cfg(feature = "memchr")]
@@ -72,6 +109,19 @@ impl<const N: usize> Pattern for AnyOf<N> {
         #[cfg(not(feature = "memchr"))]
         {
             find_any(&self.0, haystack)
+        }
+    }
+}
+
+impl<const N: usize> Pattern for Substring<N> {
+    fn find(&self, haystack: &[u8]) -> Option<usize> {
+        #[cfg(feature = "memchr")]
+        {
+            find_memmem(&self.0, haystack)
+        }
+        #[cfg(not(feature = "memchr"))]
+        {
+            find_substr(&self.0, haystack)
         }
     }
 }
