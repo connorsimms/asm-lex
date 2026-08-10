@@ -1,3 +1,6 @@
+#[cfg(test)]
+mod tests;
+
 pub mod targets;
 
 use crate::byte;
@@ -40,12 +43,19 @@ impl<T: LlvmTarget> Llvm<T> {
 
     const STATEMENT_END_CHARS: ByteSet = ByteSet::from_bytes(b"\r\n")
         .with_byte_if(T::SEPARATOR_STR[0], T::SEPARATOR_STR.len() == 1)
-        .with_byte_if(T::COMMENT_STR[0], T::COMMENT_STR.len() == 1);
+        .with_byte_if(T::COMMENT_STR[0], T::COMMENT_STR.len() == 1)
+        .with_byte_if(b'#', T::ALLOW_ADDITIONAL_COMMENTS)
+        .with_byte_if(
+            T::COMMENT_STR[0],
+            T::COMMENT_STR.len() >= 2 && T::COMMENT_STR[1] == b'#',
+        );
 
     const ARG_STOP_CHARS: ByteSet = ByteSet::new()
         .with_byte(b'/') // slash-star comments
         .with_byte(b'"') // double quotes
         .with_byte(b'\'') // single quotes
+        .with_byte(T::SEPARATOR_STR[0])
+        .with_byte(T::COMMENT_STR[0])
         .with_set(&Self::STATEMENT_END_CHARS);
 
     const SYMBOL_START: Class = Class::with_bit(0);
@@ -75,21 +85,20 @@ impl<T: LlvmTarget> Llvm<T> {
         matches!(b, b'\r' | b'\n')
     }
 
-    fn eat_single_quoted(cursor: &mut Cursor<'_>) -> Span {
+    fn try_single_quoted(cursor: &mut Cursor<'_>) -> Option<Span> {
         let start = cursor.pos();
         if cursor.eat(b'\'') {
-            // Any character following a backslash is ignored
-            while let Some(b) = cursor.bump() {
-                match b {
-                    b'\\' => {
-                        cursor.bump();
-                    }
-                    b'\'' => break,
-                    _ => {}
-                }
+            cursor.eat(b'\\');
+            cursor.bump();
+            if cursor.eat(b'\'') {
+                Some(start..cursor.pos())
+            } else {
+                cursor.restore(start);
+                None
             }
+        } else {
+            None
         }
-        start..cursor.pos()
     }
 
     // Handles escape quotes.
@@ -122,37 +131,44 @@ impl<T: LlvmTarget> Llvm<T> {
         cursor.pos().wrapping_add_signed(i + 1)
     }
 
-    // hopefully compiler does smart things here
     fn eat_line_separator(cursor: &mut Cursor<'_>) -> bool {
-        match T::SEPARATOR_STR.len() {
-            1 => cursor.eat(T::SEPARATOR_STR[0]),
-            2 => {
-                if cursor.peek() == Some(T::SEPARATOR_STR[0])
-                    && cursor.seek(1) == Some(T::SEPARATOR_STR[2])
-                {
-                    cursor.advance(2);
-                    true
-                } else {
-                    false
-                }
-            }
-            len => {
-                if cursor.starts_with(T::SEPARATOR_STR) {
-                    cursor.advance(len);
-                    true
-                } else {
-                    false
-                }
-            }
+        if cursor.starts_with(T::SEPARATOR_STR) {
+            cursor.advance(T::SEPARATOR_STR.len());
+            true
+        } else {
+            false
         }
     }
 
-    fn try_linemarker(cursor: &mut Cursor<'_>) -> Option<Kind> {
-        if cursor.peek() != Some(b'#')
-            || cursor
-                .seek(-1)
-                .is_some_and(|b| !Self::class(b).contains(Self::STATEMENT_END))
-        {
+    // Eats leading gap chars.
+    // Returns true if next item is the first on its physical line.
+    #[inline]
+    fn lex_preamble(cursor: &mut Cursor<'_>) -> (bool, bool) {
+        let mut starts_physical_line = cursor.pos() == 0;
+        let mut starts_logical_line = cursor.pos() == 0;
+        loop {
+            if !cursor.eat_while(|b| Self::is_end_of_line(b)).is_empty() {
+                starts_physical_line = true;
+                starts_logical_line = true;
+                continue;
+            }
+            if !cursor
+                .eat_while(|b| Self::is_horizontal_whitespace(b))
+                .is_empty()
+            {
+                continue;
+            }
+            if Self::eat_line_separator(cursor) {
+                starts_logical_line = true;
+                continue;
+            }
+            break;
+        }
+        (starts_physical_line, starts_logical_line)
+    }
+
+    fn try_linemarker(cursor: &mut Cursor<'_>, starts_line: bool) -> Option<Kind> {
+        if cursor.peek() != Some(b'#') || !starts_line {
             return None;
         }
 
@@ -176,8 +192,7 @@ impl<T: LlvmTarget> Llvm<T> {
         Some(Kind::Preprocessor)
     }
 
-    // hopefully compiler does smart things here
-    fn is_line_comment(cursor: &mut Cursor<'_>) -> bool {
+    fn is_line_comment(cursor: &Cursor<'_>) -> bool {
         if T::ALLOW_ADDITIONAL_COMMENTS {
             if cursor.peek() == Some(b'#') {
                 return true;
@@ -186,14 +201,10 @@ impl<T: LlvmTarget> Llvm<T> {
                 return true;
             }
         }
-        match T::COMMENT_STR.len() {
-            1 => cursor.peek() == Some(T::COMMENT_STR[0]),
-            2 => {
-                cursor.peek() == Some(T::COMMENT_STR[0])
-                    && cursor.seek(1) == Some(T::COMMENT_STR[1])
-            }
-            _ => cursor.starts_with(T::COMMENT_STR),
+        if T::COMMENT_STR.len() >= 2 && T::COMMENT_STR[1] == b'#' {
+            return cursor.peek() == Some(T::COMMENT_STR[0]);
         }
+        cursor.starts_with(T::COMMENT_STR)
     }
 
     fn try_line_comment(cursor: &mut Cursor<'_>) -> Option<Kind> {
@@ -206,8 +217,13 @@ impl<T: LlvmTarget> Llvm<T> {
     }
 
     #[inline]
-    fn is_slash_star_comment(cursor: &mut Cursor<'_>) -> bool {
-        T::ALLOW_ADDITIONAL_COMMENTS && cursor.peek() != Some(b'/') && cursor.seek(1) != Some(b'*')
+    fn is_slash_star_comment(cursor: &Cursor<'_>) -> bool {
+        T::ALLOW_ADDITIONAL_COMMENTS && cursor.peek() == Some(b'/') && cursor.seek(1) == Some(b'*')
+    }
+
+    #[inline]
+    fn is_statement_separator(cursor: &Cursor<'_>) -> bool {
+        cursor.starts_with(T::SEPARATOR_STR)
     }
 
     fn try_slash_star_comment(cursor: &mut Cursor<'_>) -> Option<Kind> {
@@ -215,7 +231,7 @@ impl<T: LlvmTarget> Llvm<T> {
             return None;
         }
         cursor.eat_until(&crate::pattern::Substring(*b"*/"));
-        cursor.restore(Self::trim_trailing_hspace(cursor));
+        cursor.advance(2);
         Some(Kind::Comment)
     }
 
@@ -235,7 +251,9 @@ impl<T: LlvmTarget> Llvm<T> {
                 _ if class.contains(Self::STATEMENT_END) => break,
                 b'\'' => {
                     let span = content.get_or_insert(cursor.pos()..cursor.pos());
-                    Self::eat_single_quoted(cursor);
+                    if Self::try_single_quoted(cursor).is_none() {
+                        cursor.bump();
+                    }
                     span.end = cursor.pos();
                 }
                 b'"' => {
@@ -243,6 +261,7 @@ impl<T: LlvmTarget> Llvm<T> {
                     Self::eat_double_quoted(cursor);
                     span.end = cursor.pos();
                 }
+                _ if Self::is_statement_separator(cursor) => break,
                 _ if Self::is_line_comment(cursor) => break,
                 _ if Self::try_slash_star_comment(cursor).is_some() => {}
                 _ => {
@@ -267,34 +286,10 @@ impl<T: LlvmTarget> Llvm<T> {
         }
     }
 
-    // Eats leading gap chars.
-    // Returns true if next item is the first on its physical line.
-    #[inline]
-    fn lex_preamble(cursor: &mut Cursor<'_>) -> bool {
-        let mut starts_line = cursor.pos() == 0;
-        loop {
-            if !cursor.eat_while(|b| Self::is_end_of_line(b)).is_empty() {
-                starts_line = true;
-                continue;
-            }
-            if !cursor
-                .eat_while(|b| Self::is_horizontal_whitespace(b))
-                .is_empty()
-            {
-                continue;
-            }
-            if Self::eat_line_separator(cursor) {
-                continue;
-            }
-            break;
-        }
-        starts_line
-    }
-
     fn try_symbol_kind(cursor: &mut Cursor<'_>) -> Option<source::Kind> {
         let symbol_start = cursor.pos();
 
-        let _ = cursor.eat(b'@') || cursor.eat(b'$');
+        let prefix = cursor.eat(b'@') || cursor.eat(b'$');
 
         match cursor.peek()? {
             b'0'..=b'9' => {
@@ -310,7 +305,7 @@ impl<T: LlvmTarget> Llvm<T> {
                     Some(source::Kind::Unknown)
                 }
             }
-            b'"' => {
+            b'"' if !prefix => {
                 let string = Self::eat_double_quoted(cursor);
                 let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
                 if cursor.eat(b':') {
@@ -324,15 +319,19 @@ impl<T: LlvmTarget> Llvm<T> {
                     Some(source::Kind::Unknown)
                 }
             }
-            b'\'' => {
-                let string = Self::eat_single_quoted(cursor);
-                let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
-                if cursor.eat(b':') {
-                    // string is closed or ':' would've been swallowed
-                    let (name_start, name_end) = (string.start + 1, string.end - 1);
-                    Some(source::Kind::Label {
-                        name: name_start..name_end,
-                    })
+            b'\'' if !prefix => {
+                let string = Self::try_single_quoted(cursor);
+                if let Some(string) = string {
+                    let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
+                    if cursor.eat(b':') {
+                        let (name_start, name_end) = (string.start + 1, string.end - 1);
+                        Some(source::Kind::Label {
+                            name: name_start..name_end,
+                        })
+                    } else {
+                        let _ = Self::lex_args(cursor);
+                        Some(source::Kind::Unknown)
+                    }
                 } else {
                     let _ = Self::lex_args(cursor);
                     Some(source::Kind::Unknown)
@@ -353,7 +352,13 @@ impl<T: LlvmTarget> Llvm<T> {
                     let keyword_start = cursor.pos();
                     cursor.eat(b'=');
                     let keyword_end = cursor.pos();
-                    let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
+                    if cursor
+                        .eat_while(|b| Self::is_horizontal_whitespace(b))
+                        .is_empty()
+                    {
+                        let _ = Self::lex_args(cursor);
+                        return Some(source::Kind::Unknown);
+                    }
                     let args = Self::lex_args(cursor);
                     return Some(source::Kind::Definition {
                         symbol: symbol_start..symbol_end,
@@ -387,11 +392,11 @@ impl<T: LlvmTarget> Llvm<T> {
 
 impl<T: LlvmTarget> Dialect for Llvm<T> {
     fn next_item(cur: &mut Cursor<'_>) -> Option<Item> {
-        let is_first = Self::lex_preamble(cur);
+        let (starts_physical, starts_logical) = Self::lex_preamble(cur);
 
         let start = cur.pos();
 
-        let kind = Self::try_linemarker(cur)
+        let kind = Self::try_linemarker(cur, starts_logical)
             .or_else(|| Self::try_slash_star_comment(cur))
             .or_else(|| Self::try_line_comment(cur))
             .or_else(|| Self::try_symbol_kind(cur))?;
@@ -399,7 +404,7 @@ impl<T: LlvmTarget> Dialect for Llvm<T> {
         Some(Item {
             kind,
             span: start..cur.pos(),
-            starts_line: is_first,
+            starts_line: starts_physical,
         })
     }
 }
