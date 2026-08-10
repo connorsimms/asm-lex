@@ -26,7 +26,7 @@ pub struct Llvm<T: LlvmTarget> {
 }
 
 impl<T: LlvmTarget> Llvm<T> {
-    const AT_IN_IDENTIFIER: bool = !T::COMMENT_STR[0] == b'@' && T::USE_AT_FOR_SPECIFIER;
+    const AT_IN_IDENTIFIER: bool = T::COMMENT_STR[0] != b'@' && T::USE_AT_FOR_SPECIFIER;
 
     const LINE_END_CHARS: ByteSet = ByteSet::from_bytes(b"\r\n");
 
@@ -46,7 +46,6 @@ impl<T: LlvmTarget> Llvm<T> {
     const STATEMENT_END_CHARS: ByteSet = ByteSet::from_bytes(b"\r\n")
         .with_byte_if(T::SEPARATOR_STR[0], T::SEPARATOR_STR.len() == 1)
         .with_byte_if(T::COMMENT_STR[0], T::COMMENT_STR.len() == 1)
-        .with_byte_if(b'#', T::ALLOW_ADDITIONAL_COMMENTS)
         .with_byte_if(
             T::COMMENT_STR[0],
             T::COMMENT_STR.len() >= 2 && T::COMMENT_STR[1] == b'#',
@@ -167,8 +166,12 @@ impl<T: LlvmTarget> Llvm<T> {
         (starts_line, starts_statement)
     }
 
-    fn try_linemarker(cursor: &mut Cursor<'_>, starts_statement: bool) -> Option<Kind> {
-        if cursor.peek() != Some(b'#') || !starts_statement {
+    fn try_linemarker(cursor: &mut Cursor<'_>) -> Option<Kind> {
+        if cursor.peek() != Some(b'#')
+            || cursor
+                .seek(-1)
+                .is_some_and(|b| Self::is_horizontal_whitespace(b))
+        {
             return None;
         }
 
@@ -207,8 +210,40 @@ impl<T: LlvmTarget> Llvm<T> {
         cursor.starts_with(T::COMMENT_STR)
     }
 
-    fn try_line_comment(cursor: &mut Cursor<'_>) -> Option<Kind> {
+    fn try_line_comment(cursor: &mut Cursor<'_>, starts_statement: bool) -> Option<Kind> {
+        if !starts_statement {
+            return None;
+        }
+
+        if let Some(kind) = Self::try_linemarker(cursor) {
+            return Some(kind);
+        }
+
         if !Self::is_line_comment(cursor) {
+            return None;
+        }
+
+        cursor.eat_until(&crate::pattern::AnyOf(*b"\r\n"));
+        cursor.restore(Self::trim_trailing_hspace(cursor));
+        Some(Kind::Comment)
+    }
+
+    // Comment appearing anywhere on line
+    fn is_comment(cursor: &Cursor<'_>) -> bool {
+        if T::ALLOW_ADDITIONAL_COMMENTS
+            && cursor.peek() == Some(b'/')
+            && cursor.seek(1) == Some(b'/')
+        {
+            return true;
+        }
+        if T::COMMENT_STR.len() >= 2 && T::COMMENT_STR[1] == b'#' {
+            return cursor.peek() == Some(T::COMMENT_STR[0]);
+        }
+        cursor.starts_with(T::COMMENT_STR)
+    }
+
+    fn try_comment(cursor: &mut Cursor<'_>) -> Option<Kind> {
+        if !Self::is_comment(cursor) {
             return None;
         }
         cursor.eat_until(&crate::pattern::AnyOf(*b"\r\n"));
@@ -262,7 +297,7 @@ impl<T: LlvmTarget> Llvm<T> {
                     span.end = cursor.pos();
                 }
                 _ if Self::is_statement_separator(cursor) => break,
-                _ if Self::is_line_comment(cursor) => break,
+                _ if Self::is_comment(cursor) => break,
                 _ if Self::try_slash_star_comment(cursor).is_some() => {}
                 _ => {
                     let span = content.get_or_insert(cursor.pos()..cursor.pos());
@@ -291,7 +326,14 @@ impl<T: LlvmTarget> Llvm<T> {
 
         let prefix = cursor.eat(b'@') || cursor.eat(b'$');
 
-        match cursor.peek()? {
+        let Some(b) = cursor.peek() else {
+            if prefix {
+                return Some(source::Kind::Unknown);
+            }
+            return None;
+        };
+
+        match b {
             b'0'..=b'9' => {
                 let _ = cursor.eat_while(|b| b.is_ascii_digit());
                 let symbol_end = cursor.pos();
@@ -352,10 +394,7 @@ impl<T: LlvmTarget> Llvm<T> {
                     let keyword_start = cursor.pos();
                     cursor.eat(b'=');
                     let keyword_end = cursor.pos();
-                    if cursor
-                        .eat_while(|b| Self::is_horizontal_whitespace(b))
-                        .is_empty()
-                    {
+                    if cursor.eat(b'=') {
                         let _ = Self::lex_args(cursor);
                         return Some(source::Kind::Unknown);
                     }
@@ -396,9 +435,9 @@ impl<T: LlvmTarget> Dialect for Llvm<T> {
 
         let start = cur.pos();
 
-        let kind = Self::try_linemarker(cur, starts_statement)
+        let kind = Self::try_line_comment(cur, starts_statement)
             .or_else(|| Self::try_slash_star_comment(cur))
-            .or_else(|| Self::try_line_comment(cur))
+            .or_else(|| Self::try_comment(cur))
             .or_else(|| Self::try_symbol_kind(cur))?;
 
         Some(Item {
