@@ -501,3 +501,24 @@ fn check_try_symbol_kind<T: LlvmTarget>(cases: &[(&[u8], Option<Kind>, usize)]) 
         assert_eq!(cursor.pos(), *pos);
     }
 }
+
+#[test]
+fn try_symbol_kind_label() {
+    use Kind::{Label, Unknown};
+    let label = |name| Label { name };
+    let cases: &[(&[u8], Option<Kind>, usize)] = &[
+        (b"a:", Some(label(0..1)), 2),
+        (b"@a:", Some(label(0..2)), 3),
+        (b"$a:", Some(label(0..2)), 3),
+        (b"'a':", Some(label(0..3)), 4),
+        (b"'\n':", Some(label(0..3)), 4),
+        (b"@'a':", Some(label(0..4)), 5),
+        (b"$'a':", Some(label(0..4)), 5),
+        (b"\"b\":", Some(label(1..2)), 4),
+        (b"\"a\n$\":", Some(label(1..4)), 6),
+        (b"@\"b\":", Some(Unknown), 5),
+        (b"", None, 0),
+    ];
+
+    check_try_symbol_kind::<X86Elf>(cases);
+}

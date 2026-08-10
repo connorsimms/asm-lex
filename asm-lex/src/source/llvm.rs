@@ -361,14 +361,14 @@ impl<T: LlvmTarget> Llvm<T> {
                     Some(source::Kind::Unknown)
                 }
             }
-            b'\'' if !prefix => {
+            b'\'' => {
                 let string = Self::try_single_quoted(cursor);
-                if let Some(string) = string {
+                if string.is_some() {
+                    let symbol_end = cursor.pos();
                     let _ = cursor.eat_while(|b| Self::is_horizontal_whitespace(b));
                     if cursor.eat(b':') {
-                        let (name_start, name_end) = (string.start + 1, string.end - 1);
                         Some(source::Kind::Label {
-                            name: name_start..name_end,
+                            name: symbol_start..symbol_end,
                         })
                     } else {
                         let _ = Self::lex_args(cursor);
