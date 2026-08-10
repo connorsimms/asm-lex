@@ -15,7 +15,7 @@ pub trait LlvmTarget {
     const SEPARATOR_STR: &'static [u8] = b";";
     const COMMENT_STR: &'static [u8] = b"#";
     const ALLOW_ADDITIONAL_COMMENTS: bool = true;
-    const AT_IN_IDENTIFIER: bool = false;
+    const USE_AT_FOR_SPECIFIER: bool = false;
     const QUESTION_STARTS_IDENTIFIER: bool = false;
     const DOLLAR_STARTS_IDENTIFIER: bool = false;
     const AT_STARTS_IDENTIFIER: bool = false;
@@ -26,6 +26,8 @@ pub struct Llvm<T: LlvmTarget> {
 }
 
 impl<T: LlvmTarget> Llvm<T> {
+    const AT_IN_IDENTIFIER: bool = !T::COMMENT_STR[0] == b'@' && T::USE_AT_FOR_SPECIFIER;
+
     const LINE_END_CHARS: ByteSet = ByteSet::from_bytes(b"\r\n");
 
     const HSPACE_CHARS: ByteSet = ByteSet::from_bytes(b" \t\x00");
@@ -39,7 +41,7 @@ impl<T: LlvmTarget> Llvm<T> {
     const SYMBOL_CONTINUE_CHARS: ByteSet = ByteSet::from_bytes(b"_.$?")
         .with_set(&byte::ASCII_ALPHA)
         .with_set(&byte::ASCII_DIGIT)
-        .with_byte_if(b'@', T::AT_IN_IDENTIFIER);
+        .with_byte_if(b'@', Self::AT_IN_IDENTIFIER);
 
     const STATEMENT_END_CHARS: ByteSet = ByteSet::from_bytes(b"\r\n")
         .with_byte_if(T::SEPARATOR_STR[0], T::SEPARATOR_STR.len() == 1)
@@ -140,16 +142,14 @@ impl<T: LlvmTarget> Llvm<T> {
         }
     }
 
-    // Eats leading gap chars.
-    // Returns true if next item is the first on its physical line.
     #[inline]
     fn lex_preamble(cursor: &mut Cursor<'_>) -> (bool, bool) {
-        let mut starts_physical_line = cursor.pos() == 0;
-        let mut starts_logical_line = cursor.pos() == 0;
+        let mut starts_line = cursor.pos() == 0;
+        let mut starts_statement = cursor.pos() == 0;
         loop {
             if !cursor.eat_while(|b| Self::is_end_of_line(b)).is_empty() {
-                starts_physical_line = true;
-                starts_logical_line = true;
+                starts_line = true;
+                starts_statement = true;
                 continue;
             }
             if !cursor
@@ -159,16 +159,16 @@ impl<T: LlvmTarget> Llvm<T> {
                 continue;
             }
             if Self::eat_line_separator(cursor) {
-                starts_logical_line = true;
+                starts_statement = true;
                 continue;
             }
             break;
         }
-        (starts_physical_line, starts_logical_line)
+        (starts_line, starts_statement)
     }
 
-    fn try_linemarker(cursor: &mut Cursor<'_>, starts_line: bool) -> Option<Kind> {
-        if cursor.peek() != Some(b'#') || !starts_line {
+    fn try_linemarker(cursor: &mut Cursor<'_>, starts_statement: bool) -> Option<Kind> {
+        if cursor.peek() != Some(b'#') || !starts_statement {
             return None;
         }
 
@@ -392,11 +392,11 @@ impl<T: LlvmTarget> Llvm<T> {
 
 impl<T: LlvmTarget> Dialect for Llvm<T> {
     fn next_item(cur: &mut Cursor<'_>) -> Option<Item> {
-        let (starts_physical, starts_logical) = Self::lex_preamble(cur);
+        let (starts_line, starts_statement) = Self::lex_preamble(cur);
 
         let start = cur.pos();
 
-        let kind = Self::try_linemarker(cur, starts_logical)
+        let kind = Self::try_linemarker(cur, starts_statement)
             .or_else(|| Self::try_slash_star_comment(cur))
             .or_else(|| Self::try_line_comment(cur))
             .or_else(|| Self::try_symbol_kind(cur))?;
@@ -404,7 +404,7 @@ impl<T: LlvmTarget> Dialect for Llvm<T> {
         Some(Item {
             kind,
             span: start..cur.pos(),
-            starts_line: starts_physical,
+            starts_line,
         })
     }
 }
