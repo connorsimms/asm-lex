@@ -23,13 +23,13 @@ fn try_single_quoted() {
         (br"'\\''", Some(0..4), 4),
         (br#"'\"'"#, Some(0..4), 4),
     ];
-    check_try_single_quoted::<X86LinuxElf>(cases);
+    check_try_single_quoted::<X86Elf>(cases);
     check_try_single_quoted::<X86Darwin>(cases);
-    check_try_single_quoted::<ArmLinuxElf>(cases);
+    check_try_single_quoted::<ArmElf>(cases);
     check_try_single_quoted::<ArmDarwin>(cases);
-    check_try_single_quoted::<Aarch64LinuxElf>(cases);
+    check_try_single_quoted::<Aarch64Elf>(cases);
     check_try_single_quoted::<Aarch64Darwin>(cases);
-    check_try_single_quoted::<RiscvLinuxElf>(cases);
+    check_try_single_quoted::<RiscvElf>(cases);
     check_try_single_quoted::<RiscvDarwin>(cases);
 }
 
@@ -51,13 +51,13 @@ fn eat_double_quoted() {
         (b"\"a\tb\"", 0..5, 5),
         (b"\"a\\\"b\"", 0..6, 6),
     ];
-    check_eat_double_quoted::<X86LinuxElf>(cases);
+    check_eat_double_quoted::<X86Elf>(cases);
     check_eat_double_quoted::<X86Darwin>(cases);
-    check_eat_double_quoted::<ArmLinuxElf>(cases);
+    check_eat_double_quoted::<ArmElf>(cases);
     check_eat_double_quoted::<ArmDarwin>(cases);
-    check_eat_double_quoted::<Aarch64LinuxElf>(cases);
+    check_eat_double_quoted::<Aarch64Elf>(cases);
     check_eat_double_quoted::<Aarch64Darwin>(cases);
-    check_eat_double_quoted::<RiscvLinuxElf>(cases);
+    check_eat_double_quoted::<RiscvElf>(cases);
     check_eat_double_quoted::<RiscvDarwin>(cases);
 }
 
@@ -80,12 +80,12 @@ fn eat_semicolon_line_separator() {
         (b"#", false, 0),
         (b"\n", false, 0),
     ];
-    check_eat_line_separator::<X86LinuxElf>(cases);
+    check_eat_line_separator::<X86Elf>(cases);
     check_eat_line_separator::<X86Darwin>(cases);
-    check_eat_line_separator::<ArmLinuxElf>(cases);
+    check_eat_line_separator::<ArmElf>(cases);
     check_eat_line_separator::<ArmDarwin>(cases);
-    check_eat_line_separator::<Aarch64LinuxElf>(cases);
-    check_eat_line_separator::<RiscvLinuxElf>(cases);
+    check_eat_line_separator::<Aarch64Elf>(cases);
+    check_eat_line_separator::<RiscvElf>(cases);
 }
 
 #[test]
@@ -123,12 +123,12 @@ fn lex_preamble() {
         (b"Label:\r# ...", 6, (true, true), 7),
         (b"Label:\n\r# ...", 6, (true, true), 8),
     ];
-    check_lex_preamble::<X86LinuxElf>(cases);
+    check_lex_preamble::<X86Elf>(cases);
     check_lex_preamble::<X86Darwin>(cases);
-    check_lex_preamble::<ArmLinuxElf>(cases);
+    check_lex_preamble::<ArmElf>(cases);
     check_lex_preamble::<ArmDarwin>(cases);
-    check_lex_preamble::<Aarch64LinuxElf>(cases);
-    check_lex_preamble::<RiscvLinuxElf>(cases);
+    check_lex_preamble::<Aarch64Elf>(cases);
+    check_lex_preamble::<RiscvElf>(cases);
     check_lex_preamble::<Aarch64Darwin>(cases);
     check_lex_preamble::<RiscvDarwin>(cases);
 }
@@ -140,12 +140,12 @@ fn lex_preamble_semicolon_separator() {
         (b"\n;symbol", 0, (true, true), 2),
         (b"Label:;# ...", 6, (false, true), 7),
     ];
-    check_lex_preamble::<X86LinuxElf>(cases);
+    check_lex_preamble::<X86Elf>(cases);
     check_lex_preamble::<X86Darwin>(cases);
-    check_lex_preamble::<ArmLinuxElf>(cases);
+    check_lex_preamble::<ArmElf>(cases);
     check_lex_preamble::<ArmDarwin>(cases);
-    check_lex_preamble::<Aarch64LinuxElf>(cases);
-    check_lex_preamble::<RiscvLinuxElf>(cases);
+    check_lex_preamble::<Aarch64Elf>(cases);
+    check_lex_preamble::<RiscvElf>(cases);
 }
 
 #[test]
@@ -162,7 +162,7 @@ fn lex_preamble_double_percent_separator() {
 fn check_try_linemarker<T: LlvmTarget>(cases: &[(&[u8], Option<Kind>, usize)]) {
     for (bytes, kind, pos) in cases {
         let mut cursor = Cursor::new(bytes);
-        assert_eq!(Llvm::<T>::try_linemarker(&mut cursor, true), *kind);
+        assert_eq!(Llvm::<T>::try_linemarker(&mut cursor), *kind);
         assert_eq!(cursor.pos(), *pos);
     }
 }
@@ -183,12 +183,12 @@ fn try_linemarker() {
         (b"# 100 comment", None, 0),
         (b"# comment \"file\"", None, 0),
     ];
-    check_try_linemarker::<X86LinuxElf>(cases);
+    check_try_linemarker::<X86Elf>(cases);
     check_try_linemarker::<X86Darwin>(cases);
-    check_try_linemarker::<ArmLinuxElf>(cases);
+    check_try_linemarker::<ArmElf>(cases);
     check_try_linemarker::<ArmDarwin>(cases);
-    check_try_linemarker::<Aarch64LinuxElf>(cases);
-    check_try_linemarker::<RiscvLinuxElf>(cases);
+    check_try_linemarker::<Aarch64Elf>(cases);
+    check_try_linemarker::<RiscvElf>(cases);
     check_try_linemarker::<Aarch64Darwin>(cases);
     check_try_linemarker::<RiscvDarwin>(cases);
 }
@@ -201,7 +201,7 @@ fn check_is_line_comment<T: LlvmTarget>(cases: &[(&[u8], bool)]) {
 }
 
 #[test]
-fn is_line_comment_x86_linux_elf() {
+fn is_line_comment_x86_elf() {
     let cases: &[(&[u8], bool)] = &[
         (b"# ", true),
         (b"## ", true),
@@ -209,7 +209,7 @@ fn is_line_comment_x86_linux_elf() {
         (b"@@ ", false),
         (b";; ", false),
     ];
-    check_is_line_comment::<X86LinuxElf>(cases);
+    check_is_line_comment::<X86Elf>(cases);
 }
 
 #[test]
@@ -228,14 +228,14 @@ fn is_line_comment_x86_darwin() {
 fn check_try_line_comment<T: LlvmTarget>(cases: &[(&[u8], Option<Kind>, usize)]) {
     for (bytes, kind, pos) in cases {
         let mut cursor = Cursor::new(bytes);
-        assert_eq!(Llvm::<T>::try_line_comment(&mut cursor), *kind);
+        assert_eq!(Llvm::<T>::try_line_comment(&mut cursor, true), *kind);
         assert_eq!(cursor.pos(), *pos);
     }
 }
 
 #[test]
-fn try_line_comment_x86_linux_elf() {
-    use Kind::Comment;
+fn try_line_comment_x86_elf() {
+    use Kind::{Comment, Preprocessor};
     let cases: &[(&[u8], Option<Kind>, usize)] = &[
         (b"# ...", Some(Comment), 5),
         (b"# ...\n", Some(Comment), 5),
@@ -243,16 +243,23 @@ fn try_line_comment_x86_linux_elf() {
         (b"// ...", Some(Comment), 6),
         (b"// ...\n", Some(Comment), 6),
         (b"// ...\r", Some(Comment), 6),
+        (b"# 100 \"file\"\n", Some(Preprocessor), 12),
+        (b"# 100 \"file\"\r", Some(Preprocessor), 12),
+        (b"# 100 \"file\"", Some(Preprocessor), 12),
+        (b"#100 \"file\"", Some(Preprocessor), 11),
+        (b"#100\"file\"", Some(Preprocessor), 10),
+        (b"# 100 \"\"", Some(Preprocessor), 8),
+        (b"# 100 \"file\" junk", Some(Preprocessor), 17),
         (b"@ ...", None, 0),
         (b"; ...", None, 0),
         (b"! ...", None, 0),
     ];
-    check_try_line_comment::<X86LinuxElf>(cases);
+    check_try_line_comment::<X86Elf>(cases);
 }
 
 #[test]
 fn try_line_comment_x86_darwin() {
-    use Kind::Comment;
+    use Kind::{Comment, Preprocessor};
     let cases: &[(&[u8], Option<Kind>, usize)] = &[
         (b"# ...", Some(Comment), 5),
         (b"## ...", Some(Comment), 6),
@@ -261,6 +268,13 @@ fn try_line_comment_x86_darwin() {
         (b"// ...", Some(Comment), 6),
         (b"// ...\n", Some(Comment), 6),
         (b"// ...\r", Some(Comment), 6),
+        (b"# 100 \"file\"\n", Some(Preprocessor), 12),
+        (b"# 100 \"file\"\r", Some(Preprocessor), 12),
+        (b"# 100 \"file\"", Some(Preprocessor), 12),
+        (b"#100 \"file\"", Some(Preprocessor), 11),
+        (b"#100\"file\"", Some(Preprocessor), 10),
+        (b"# 100 \"\"", Some(Preprocessor), 8),
+        (b"# 100 \"file\" junk", Some(Preprocessor), 17),
         (b"@ ...", None, 0),
         (b"; ...", None, 0),
         (b"! ...", None, 0),
