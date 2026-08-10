@@ -224,3 +224,46 @@ fn is_line_comment_x86_darwin() {
     ];
     check_is_line_comment::<X86Darwin>(cases);
 }
+
+fn check_try_line_comment<T: LlvmTarget>(cases: &[(&[u8], Option<Kind>, usize)]) {
+    for (bytes, kind, pos) in cases {
+        let mut cursor = Cursor::new(bytes);
+        assert_eq!(Llvm::<T>::try_line_comment(&mut cursor), *kind);
+        assert_eq!(cursor.pos(), *pos);
+    }
+}
+
+#[test]
+fn try_line_comment_x86_linux_elf() {
+    use Kind::Comment;
+    let cases: &[(&[u8], Option<Kind>, usize)] = &[
+        (b"# ...", Some(Comment), 5),
+        (b"# ...\n", Some(Comment), 5),
+        (b"# ...\r", Some(Comment), 5),
+        (b"// ...", Some(Comment), 6),
+        (b"// ...\n", Some(Comment), 6),
+        (b"// ...\r", Some(Comment), 6),
+        (b"@ ...", None, 0),
+        (b"; ...", None, 0),
+        (b"! ...", None, 0),
+    ];
+    check_try_line_comment::<X86LinuxElf>(cases);
+}
+
+#[test]
+fn try_line_comment_x86_darwin() {
+    use Kind::Comment;
+    let cases: &[(&[u8], Option<Kind>, usize)] = &[
+        (b"# ...", Some(Comment), 5),
+        (b"## ...", Some(Comment), 6),
+        (b"# ...\n", Some(Comment), 5),
+        (b"# ...\r", Some(Comment), 5),
+        (b"// ...", Some(Comment), 6),
+        (b"// ...\n", Some(Comment), 6),
+        (b"// ...\r", Some(Comment), 6),
+        (b"@ ...", None, 0),
+        (b"; ...", None, 0),
+        (b"! ...", None, 0),
+    ];
+    check_try_line_comment::<X86Darwin>(cases);
+}
