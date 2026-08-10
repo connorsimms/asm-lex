@@ -192,3 +192,35 @@ fn try_linemarker() {
     check_try_linemarker::<Aarch64Darwin>(cases);
     check_try_linemarker::<RiscvDarwin>(cases);
 }
+
+fn check_is_line_comment<T: LlvmTarget>(cases: &[(&[u8], bool)]) {
+    for (bytes, res) in cases {
+        let cursor = Cursor::new(bytes);
+        assert_eq!(Llvm::<T>::is_line_comment(&cursor), *res);
+    }
+}
+
+#[test]
+fn is_line_comment_x86_linux_elf() {
+    let cases: &[(&[u8], bool)] = &[
+        (b"# ", true),
+        (b"## ", true),
+        (b"// ", true),
+        (b"@@ ", false),
+        (b";; ", false),
+    ];
+    check_is_line_comment::<X86LinuxElf>(cases);
+}
+
+#[test]
+// https://github.com/llvm/llvm-project/blob/main/llvm/test/MC/AsmParser/comments-x86-darwin.s
+fn is_line_comment_x86_darwin() {
+    let cases: &[(&[u8], bool)] = &[
+        (b"# ", true),
+        (b"## ", true),
+        (b"// ", true),
+        (b"@@ ", false),
+        (b";; ", false),
+    ];
+    check_is_line_comment::<X86Darwin>(cases);
+}
