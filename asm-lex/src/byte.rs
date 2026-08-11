@@ -31,8 +31,9 @@ impl ByteSet {
 
     #[must_use]
     /// # Panics
-    /// Panics if a multibyte comment sequence is empty.
-    pub const fn from_first_bytes(input: &[[u8; 2]]) -> Self {
+    /// Panics if a multibyte sequence is empty.
+    pub const fn from_first_bytes<const N: usize>(input: &[[u8; N]]) -> Self {
+        assert!(N != 0, "Multibyte sequences should not be empty");
         let mut set = Self::new();
         let mut i = 0;
         while i < input.len() {

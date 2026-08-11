@@ -89,6 +89,20 @@ proptest! {
 }
 
 #[test]
+fn from_range() {
+    const SET: ByteSet = ByteSet::from_range(b'a', b'y');
+    for b in 0u8..b'a' {
+        assert!(!SET.contains(b));
+    }
+    for b in b'a'..=b'y' {
+        assert!(SET.contains(b));
+    }
+    for b in b'z'..=255 {
+        assert!(!SET.contains(b));
+    }
+}
+
+#[test]
 fn contains() {
     const BYTES: &[u8] = b"ABC123!@#";
     const SET: ByteSet = ByteSet::from_bytes(BYTES);
@@ -157,10 +171,10 @@ proptest! {
 #[test]
 fn with_byte() {
     const SET1: ByteSet = ByteSet::new().with_byte(0);
+    const SET2: ByteSet = ByteSet::new().with_byte(255);
     for b in 0u8..=255 {
         assert_eq!(SET1.contains(b), b == 0);
     }
-    const SET2: ByteSet = ByteSet::new().with_byte(255);
     for b in 0u8..=255 {
         assert_eq!(SET2.contains(b), b == 255);
     }

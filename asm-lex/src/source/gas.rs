@@ -151,7 +151,10 @@ impl<T: GasTarget> Gas<T> {
     }
 
     fn try_linemarker(cursor: &mut Cursor<'_>) -> Option<source::Kind> {
-        if !T::HAS_LINEMARKERS || cursor.peek() != Some(b'#') || !cursor.at_line_start() {
+        if !T::HAS_LINEMARKERS
+            || cursor.peek() != Some(b'#')
+            || cursor.seek(-1).is_some_and(|b| b != b'\n')
+        {
             return None;
         }
 
