@@ -144,7 +144,7 @@ impl<T: LlvmTarget> Llvm<T> {
     #[inline]
     fn lex_preamble(cursor: &mut Cursor<'_>) -> (bool, bool) {
         let mut starts_line = cursor.pos() == 0;
-        let mut starts_statement = cursor.pos() == 0;
+        let mut starts_statement = cursor.pos() == 0 || cursor.seek(-1) == Some(b':');
         loop {
             if !cursor.eat_while(|b| Self::is_end_of_line(b)).is_empty() {
                 starts_line = true;
@@ -170,7 +170,7 @@ impl<T: LlvmTarget> Llvm<T> {
         if cursor.peek() != Some(b'#')
             || cursor
                 .seek(-1)
-                .is_some_and(|b| Self::is_horizontal_whitespace(b))
+                .is_some_and(|b| Self::is_horizontal_whitespace(b) || b == b':')
         {
             return None;
         }
