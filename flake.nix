@@ -75,17 +75,43 @@
             '';
           };
 
-          cross = pkgs.mkShell {
+          csmith = pkgs.mkShell {
+            nativeBuildInputs = with pkgs; [
+              csmith
+            ];
+          };
+
+          gnu64-gnu = pkgs.mkShell {
             nativeBuildInputs = with pkgs; [
               pkgsCross.gnu64.buildPackages.gcc
               pkgsCross.gnu64.buildPackages.binutils
+            ];
+          };
+
+          gnu64-llvm = pkgs.mkShell {
+            nativeBuildInputs = with pkgs; [
+              pkgsCross.gnu64.buildPackages.llvmPackages.llvm
+            ];
+          };
+
+          aarch64-gnu = pkgs.mkShell {
+            nativeBuildInputs = with pkgs; [
               pkgsCross.aarch64-multiplatform.buildPackages.gcc
               pkgsCross.aarch64-multiplatform.buildPackages.binutils
+            ];
+          };
+
+          arm-gnu = pkgs.mkShell {
+            nativeBuildInputs = with pkgs; [
               pkgsCross.armv7l-hf-multiplatform.buildPackages.gcc
               pkgsCross.armv7l-hf-multiplatform.buildPackages.binutils
+            ];
+          };
+
+          riscv64-gnu = pkgs.mkShell {
+            nativeBuildInputs = with pkgs; [
               pkgsCross.riscv64.buildPackages.gcc
               pkgsCross.riscv64.buildPackages.binutils
-              csmith
             ];
           };
         };
