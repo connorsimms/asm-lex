@@ -42,11 +42,6 @@ impl<'a> Cursor<'a> {
     }
 
     #[inline]
-    pub fn at_line_start(&self) -> bool {
-        self.pos() == 0 || self.seek(-1).is_some_and(|b| b == b'\n')
-    }
-
-    #[inline]
     pub fn peek(&self) -> Option<u8> {
         self.bytes.get(self.pos).copied()
     }

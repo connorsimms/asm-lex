@@ -5,7 +5,7 @@ use proptest::collection::vec;
 use proptest::prelude::*;
 
 #[test]
-fn test_new() {
+fn new() {
     let bytes = b"Some string";
     let cursor = Cursor::new(bytes);
     assert_eq!(cursor.pos(), 0);
@@ -13,7 +13,24 @@ fn test_new() {
 }
 
 #[test]
-fn test_restore() {
+fn pos() {
+    let bytes = b"Some string";
+    let mut cursor = Cursor::new(bytes);
+    for i in 0..bytes.len() {
+        cursor.pos = i;
+        assert_eq!(cursor.pos(), i);
+    }
+}
+
+#[test]
+fn bytes() {
+    let bytes = b"Some string";
+    let cursor = Cursor::new(bytes);
+    assert_eq!(cursor.bytes(), bytes);
+}
+
+#[test]
+fn restore() {
     let bytes = b"Some string";
     let mut cursor = Cursor::new(bytes);
     for i in 0..=bytes.len() {
@@ -24,14 +41,14 @@ fn test_restore() {
 
 #[test]
 #[should_panic(expected = "out of bounds")]
-fn test_restore_invalid() {
+fn restore_invalid() {
     let bytes = b"Some string";
     let mut cursor = Cursor::new(bytes);
     cursor.restore(bytes.len() + 1);
 }
 
 #[test]
-fn test_advance() {
+fn advance() {
     let bytes = &[b'a'; 100];
     let mut cursor = Cursor::new(bytes);
     let mut prev = 0;
@@ -56,24 +73,7 @@ proptest! {
 }
 
 #[test]
-fn test_at_line_start() {
-    let mut cursor = Cursor::new(b"\nSome\nstring\n");
-    assert!(cursor.at_line_start());
-    cursor.advance(1);
-    assert!(cursor.at_line_start());
-    cursor.advance(1);
-    assert!(!cursor.at_line_start());
-    cursor.advance(4);
-    assert!(cursor.at_line_start());
-    cursor.advance(usize::MAX);
-    assert!(cursor.at_line_start());
-    let mut cursor = Cursor::new(b"\nSome\nstring");
-    cursor.advance(usize::MAX);
-    assert!(!cursor.at_line_start());
-}
-
-#[test]
-fn test_peek() {
+fn peek() {
     let mut cursor = Cursor::new(b"Some string");
     for i in 0..cursor.bytes().len() {
         assert_eq!(cursor.peek(), Some(cursor.bytes()[i]));
@@ -83,7 +83,7 @@ fn test_peek() {
 }
 
 #[test]
-fn test_seek() {
+fn seek() {
     let mut cursor = Cursor::new(b"Some string");
     assert_eq!(cursor.seek(isize::MIN), None);
     assert_eq!(cursor.seek(-1), None);
@@ -99,7 +99,7 @@ fn test_seek() {
 }
 
 #[test]
-fn test_starts_with() {
+fn starts_with() {
     let mut cursor = Cursor::new(b"Some string");
     assert!(cursor.starts_with(b""));
     assert!(cursor.starts_with(b"S"));
@@ -124,7 +124,7 @@ proptest! {
 }
 
 #[test]
-fn test_bump() {
+fn bump() {
     let mut cursor = Cursor::new(b"Some string");
     assert_eq!(cursor.bump(), Some(b'S'));
     assert_eq!(cursor.pos(), 1);
@@ -171,7 +171,7 @@ proptest! {
 }
 
 #[test]
-fn test_eat() {
+fn eat() {
     let mut cursor = Cursor::new(b"Some string");
     assert!(cursor.eat(b'S'));
     assert_eq!(cursor.pos(), 1);
@@ -216,7 +216,7 @@ proptest! {
 }
 
 #[test]
-fn test_eat_while() {
+fn eat_while() {
     let mut cursor = Cursor::new(b"Some string");
     assert_eq!(cursor.eat_while(|b| b == b'S' || b == b'o'), 0..2);
     assert_eq!(cursor.pos(), 2);
@@ -259,8 +259,24 @@ fn eat_until_any_of_2() {
     let mut cursor = Cursor::new(b"Some string");
     assert_eq!(cursor.eat_until(&AnyOf(*b"So")), 0..0);
     assert_eq!(cursor.pos(), 0);
-    assert_eq!(cursor.eat_until(&AnyOf(*b"tr")), 0..6);
-    assert_eq!(cursor.pos(), 6);
-    assert_eq!(cursor.eat_until(&AnyOf(*b"So")), 6..11);
+    assert_eq!(cursor.eat_until(&AnyOf(*b"em")), 0..2);
+    assert_eq!(cursor.pos(), 2);
+    assert_eq!(cursor.eat_until(&AnyOf(*b"st")), 2..5);
+    assert_eq!(cursor.pos(), 5);
+    assert_eq!(cursor.eat_until(&AnyOf(*b"So")), 5..11);
+    assert_eq!(cursor.pos(), 11);
+}
+
+#[test]
+fn eat_until_substring_2() {
+    use crate::pattern::Substring;
+    let mut cursor = Cursor::new(b"Some string");
+    assert_eq!(cursor.eat_until(&Substring(*b"So")), 0..0);
+    assert_eq!(cursor.pos(), 0);
+    assert_eq!(cursor.eat_until(&Substring(*b"me")), 0..2);
+    assert_eq!(cursor.pos(), 2);
+    assert_eq!(cursor.eat_until(&Substring(*b"st")), 2..5);
+    assert_eq!(cursor.pos(), 5);
+    assert_eq!(cursor.eat_until(&Substring(*b"So")), 5..11);
     assert_eq!(cursor.pos(), 11);
 }
