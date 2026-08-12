@@ -3,7 +3,6 @@
 
 pub mod invariants;
 pub mod snapshot;
-pub mod targets;
 
 // prototype api design stuff
 
@@ -60,9 +59,7 @@ pub fn for_each_span(
                 f("args", a);
             }
         }
-        Comment => {}
-        Preprocessor => {}
-        Unknown => {}
+        Comment | Preprocessor | Unknown => {}
         _ => {
             panic!("Variant is not handled");
         }
