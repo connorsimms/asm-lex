@@ -44,10 +44,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "asm-parse"
-version = "0.1.0"
-
-[[package]]
 name = "autocfg"
 version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
