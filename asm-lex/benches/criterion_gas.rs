@@ -1,4 +1,4 @@
-use asm_lex::lexer::Lexer;
+use asm_lex::source::lexer::Lexer;
 use asm_lex::source::{
     gas::{targets::*, Gas},
     Dialect, Item,
