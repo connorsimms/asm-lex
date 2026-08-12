@@ -105,28 +105,3 @@ impl Item {
         }
     }
 }
-
-pub struct SourceLexer<'a, D: asm_lex::source::Dialect> {
-    cursor: asm_lex::cursor::Cursor<'a>,
-    bytes: &'a [u8],
-    _dialect: core::marker::PhantomData<D>,
-}
-
-impl<'a, D: asm_lex::source::Dialect> SourceLexer<'a, D> {
-    pub fn from_bytes(bytes: &'a [u8]) -> Self {
-        Self {
-            cursor: asm_lex::cursor::Cursor::new(bytes),
-            bytes,
-            _dialect: core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, D: asm_lex::source::Dialect> Iterator for SourceLexer<'a, D> {
-    type Item = self::Item;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let item = D::next_item(&mut self.cursor);
-        item.map(|i| Self::Item::from_source_item(&i, self.bytes))
-    }
-}

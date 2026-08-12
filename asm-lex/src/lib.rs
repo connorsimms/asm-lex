@@ -3,7 +3,6 @@
 
 pub mod byte;
 pub mod cursor;
-pub mod lexer;
 pub mod listing;
 pub mod pattern;
 mod sealed;
