@@ -185,7 +185,30 @@ proptest! {
     fn prop_with_byte(byte: u8) {
         let set = ByteSet::new().with_byte(byte);
         for b in 0u8..=255 {
-            assert_eq!(set.contains(b), b == byte);
+            prop_assert_eq!(set.contains(b), b == byte);
+        }
+    }
+}
+
+#[test]
+fn with_byte_if() {
+    const SET1: ByteSet = ByteSet::new().with_byte_if(0, true);
+    const SET2: ByteSet = ByteSet::new().with_byte_if(255, false);
+    for b in 0u8..=255 {
+        assert_eq!(SET1.contains(b), b == 0);
+    }
+    for b in 0u8..=255 {
+        assert!(!SET2.contains(b));
+    }
+}
+
+proptest! {
+    #[test]
+    fn prop_with_byte_if(byte: u8, cond: bool)
+    {
+        let set = ByteSet::new().with_byte_if(byte,cond);
+        for b in 0u8..=255 {
+            prop_assert_eq!(set.contains(b), b == byte && cond);
         }
     }
 }
