@@ -3,7 +3,7 @@ mod tests;
 
 pub mod targets;
 
-use crate::byte::{ByteSet, Class, ClassTable};
+use crate::byte::{Class, Set, Table};
 use crate::cursor::Cursor;
 use crate::source;
 use crate::source::{Dialect, Item};
@@ -11,25 +11,25 @@ use crate::Span;
 
 pub trait GasTarget {
     // Anything from byte to newline is a comment, can be placed anywhere
-    const COMMENT_CHARS: ByteSet;
+    const COMMENT_CHARS: Set;
 
     // Anything from byte to newline is a comment, must be first character
-    const LINE_COMMENT_CHARS: ByteSet;
+    const LINE_COMMENT_CHARS: Set;
 
     // Anything from byte sequence to newline is a comment, can be placed anywhere
     const MULTI_COMMENT_CHARS: &'static [[u8; 2]];
 
     // The starting bytes of multi-byte comment sequence
-    const MULTI_COMMENT_START_CHARS: ByteSet = ByteSet::from_first_bytes(Self::MULTI_COMMENT_CHARS);
+    const MULTI_COMMENT_START_CHARS: Set = Set::from_first_bytes(Self::MULTI_COMMENT_CHARS);
 
     // A statement ends at a newline or line separator
-    const LINE_SEPARATOR_CHARS: ByteSet;
+    const LINE_SEPARATOR_CHARS: Set;
 
     // Characters that symbols can start with
-    const SYMBOL_START_CHARS: ByteSet;
+    const SYMBOL_START_CHARS: Set;
 
     // Characters that may follow
-    const SYMBOL_CONTINUE_CHARS: ByteSet;
+    const SYMBOL_CONTINUE_CHARS: Set;
 
     // Whether (55$:) is a valid label or not
     const LOCAL_LABELS_DOLLAR: bool = false;
@@ -44,24 +44,24 @@ pub struct Gas<T: GasTarget> {
 
 impl<T: GasTarget> Gas<T> {
     // Characters not included in the spans of Items
-    const GAP_CHARS: ByteSet = ByteSet::from_bytes(b" \t\r\n").with_set(&T::LINE_SEPARATOR_CHARS);
+    const GAP_CHARS: Set = Set::from_bytes(b" \t\r\n").with_set(&T::LINE_SEPARATOR_CHARS);
 
     // Horizontal whitespace characters
-    const HSPACE_CHARS: ByteSet = ByteSet::from_bytes(b" \t\r");
+    const HSPACE_CHARS: Set = Set::from_bytes(b" \t\r");
 
     // Characters at which lex_args may be interrupted
-    const ARG_STOP_CHARS: ByteSet = ByteSet::from_bytes(b"\n\"/")
+    const ARG_STOP_CHARS: Set = Set::from_bytes(b"\n\"/")
         .with_set(&T::LINE_SEPARATOR_CHARS)
         .with_set(&T::COMMENT_CHARS)
         .with_set(&T::MULTI_COMMENT_START_CHARS);
 
     // Characters at which lex_args may end
-    const STATEMENT_END_CHARS: ByteSet = ByteSet::from_bytes(b"\n")
+    const STATEMENT_END_CHARS: Set = Set::from_bytes(b"\n")
         .with_set(&T::LINE_SEPARATOR_CHARS)
         .with_set(&T::COMMENT_CHARS);
 
     // Characters that comments or linemarkers start with
-    const TRIVIA_START_CHARS: ByteSet = ByteSet::from_bytes(b"/")
+    const TRIVIA_START_CHARS: Set = Set::from_bytes(b"/")
         .with_set(&T::MULTI_COMMENT_START_CHARS)
         .with_set(&T::LINE_COMMENT_CHARS)
         .with_set(&T::COMMENT_CHARS);
@@ -78,7 +78,7 @@ impl<T: GasTarget> Gas<T> {
     const STATEMENT_END: Class = Class::with_bit(9);
     const TRIVIA_START: Class = Class::with_bit(10);
 
-    const TABLE: ClassTable = ClassTable::build(&[
+    const TABLE: Table = Table::build(&[
         (Self::COMMENT, &T::COMMENT_CHARS),
         (Self::LINE_COMMENT, &T::LINE_COMMENT_CHARS),
         (Self::MULTI_START, &T::MULTI_COMMENT_START_CHARS),

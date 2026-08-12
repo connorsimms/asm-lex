@@ -9,7 +9,7 @@ extern crate alloc;
 
 #[test]
 fn new() {
-    const SET: ByteSet = ByteSet::new();
+    const SET: Set = Set::new();
     for b in 0u8..=255 {
         assert!(!SET.contains(b));
     }
@@ -18,7 +18,7 @@ fn new() {
 #[test]
 fn from_bytes() {
     const BYTES: &[u8] = b"ABCDEF";
-    const SET: ByteSet = ByteSet::from_bytes(BYTES);
+    const SET: Set = Set::from_bytes(BYTES);
     for b in 0u8..=255 {
         assert_eq!(SET.contains(b), BYTES.contains(&b));
     }
@@ -26,7 +26,7 @@ fn from_bytes() {
 
 #[test]
 fn from_bytes_empty() {
-    const SET: ByteSet = ByteSet::from_bytes(b"");
+    const SET: Set = Set::from_bytes(b"");
     for b in 0u8..=255 {
         assert!(!SET.contains(b));
     }
@@ -35,7 +35,7 @@ fn from_bytes_empty() {
 #[test]
 fn from_bytes_repeat() {
     const BYTES: &[u8] = b"AAABBCDD";
-    const SET: ByteSet = ByteSet::from_bytes(BYTES);
+    const SET: Set = Set::from_bytes(BYTES);
     for b in 0u8..=255 {
         assert_eq!(SET.contains(b), BYTES.contains(&b));
     }
@@ -44,7 +44,7 @@ fn from_bytes_repeat() {
 proptest! {
     #[test]
     fn prop_from_bytes(bytes in vec(any::<u8>(), 0..300)) {
-        let set = ByteSet::from_bytes(&bytes);
+        let set = Set::from_bytes(&bytes);
         for b in 0u8..=255 {
             prop_assert_eq!(set.contains(b), bytes.contains(&b));
         }
@@ -54,7 +54,7 @@ proptest! {
 #[test]
 fn from_first_bytes() {
     const WORDS: &[[u8; 2]] = &[*b"AA", *b"BB", *b"CC"];
-    const SET: ByteSet = ByteSet::from_first_bytes(WORDS);
+    const SET: Set = Set::from_first_bytes(WORDS);
     for b in 0u8..=255 {
         assert_eq!(SET.contains(b), (b'A'..=b'C').contains(&b));
     }
@@ -63,7 +63,7 @@ fn from_first_bytes() {
 #[test]
 fn from_first_bytes_empty() {
     const WORDS: &[[u8; 2]] = &[];
-    const SET: ByteSet = ByteSet::from_first_bytes(WORDS);
+    const SET: Set = Set::from_first_bytes(WORDS);
     for b in 0u8..=255 {
         assert!(!SET.contains(b));
     }
@@ -72,7 +72,7 @@ fn from_first_bytes_empty() {
 #[test]
 fn from_first_bytes_repeat() {
     const WORDS: &[[u8; 2]] = &[*b"AA", *b"BB", *b"BB"];
-    const SET: ByteSet = ByteSet::from_first_bytes(WORDS);
+    const SET: Set = Set::from_first_bytes(WORDS);
     for b in 0u8..=255 {
         assert_eq!(SET.contains(b), (b'A'..=b'B').contains(&b));
     }
@@ -81,7 +81,7 @@ fn from_first_bytes_repeat() {
 proptest! {
     #[test]
     fn prop_from_first_bytes(bytes in vec(proptest::array::uniform2(1u8..), 0..300)) {
-        let set = ByteSet::from_first_bytes(&bytes);
+        let set = Set::from_first_bytes(&bytes);
         for b in 0u8..=255 {
             prop_assert_eq!(set.contains(b), bytes.iter().any(|w| w.first() == Some(&b)));
         }
@@ -90,7 +90,7 @@ proptest! {
 
 #[test]
 fn from_range() {
-    const SET: ByteSet = ByteSet::from_range(b'a', b'y');
+    const SET: Set = Set::from_range(b'a', b'y');
     for b in 0u8..b'a' {
         assert!(!SET.contains(b));
     }
@@ -105,7 +105,7 @@ fn from_range() {
 #[test]
 fn contains() {
     const BYTES: &[u8] = b"ABC123!@#";
-    const SET: ByteSet = ByteSet::from_bytes(BYTES);
+    const SET: Set = Set::from_bytes(BYTES);
     for b in 0u8..=255 {
         assert_eq!(SET.contains(b), BYTES.contains(&b));
     }
@@ -113,7 +113,7 @@ fn contains() {
 
 #[test]
 fn insert() {
-    let mut set = ByteSet::new();
+    let mut set = Set::new();
     set.insert(0u8);
     assert!(set.contains(0u8));
     set.insert(255u8);
@@ -123,7 +123,7 @@ fn insert() {
 proptest! {
     #[test]
     fn prop_insert_byte(b: u8) {
-        let mut set = ByteSet::new();
+        let mut set = Set::new();
         set.insert(b);
 
         for x in 0u8..=255 {
@@ -133,7 +133,7 @@ proptest! {
 
     #[test]
     fn prop_insert_bytes(bytes in vec(any::<u8>(), 0..300)) {
-        let mut set = ByteSet::new();
+        let mut set = Set::new();
         for b in &bytes {
             set.insert(*b);
         }
@@ -148,8 +148,8 @@ proptest! {
 fn union() {
     let bytes1 = b"ABC";
     let bytes2 = b"XYZ";
-    let mut set1 = ByteSet::from_bytes(bytes1);
-    let set2 = ByteSet::from_bytes(bytes2);
+    let mut set1 = Set::from_bytes(bytes1);
+    let set2 = Set::from_bytes(bytes2);
     set1.union(&set2);
     for b in 0u8..=255 {
         assert_eq!(set1.contains(b), bytes1.contains(&b) || bytes2.contains(&b));
@@ -159,8 +159,8 @@ fn union() {
 proptest! {
     #[test]
     fn prop_union(bytes1 in vec(any::<u8>(), 0..100), bytes2 in vec(any::<u8>(), 0..100)) {
-        let mut set1 = ByteSet::from_bytes(&bytes1);
-        let set2 = ByteSet::from_bytes(&bytes2);
+        let mut set1 = Set::from_bytes(&bytes1);
+        let set2 = Set::from_bytes(&bytes2);
         set1.union(&set2);
         for b in 0u8..=255 {
             prop_assert_eq!(set1.contains(b), bytes1.contains(&b) || bytes2.contains(&b));
@@ -170,8 +170,8 @@ proptest! {
 
 #[test]
 fn with_byte() {
-    const SET1: ByteSet = ByteSet::new().with_byte(0);
-    const SET2: ByteSet = ByteSet::new().with_byte(255);
+    const SET1: Set = Set::new().with_byte(0);
+    const SET2: Set = Set::new().with_byte(255);
     for b in 0u8..=255 {
         assert_eq!(SET1.contains(b), b == 0);
     }
@@ -183,7 +183,7 @@ fn with_byte() {
 proptest! {
     #[test]
     fn prop_with_byte(byte: u8) {
-        let set = ByteSet::new().with_byte(byte);
+        let set = Set::new().with_byte(byte);
         for b in 0u8..=255 {
             prop_assert_eq!(set.contains(b), b == byte);
         }
@@ -192,8 +192,8 @@ proptest! {
 
 #[test]
 fn with_byte_if() {
-    const SET1: ByteSet = ByteSet::new().with_byte_if(0, true);
-    const SET2: ByteSet = ByteSet::new().with_byte_if(255, false);
+    const SET1: Set = Set::new().with_byte_if(0, true);
+    const SET2: Set = Set::new().with_byte_if(255, false);
     for b in 0u8..=255 {
         assert_eq!(SET1.contains(b), b == 0);
     }
@@ -206,7 +206,7 @@ proptest! {
     #[test]
     fn prop_with_byte_if(byte: u8, cond: bool)
     {
-        let set = ByteSet::new().with_byte_if(byte,cond);
+        let set = Set::new().with_byte_if(byte,cond);
         for b in 0u8..=255 {
             prop_assert_eq!(set.contains(b), b == byte && cond);
         }
@@ -216,7 +216,7 @@ proptest! {
 #[test]
 fn with_bytes() {
     const BYTES: &[u8] = b"ABC";
-    const SET: ByteSet = ByteSet::new().with_bytes(BYTES);
+    const SET: Set = Set::new().with_bytes(BYTES);
     for b in 0u8..=255 {
         assert_eq!(SET.contains(b), BYTES.contains(&b));
     }
@@ -225,7 +225,7 @@ fn with_bytes() {
 #[test]
 fn with_bytes_empty() {
     const BYTES: &[u8] = b"";
-    const SET: ByteSet = ByteSet::new().with_bytes(BYTES);
+    const SET: Set = Set::new().with_bytes(BYTES);
     for b in 0u8..=255 {
         assert_eq!(SET.contains(b), BYTES.contains(&b));
     }
@@ -234,7 +234,7 @@ fn with_bytes_empty() {
 proptest! {
     #[test]
     fn prop_with_bytes(bytes in vec(any::<u8>(), 0..300)) {
-        let set = ByteSet::new().with_bytes(&bytes);
+        let set = Set::new().with_bytes(&bytes);
         for b in 0u8..=255 {
             prop_assert_eq!(set.contains(b), bytes.contains(&b));
         }
@@ -243,7 +243,7 @@ proptest! {
 
 #[test]
 fn with_range() {
-    const SET: ByteSet = ByteSet::new().with_range(b'A', b'Y');
+    const SET: Set = Set::new().with_range(b'A', b'Y');
     for b in 0u8..=255 {
         assert_eq!(SET.contains(b), (b'A'..=b'Y').contains(&b));
     }
@@ -251,7 +251,7 @@ fn with_range() {
 
 #[test]
 fn with_range_single() {
-    const SET: ByteSet = ByteSet::new().with_range(b'A', b'A');
+    const SET: Set = Set::new().with_range(b'A', b'A');
     for b in 0u8..=255 {
         assert_eq!(SET.contains(b), b == b'A');
     }
@@ -260,13 +260,13 @@ fn with_range_single() {
 #[test]
 #[should_panic(expected = "Start must not be greater than end")]
 fn with_range_invalid() {
-    let _set = ByteSet::new().with_range(b'B', b'A');
+    let _set = Set::new().with_range(b'B', b'A');
 }
 
 proptest! {
     #[test]
     fn prop_with_range(range in any::<core::ops::RangeInclusive<u8>>()) {
-        let set = ByteSet::new().with_range(*range.start(), *range.end());
+        let set = Set::new().with_range(*range.start(), *range.end());
         for b in 0u8..=255 {
             prop_assert_eq!(set.contains(b), range.contains(&b));
         }
@@ -275,7 +275,7 @@ proptest! {
     #[test]
     fn prop_with_ranges(ranges in any::<(core::ops::RangeInclusive<u8>, core::ops::RangeInclusive<u8>)>()) {
         let (range1, range2) = ranges;
-        let mut set = ByteSet::new().with_range(*range1.start(), *range1.end());
+        let mut set = Set::new().with_range(*range1.start(), *range1.end());
         for b in 0u8..=255 {
             prop_assert_eq!(set.contains(b), range1.contains(&b));
         }
@@ -290,8 +290,8 @@ proptest! {
 fn with_set() {
     const BYTES1: &[u8] = b"ABCDEF123";
     const BYTES2: &[u8] = b"XYZ";
-    const SET1: ByteSet = ByteSet::from_bytes(BYTES1);
-    const SET2: ByteSet = ByteSet::from_bytes(BYTES2).with_set(&SET1);
+    const SET1: Set = Set::from_bytes(BYTES1);
+    const SET2: Set = Set::from_bytes(BYTES2).with_set(&SET1);
     for b in 0u8..=255 {
         if BYTES2.contains(&b) {
             assert!(SET2.contains(b));
@@ -305,8 +305,8 @@ fn with_set() {
 proptest! {
     #[test]
     fn prop_with_set(bytes1 in vec(any::<u8>(), 0..100), bytes2 in vec(any::<u8>(), 0..100)) {
-        let set1 = ByteSet::from_bytes(&bytes1);
-        let set2 = ByteSet::from_bytes(&bytes2).with_set(&set1);
+        let set1 = Set::from_bytes(&bytes1);
+        let set2 = Set::from_bytes(&bytes2).with_set(&set1);
 
         for b in 0u8..=255 {
             prop_assert_eq!(set2.contains(b), bytes1.contains(&b) || bytes2.contains(&b));
@@ -317,19 +317,19 @@ proptest! {
 #[test]
 fn from() {
     let bytes = b"";
-    let set = ByteSet::from(bytes);
+    let set = Set::from(bytes);
     for b in 0u8..=255 {
         assert_eq!(set.contains(b), bytes.contains(&b));
     }
 
     let bytes: &[u8] = b"ABCDEF";
-    let set = ByteSet::from(bytes);
+    let set = Set::from(bytes);
     for b in 0u8..=255 {
         assert_eq!(set.contains(b), bytes.contains(&b));
     }
 
     let bytes: &[u8; 4] = b"ABCD";
-    let set = ByteSet::from(bytes);
+    let set = Set::from(bytes);
     for b in 0u8..=255 {
         assert_eq!(set.contains(b), bytes.contains(&b));
     }
@@ -339,8 +339,8 @@ fn from() {
 fn bitor() {
     let bytes1 = b"ABC";
     let bytes2 = b"XYZ";
-    let set1 = ByteSet::from_bytes(bytes1);
-    let set2 = ByteSet::from_bytes(bytes2);
+    let set1 = Set::from_bytes(bytes1);
+    let set2 = Set::from_bytes(bytes2);
     let set3 = set1 | set2;
     for b in 0u8..=255 {
         assert_eq!(set3.contains(b), bytes1.contains(&b) || bytes2.contains(&b));
@@ -351,8 +351,8 @@ fn bitor() {
 fn bitor_assign() {
     let bytes1 = b"ABC";
     let bytes2 = b"XYZ";
-    let mut set1 = ByteSet::from_bytes(bytes1);
-    let set2 = ByteSet::from_bytes(bytes2);
+    let mut set1 = Set::from_bytes(bytes1);
+    let set2 = Set::from_bytes(bytes2);
     set1 |= set2;
     for b in 0u8..=255 {
         assert_eq!(set1.contains(b), bytes1.contains(&b) || bytes2.contains(&b));

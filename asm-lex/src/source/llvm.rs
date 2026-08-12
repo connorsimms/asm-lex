@@ -4,7 +4,7 @@ mod tests;
 pub mod targets;
 
 use crate::byte;
-use crate::byte::{ByteSet, Class, ClassTable};
+use crate::byte::{Class, Set, Table};
 use crate::cursor::Cursor;
 use crate::source;
 use crate::source::{Dialect, Item, Kind};
@@ -28,22 +28,22 @@ pub struct Llvm<T: LlvmTarget> {
 impl<T: LlvmTarget> Llvm<T> {
     const AT_IN_IDENTIFIER: bool = T::COMMENT_STR[0] != b'@' && T::USE_AT_FOR_SPECIFIER;
 
-    const LINE_END_CHARS: ByteSet = ByteSet::from_bytes(b"\r\n");
+    const LINE_END_CHARS: Set = Set::from_bytes(b"\r\n");
 
-    const HSPACE_CHARS: ByteSet = ByteSet::from_bytes(b" \t\x00");
+    const HSPACE_CHARS: Set = Set::from_bytes(b" \t\x00");
 
-    const SYMBOL_START_CHARS: ByteSet = ByteSet::from_bytes(b"_.")
+    const SYMBOL_START_CHARS: Set = Set::from_bytes(b"_.")
         .with_set(&byte::ASCII_ALPHA)
         .with_byte_if(b'?', T::QUESTION_STARTS_IDENTIFIER)
         .with_byte_if(b'$', T::DOLLAR_STARTS_IDENTIFIER)
         .with_byte_if(b'@', T::AT_STARTS_IDENTIFIER);
 
-    const SYMBOL_CONTINUE_CHARS: ByteSet = ByteSet::from_bytes(b"_.$?")
+    const SYMBOL_CONTINUE_CHARS: Set = Set::from_bytes(b"_.$?")
         .with_set(&byte::ASCII_ALPHA)
         .with_set(&byte::ASCII_DIGIT)
         .with_byte_if(b'@', Self::AT_IN_IDENTIFIER);
 
-    const STATEMENT_END_CHARS: ByteSet = ByteSet::from_bytes(b"\r\n")
+    const STATEMENT_END_CHARS: Set = Set::from_bytes(b"\r\n")
         .with_byte_if(T::SEPARATOR_STR[0], T::SEPARATOR_STR.len() == 1)
         .with_byte_if(T::COMMENT_STR[0], T::COMMENT_STR.len() == 1)
         .with_byte_if(
@@ -51,7 +51,7 @@ impl<T: LlvmTarget> Llvm<T> {
             T::COMMENT_STR.len() >= 2 && T::COMMENT_STR[1] == b'#',
         );
 
-    const ARG_STOP_CHARS: ByteSet = ByteSet::new()
+    const ARG_STOP_CHARS: Set = Set::new()
         .with_byte(b'/') // slash-star comments
         .with_byte(b'"') // double quotes
         .with_byte(b'\'') // single quotes
@@ -64,7 +64,7 @@ impl<T: LlvmTarget> Llvm<T> {
     const STATEMENT_END: Class = Class::with_bit(2);
     const ARG_STOP: Class = Class::with_bit(3);
 
-    const TABLE: ClassTable = ClassTable::build(&[
+    const TABLE: Table = Table::build(&[
         (Self::SYMBOL_START, &Self::SYMBOL_START_CHARS),
         (Self::SYMBOL_CONTINUE, &Self::SYMBOL_CONTINUE_CHARS),
         (Self::STATEMENT_END, &Self::STATEMENT_END_CHARS),
