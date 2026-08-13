@@ -4,30 +4,6 @@
 pub mod invariants;
 pub mod snapshot;
 
-// prototype api design stuff
-
-pub struct Lexer<'a, D: asm_lex::source::Dialect> {
-    cursor: asm_lex::cursor::Cursor<'a>,
-    _dialect: core::marker::PhantomData<D>,
-}
-
-impl<'a, D: asm_lex::source::Dialect> Lexer<'a, D> {
-    pub fn from_bytes(bytes: &'a [u8]) -> Self {
-        Self {
-            cursor: asm_lex::cursor::Cursor::new(bytes),
-            _dialect: core::marker::PhantomData,
-        }
-    }
-}
-
-impl<'a, D: asm_lex::source::Dialect> Iterator for Lexer<'a, D> {
-    type Item = asm_lex::source::Item;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        D::next_item(&mut self.cursor)
-    }
-}
-
 pub fn for_each_span(
     kind: &asm_lex::source::Kind,
     mut f: impl FnMut(&'static str, &asm_lex::Span),
