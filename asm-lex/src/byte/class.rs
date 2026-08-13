@@ -8,7 +8,7 @@ impl Class {
     /// # Panics
     /// Panics if `bit` is greater than or equal to `u16::BITS`
     pub const fn with_bit(bit: u32) -> Self {
-        assert!(bit < u16::BITS);
+        assert!(bit < u16::BITS, "bit should be less than 16");
         Self(1 << bit)
     }
 

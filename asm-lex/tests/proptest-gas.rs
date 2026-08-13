@@ -2,12 +2,12 @@
 
 mod common;
 
+use asm_lex::source::lexer::Lexer;
 use asm_lex::source::{
     gas::{targets::*, Gas},
     Item,
 };
 use common::invariants;
-use common::*;
 use proptest::{
     collection::vec,
     prelude::*,
@@ -42,7 +42,7 @@ proptest! {
     #[test]
     fn x86_64_linux_elf(bytes in vec(asm_byte(), 0..1000))
     {
-        let items: Vec<Item> = Lexer::<Gas<X86_64LinuxElf>>::from_bytes(&bytes).collect();
+        let items: Vec<Item> = Lexer::<Gas<X86_64LinuxElf>>::new(&bytes).collect();
         invariants::monotonic_valid_spans(&bytes, &items);
         invariants::starts_line_iff_newline(&bytes, &items);
         invariants::containing_item_spans(&items);
@@ -55,7 +55,7 @@ proptest! {
     #[test]
     fn aarch64_linux_elf(bytes in vec(asm_byte(), 0..1000))
     {
-        let items: Vec<Item> = Lexer::<Gas<Aarch64LinuxElf>>::from_bytes(&bytes).collect();
+        let items: Vec<Item> = Lexer::<Gas<Aarch64LinuxElf>>::new(&bytes).collect();
         invariants::monotonic_valid_spans(&bytes, &items);
         invariants::starts_line_iff_newline(&bytes, &items);
         invariants::containing_item_spans(&items);
@@ -68,7 +68,7 @@ proptest! {
     #[test]
     fn arm_linux_eabi_elf(bytes in vec(asm_byte(), 0..1000))
     {
-        let items: Vec<Item> = Lexer::<Gas<ArmLinuxEabiElf>>::from_bytes(&bytes).collect();
+        let items: Vec<Item> = Lexer::<Gas<ArmLinuxEabiElf>>::new(&bytes).collect();
         invariants::monotonic_valid_spans(&bytes, &items);
         invariants::starts_line_iff_newline(&bytes, &items);
         invariants::containing_item_spans(&items);
@@ -81,7 +81,7 @@ proptest! {
     #[test]
     fn riscv64_linux_elf(bytes in vec(asm_byte(), 0..1000))
     {
-        let items: Vec<Item> = Lexer::<Gas<Riscv64LinuxElf>>::from_bytes(&bytes).collect();
+        let items: Vec<Item> = Lexer::<Gas<Riscv64LinuxElf>>::new(&bytes).collect();
         invariants::monotonic_valid_spans(&bytes, &items);
         invariants::starts_line_iff_newline(&bytes, &items);
         invariants::containing_item_spans(&items);
