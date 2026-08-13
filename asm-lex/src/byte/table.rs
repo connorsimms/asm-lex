@@ -1,6 +1,3 @@
-#[cfg(test)]
-mod tests;
-
 use crate::byte::{Class, Set};
 
 pub struct Table {

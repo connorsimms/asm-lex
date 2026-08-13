@@ -1,4 +1,8 @@
+#[allow(unused)]
+use pretty_assertions::{assert_eq, assert_ne};
+
 use super::*;
+use crate::pattern::Pattern;
 
 #[test]
 fn any_of_1() {
@@ -42,7 +46,7 @@ fn any_of_3() {
             for b3 in 0..=128u8 {
                 let p3 = haystack.iter().position(|x| *x == b3);
                 if p1.is_none() && p2.is_none() && p3.is_none() {
-                    assert_eq!(AnyOf([b1, b2, 3]).find(haystack), None);
+                    assert_eq!(AnyOf([b1, b2, b3]).find(haystack), None);
                 } else {
                     assert_eq!(
                         AnyOf([b1, b2, b3]).find(haystack),
