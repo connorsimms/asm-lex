@@ -2,7 +2,8 @@
 use pretty_assertions::{assert_eq, assert_ne};
 
 use super::*;
-use crate::source::gas::{targets::*, GasTarget};
+use crate::cursor::Cursor;
+use crate::source::gas::{targets::*, Gas, GasTarget};
 
 fn check<T: GasTarget>(cases: &[(&[u8], usize, bool, usize)]) {
     for (bytes, s_pos, starts_line, e_pos) in cases {

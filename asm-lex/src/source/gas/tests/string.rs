@@ -2,7 +2,8 @@
 use pretty_assertions::{assert_eq, assert_ne};
 
 use super::*;
-use crate::source::gas::{targets::*, GasTarget};
+use crate::cursor::Cursor;
+use crate::source::gas::{targets::*, Gas, GasTarget};
 use crate::Span;
 
 fn check_eat_string<T: GasTarget>(cases: &[(&[u8], Span, usize)]) {

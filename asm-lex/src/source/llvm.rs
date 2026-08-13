@@ -28,10 +28,6 @@ pub struct Llvm<T: LlvmTarget> {
 impl<T: LlvmTarget> Llvm<T> {
     const AT_IN_IDENTIFIER: bool = T::COMMENT_STR[0] != b'@' && T::USE_AT_FOR_SPECIFIER;
 
-    const LINE_END_CHARS: Set = Set::from_bytes(b"\r\n");
-
-    const HSPACE_CHARS: Set = Set::from_bytes(b" \t\x00");
-
     const SYMBOL_START_CHARS: Set = Set::from_bytes(b"_.")
         .with_set(&byte::ASCII_ALPHA)
         .with_byte_if(b'?', T::QUESTION_STARTS_IDENTIFIER)
