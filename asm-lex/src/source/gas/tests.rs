@@ -7,8 +7,9 @@ mod slash_star;
 mod string;
 mod symbol_kind;
 
-use super::*;
-use crate::source::Kind;
+use crate::byte;
+use crate::byte::Set;
+use crate::source::gas::GasTarget;
 
 // Synthetic targets for testing
 struct NoHashLineComment {}
@@ -20,10 +21,10 @@ impl GasTarget for NoHashLineComment {
     const LINE_COMMENT_CHARS: Set = Set::from_bytes(b"/");
     const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[];
     const LINE_SEPARATOR_CHARS: Set = Set::from_bytes(b";");
-    const SYMBOL_START_CHARS: Set = Set::from_bytes(b"._$").with_set(&crate::byte::ASCII_ALPHA);
+    const SYMBOL_START_CHARS: Set = Set::from_bytes(b"._$").with_set(&byte::ASCII_ALPHA);
     const SYMBOL_CONTINUE_CHARS: Set = Set::from_bytes(b"._$")
-        .with_set(&crate::byte::ASCII_ALPHA)
-        .with_set(&crate::byte::ASCII_DIGIT);
+        .with_set(&byte::ASCII_ALPHA)
+        .with_set(&byte::ASCII_DIGIT);
 }
 
 impl GasTarget for NonSlashMultibyte {
@@ -31,10 +32,10 @@ impl GasTarget for NonSlashMultibyte {
     const LINE_COMMENT_CHARS: Set = Set::from_bytes(b"#/");
     const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[*b"@@"];
     const LINE_SEPARATOR_CHARS: Set = Set::from_bytes(b";");
-    const SYMBOL_START_CHARS: Set = Set::from_bytes(b"._$").with_set(&crate::byte::ASCII_ALPHA);
+    const SYMBOL_START_CHARS: Set = Set::from_bytes(b"._$").with_set(&byte::ASCII_ALPHA);
     const SYMBOL_CONTINUE_CHARS: Set = Set::from_bytes(b"._$")
-        .with_set(&crate::byte::ASCII_ALPHA)
-        .with_set(&crate::byte::ASCII_DIGIT);
+        .with_set(&byte::ASCII_ALPHA)
+        .with_set(&byte::ASCII_DIGIT);
 }
 
 impl GasTarget for NoLineSeparator {
@@ -42,8 +43,8 @@ impl GasTarget for NoLineSeparator {
     const LINE_COMMENT_CHARS: Set = Set::from_bytes(b"#/");
     const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[];
     const LINE_SEPARATOR_CHARS: Set = Set::from_bytes(b"");
-    const SYMBOL_START_CHARS: Set = Set::from_bytes(b"._$").with_set(&crate::byte::ASCII_ALPHA);
+    const SYMBOL_START_CHARS: Set = Set::from_bytes(b"._$").with_set(&byte::ASCII_ALPHA);
     const SYMBOL_CONTINUE_CHARS: Set = Set::from_bytes(b"._$")
-        .with_set(&crate::byte::ASCII_ALPHA)
-        .with_set(&crate::byte::ASCII_DIGIT);
+        .with_set(&byte::ASCII_ALPHA)
+        .with_set(&byte::ASCII_DIGIT);
 }
