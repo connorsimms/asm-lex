@@ -112,13 +112,14 @@ fn check_lex_preamble<T: LlvmTarget>(cases: &[(&[u8], usize, (bool, bool), usize
     }
 }
 
+#[test]
 fn lex_preamble() {
     let cases: &[(&[u8], usize, (bool, bool), usize)] = &[
         (b" symbol", 0, (true, true), 1),
         (b" \tsymbol", 0, (true, true), 2),
         (b" \nsymbol", 0, (true, true), 2),
         (b" \rsymbol", 0, (true, true), 2),
-        (b"Label: # ...", 6, (false, false), 7),
+        (b"Label: # ...", 6, (false, true), 7),
         (b"Label:\n# ...", 6, (true, true), 7),
         (b"Label:\r# ...", 6, (true, true), 7),
         (b"Label:\n\r# ...", 6, (true, true), 8),

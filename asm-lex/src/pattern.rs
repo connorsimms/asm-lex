@@ -1,10 +1,8 @@
-#![allow(unused)]
-
 #[cfg(test)]
 mod tests;
 
+#[cfg(not(feature = "memchr"))]
 mod swar {
-    #![allow(unused)]
     pub const LO: u64 = 0x0101_0101_0101_0101;
     pub const HI: u64 = 0x8080_8080_8080_8080;
 }
@@ -38,11 +36,13 @@ fn find_memchr<const N: usize>(needles: &[u8; N], haystack: &[u8]) -> Option<usi
     }
 }
 
+#[cfg(not(feature = "memchr"))]
 #[inline]
 fn check(mask: u64) -> u64 {
     mask.wrapping_sub(swar::LO) & !mask & swar::HI
 }
 
+#[cfg(not(feature = "memchr"))]
 #[inline]
 fn find_any<const N: usize>(bytes: &[u8; N], haystack: &[u8]) -> Option<usize> {
     let needles = bytes.map(|n| u64::from(n) * swar::LO);
@@ -76,16 +76,17 @@ fn find_memmem<const N: usize>(needle: &[u8; N], haystack: &[u8]) -> Option<usiz
     memchr::memmem::find(haystack, needle)
 }
 
+#[cfg(not(feature = "memchr"))]
 #[inline]
 fn find_substr<const N: usize>(substr: &[u8; N], haystack: &[u8]) -> Option<usize> {
     let shifted = &haystack[substr.len() - 1..];
     let n1 = u64::from(*substr.first()?) * swar::LO;
     let n2 = u64::from(*substr.last()?) * swar::LO;
-    let mut chunks = haystack.chunks_exact(8);
-    let mut shifted_chunks = shifted.chunks_exact(8);
+    let chunks = haystack.chunks_exact(8);
+    let shifted_chunks = shifted.chunks_exact(8);
     let mut offset: usize = 0;
 
-    for (chk, shf) in &mut chunks.zip(shifted_chunks) {
+    for (chk, shf) in chunks.zip(shifted_chunks) {
         let chk = u64::from_le_bytes(chk.try_into().unwrap());
         let shf = u64::from_le_bytes(shf.try_into().unwrap());
         let hits = check(chk ^ n1) | check(shf ^ n2);
