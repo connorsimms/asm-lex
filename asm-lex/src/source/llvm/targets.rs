@@ -1,6 +1,5 @@
 use super::LlvmTarget;
 
-// not sure if <arch><os><obj> is ideal
 pub struct X86Elf {}
 pub struct X86Darwin {}
 pub struct ArmElf {}
