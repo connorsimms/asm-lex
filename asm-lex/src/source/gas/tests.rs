@@ -1,6 +1,7 @@
 mod args;
 mod comment;
 mod line_comment;
+mod linemarker;
 mod multibyte_comment;
 mod preamble;
 mod slash_star;

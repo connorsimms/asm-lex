@@ -2,6 +2,7 @@
 #![allow(clippy::incompatible_msrv)]
 
 pub mod invariants;
+pub mod proptest;
 pub mod snapshot;
 
 pub fn for_each_span(

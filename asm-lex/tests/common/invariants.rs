@@ -23,28 +23,51 @@ pub fn monotonic_valid_spans(bytes: &[u8], items: &[Item]) {
     }
 }
 
-// TODO: This invariant is ill-formed since LLVM considers '\r' a line-ending
-// character. Either create different specializations of this invariant, or
-// parameterize the line-separating characters in the trait?
-//
 // An Item starts a physical line iff it is the first item in the file OR
-// there is at least one newline between itself and the previous Item.
-pub fn starts_line_iff_newline(bytes: &[u8], items: &[Item]) {
+// there is at least one line feed between itself and the previous Item.
+pub fn starts_line_iff_lf(bytes: &[u8], items: &[Item]) {
     let mut prev_end = 0usize;
     for item in items {
         let Span { start, end } = item.span();
+        let text = &bytes[prev_end..*start];
         if prev_end == 0 {
             assert!(item.starts_line(), "First item must start line");
         } else if item.starts_line() {
             assert!(
-                bytes[prev_end..*start].contains(&b'\n'),
+                text.contains(&b'\n'),
                 "starts_line = true but no newline found in {:?}",
                 prev_end..*start
             );
         } else if !item.starts_line() {
             assert!(
-                !bytes[prev_end..*start].contains(&b'\n'),
+                !text.contains(&b'\n'),
                 "starts_line = false but newline found in {:?}",
+                prev_end..*start
+            );
+        }
+        prev_end = *end;
+    }
+}
+
+// An Item starts a physical line iff it is the first item in the file OR there
+// is at least one line feed or carriage return between itself and the previous Item.
+pub fn starts_line_iff_lf_or_cr(bytes: &[u8], items: &[Item]) {
+    let mut prev_end = 0usize;
+    for item in items {
+        let Span { start, end } = item.span();
+        let text = &bytes[prev_end..*start];
+        if prev_end == 0 {
+            assert!(item.starts_line(), "First item must start line");
+        } else if item.starts_line() {
+            assert!(
+                text.contains(&b'\n') || text.contains(&b'\r'),
+                "starts_line = true but no line feed or carriage return found in {:?}",
+                prev_end..*start
+            );
+        } else if !item.starts_line() {
+            assert!(
+                !text.contains(&b'\n') && !text.contains(&b'\r'),
+                "starts_line = false but line feed or carriage return found in {:?}",
                 prev_end..*start
             );
         }
