@@ -6,7 +6,7 @@ use crate::cursor::Cursor;
 use crate::source::gas::{targets::*, Gas, GasTarget};
 use crate::source::Kind;
 
-fn check<T: GasTarget>(cases: &[(&[u8], Option<Kind>, usize)]) {
+fn check_try_line_comment<T: GasTarget>(cases: &[(&[u8], Option<Kind>, usize)]) {
     for (bytes, kind, pos) in cases {
         let mut cursor = Cursor::new(bytes);
         assert_eq!(Gas::<T>::try_line_comment(&mut cursor), *kind);
@@ -62,12 +62,12 @@ fn with_hash_ln_comment() {
         (b"nop", None, 0),
         (b"nop#", None, 0),
     ];
-    check::<X86_64LinuxElf>(cases);
-    check::<Aarch64LinuxElf>(cases);
-    check::<ArmLinuxEabiElf>(cases);
-    check::<Riscv64LinuxElf>(cases);
-    check::<NonSlashMultibyte>(cases);
-    check::<NoLineSeparator>(cases);
+    check_try_line_comment::<X86_64LinuxElf>(cases);
+    check_try_line_comment::<Aarch64LinuxElf>(cases);
+    check_try_line_comment::<ArmLinuxEabiElf>(cases);
+    check_try_line_comment::<Riscv64LinuxElf>(cases);
+    check_try_line_comment::<NonSlashMultibyte>(cases);
+    check_try_line_comment::<NoLineSeparator>(cases);
 }
 
 #[test]
@@ -92,5 +92,5 @@ fn no_hash_ln_comment() {
         (b"nop", None, 0),
         (b"nop#...", None, 0),
     ];
-    check::<NoHashLineComment>(cases);
+    check_try_line_comment::<NoHashLineComment>(cases);
 }

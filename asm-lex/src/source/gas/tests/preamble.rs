@@ -5,7 +5,7 @@ use super::*;
 use crate::cursor::Cursor;
 use crate::source::gas::{targets::*, Gas, GasTarget};
 
-fn check<T: GasTarget>(cases: &[(&[u8], usize, bool, usize)]) {
+fn check_lex_preamble<T: GasTarget>(cases: &[(&[u8], usize, bool, usize)]) {
     for (bytes, s_pos, starts_line, e_pos) in cases {
         let mut cursor = Cursor::new(bytes);
         cursor.advance(*s_pos);
@@ -26,13 +26,13 @@ fn no_separators() {
         (b"Item\nItem", 4, true, 5),
         (b"Item\n\nItem", 4, true, 6),
     ];
-    check::<X86_64LinuxElf>(cases);
-    check::<Aarch64LinuxElf>(cases);
-    check::<ArmLinuxEabiElf>(cases);
-    check::<Riscv64LinuxElf>(cases);
-    check::<NoHashLineComment>(cases);
-    check::<NonSlashMultibyte>(cases);
-    check::<NoLineSeparator>(cases);
+    check_lex_preamble::<X86_64LinuxElf>(cases);
+    check_lex_preamble::<Aarch64LinuxElf>(cases);
+    check_lex_preamble::<ArmLinuxEabiElf>(cases);
+    check_lex_preamble::<Riscv64LinuxElf>(cases);
+    check_lex_preamble::<NoHashLineComment>(cases);
+    check_lex_preamble::<NonSlashMultibyte>(cases);
+    check_lex_preamble::<NoLineSeparator>(cases);
 }
 
 #[test]
@@ -46,10 +46,10 @@ fn semicolon_separators() {
         (b"Item;\n;Item", 4, true, 7),
         (b"Item;;\nItem", 4, true, 7),
     ];
-    check::<X86_64LinuxElf>(cases);
-    check::<Aarch64LinuxElf>(cases);
-    check::<ArmLinuxEabiElf>(cases);
-    check::<Riscv64LinuxElf>(cases);
-    check::<NoHashLineComment>(cases);
-    check::<NonSlashMultibyte>(cases);
+    check_lex_preamble::<X86_64LinuxElf>(cases);
+    check_lex_preamble::<Aarch64LinuxElf>(cases);
+    check_lex_preamble::<ArmLinuxEabiElf>(cases);
+    check_lex_preamble::<Riscv64LinuxElf>(cases);
+    check_lex_preamble::<NoHashLineComment>(cases);
+    check_lex_preamble::<NonSlashMultibyte>(cases);
 }
