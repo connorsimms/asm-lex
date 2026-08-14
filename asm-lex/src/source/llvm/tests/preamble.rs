@@ -4,7 +4,11 @@ use pretty_assertions::{assert_eq, assert_ne};
 use crate::cursor::Cursor;
 use crate::source::llvm::{targets::*, Llvm, LlvmTarget};
 
-fn check_lex_preamble<T: LlvmTarget>(cases: &[(&[u8], usize, (bool, bool), usize)]) {
+type StartsLine = bool;
+type StartsStatement = bool;
+type Case = (&'static [u8], usize, (StartsLine, StartsStatement), usize);
+
+fn check_lex_preamble<T: LlvmTarget>(cases: &[Case]) {
     for (bytes, s_pos, res, e_pos) in cases {
         let mut cursor = Cursor::new(bytes);
         cursor.restore(*s_pos);
@@ -15,7 +19,7 @@ fn check_lex_preamble<T: LlvmTarget>(cases: &[(&[u8], usize, (bool, bool), usize
 
 #[test]
 fn lex_preamble() {
-    let cases: &[(&[u8], usize, (bool, bool), usize)] = &[
+    let cases: &[Case] = &[
         (b" symbol", 0, (true, true), 1),
         (b" \tsymbol", 0, (true, true), 2),
         (b" \nsymbol", 0, (true, true), 2),
@@ -37,7 +41,7 @@ fn lex_preamble() {
 
 #[test]
 fn lex_preamble_semicolon_separator() {
-    let cases: &[(&[u8], usize, (bool, bool), usize)] = &[
+    let cases: &[Case] = &[
         (b";\nsymbol", 0, (true, true), 2),
         (b"\n;symbol", 0, (true, true), 2),
         (b"Label:;# ...", 6, (false, true), 7),
@@ -52,7 +56,7 @@ fn lex_preamble_semicolon_separator() {
 
 #[test]
 fn lex_preamble_double_percent_separator() {
-    let cases: &[(&[u8], usize, (bool, bool), usize)] = &[
+    let cases: &[Case] = &[
         (b"%%\nsymbol", 0, (true, true), 3),
         (b"\n%%symbol", 0, (true, true), 3),
         (b"Label:%%# ...", 6, (false, true), 8),
