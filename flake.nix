@@ -75,22 +75,10 @@
             '';
           };
 
-          csmith = pkgs.mkShell {
-            nativeBuildInputs = with pkgs; [
-              csmith
-            ];
-          };
-
           gnu64-gnu = pkgs.mkShell {
             nativeBuildInputs = with pkgs; [
               pkgsCross.gnu64.buildPackages.gcc
               pkgsCross.gnu64.buildPackages.binutils
-            ];
-          };
-
-          gnu64-llvm = pkgs.mkShell {
-            nativeBuildInputs = with pkgs; [
-              pkgsCross.gnu64.buildPackages.llvmPackages.llvm
             ];
           };
 
@@ -112,6 +100,13 @@
             nativeBuildInputs = with pkgs; [
               pkgsCross.riscv64.buildPackages.gcc
               pkgsCross.riscv64.buildPackages.binutils
+            ];
+          };
+
+          llvm = pkgs.mkShell {
+            nativeBuildInputs = with pkgs; [
+              llvmPackages.clang
+              llvmPackages.llvm
             ];
           };
         };
