@@ -1,7 +1,7 @@
 ---
 source: asm-lex/tests/snapshot_gas.rs
 expression: snap_items
-input_file: asm-lex/tests/fixtures/gas/riscv64_linux_elf/gcc_15_2_hello_world.s
+input_file: asm-lex/tests/fixtures/gas/riscv_elf/gcc_15_2_hello_world.s
 ---
 [
     Item {

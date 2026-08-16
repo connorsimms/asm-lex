@@ -1,18 +1,19 @@
 use crate::byte::Set;
 use crate::source::gas::GasTarget;
 
-pub struct Aarch64Elf;
+pub struct Aarch64GenericElf;
 pub struct Aarch64LinuxElf;
 pub struct Aarch64GnuElf;
 
 // tc-aarch64
 // te-generic
 // obj-elf
-impl GasTarget for Aarch64Elf {
+impl GasTarget for Aarch64GenericElf {
     const COMMENT_CHARS: Set = Set::from_bytes(b"");
     const LINE_COMMENT_CHARS: Set = Set::from_bytes(b"#");
     const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[*b"//"];
     const LINE_SEPARATOR_CHARS: Set = Set::from_bytes(b";");
+    const LOCAL_LABELS: bool = true;
     const LOCAL_LABELS_DOLLAR: bool = true;
 }
 
@@ -24,6 +25,7 @@ impl GasTarget for Aarch64LinuxElf {
     const LINE_COMMENT_CHARS: Set = Set::from_bytes(b"#");
     const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[*b"//"];
     const LINE_SEPARATOR_CHARS: Set = Set::from_bytes(b";");
+    const LOCAL_LABELS: bool = true;
 }
 
 // tc-aarch64
@@ -34,4 +36,5 @@ impl GasTarget for Aarch64GnuElf {
     const LINE_COMMENT_CHARS: Set = Set::from_bytes(b"#");
     const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[*b"//"];
     const LINE_SEPARATOR_CHARS: Set = Set::from_bytes(b";");
+    const LOCAL_LABELS: bool = true;
 }

@@ -35,10 +35,10 @@ fn lex_args() {
         (b"arg/*...*/arg", Some(0..13), 13),
         (b"arg/*...*/arg/*...*/", Some(0..13), 13),
     ];
-    check_lex_args::<X86_64LinuxElf>(cases);
+    check_lex_args::<X86LinuxElf>(cases);
     check_lex_args::<Aarch64LinuxElf>(cases);
     check_lex_args::<ArmLinuxEabiElf>(cases);
-    check_lex_args::<Riscv64LinuxElf>(cases);
+    check_lex_args::<RiscvGenericElf>(cases);
     check_lex_args::<NoHashLineComment>(cases);
     check_lex_args::<NonSlashMultibyte>(cases);
     check_lex_args::<NoLineSeparator>(cases);
@@ -55,8 +55,8 @@ fn lex_args_hash_comments() {
         (b"arg arg#", Some(0..7), 7),
         (b"arg/*.#.*/arg #", Some(0..13), 13),
     ];
-    check_lex_args::<X86_64LinuxElf>(cases);
-    check_lex_args::<Riscv64LinuxElf>(cases);
+    check_lex_args::<X86LinuxElf>(cases);
+    check_lex_args::<RiscvGenericElf>(cases);
     check_lex_args::<NoHashLineComment>(cases);
     check_lex_args::<NonSlashMultibyte>(cases);
     check_lex_args::<NoLineSeparator>(cases);
@@ -73,10 +73,10 @@ fn lex_args_line_separators() {
         (b"arg arg;", Some(0..7), 7),
         (b"arg/*.;.*/arg ;", Some(0..13), 13),
     ];
-    check_lex_args::<X86_64LinuxElf>(cases);
+    check_lex_args::<X86LinuxElf>(cases);
     check_lex_args::<Aarch64LinuxElf>(cases);
     check_lex_args::<ArmLinuxEabiElf>(cases);
-    check_lex_args::<Riscv64LinuxElf>(cases);
+    check_lex_args::<RiscvGenericElf>(cases);
     check_lex_args::<NoHashLineComment>(cases);
     check_lex_args::<NonSlashMultibyte>(cases);
 }

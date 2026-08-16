@@ -47,10 +47,10 @@ fn with_hash_ln_comment() {
         (b"# ...\t ", None, 0),
         (b"# ...\n...", None, 0),
     ];
-    check_try_linemarker::<X86_64LinuxElf>(cases);
+    check_try_linemarker::<X86LinuxElf>(cases);
     check_try_linemarker::<Aarch64LinuxElf>(cases);
     check_try_linemarker::<ArmLinuxEabiElf>(cases);
-    check_try_linemarker::<Riscv64LinuxElf>(cases);
+    check_try_linemarker::<RiscvGenericElf>(cases);
     check_try_linemarker::<NonSlashMultibyte>(cases);
     check_try_linemarker::<NoLineSeparator>(cases);
 }

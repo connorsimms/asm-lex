@@ -39,13 +39,11 @@ pub trait GasTarget {
         .with_set(&byte::ASCII_DIGIT)
         .with_set(&byte::ASCII_EXTENDED);
 
+    // Whether (55:) is a valid label or not
     const LOCAL_LABELS: bool = false;
 
     // Whether (55$:) is a valid label or not
     const LOCAL_LABELS_DOLLAR: bool = false;
-
-    // Whether linemarker preprocessor directives are enabled
-    const HAS_LINEMARKERS: bool = Self::LINE_COMMENT_CHARS.contains(b'#');
 }
 
 pub struct Gas<T: GasTarget> {
@@ -75,6 +73,9 @@ impl<T: GasTarget> Gas<T> {
         .with_set(&T::MULTI_COMMENT_START_CHARS)
         .with_set(&T::LINE_COMMENT_CHARS)
         .with_set(&T::COMMENT_CHARS);
+
+    // Whether linemarker preprocessor directives are enabled
+    const HAS_LINEMARKERS: bool = T::LINE_COMMENT_CHARS.contains(b'#');
 
     const COMMENT: Class = Class::with_bit(0);
     const LINE_COMMENT: Class = Class::with_bit(1);
@@ -161,7 +162,7 @@ impl<T: GasTarget> Gas<T> {
     }
 
     fn try_linemarker(cursor: &mut Cursor<'_>) -> Option<source::Kind> {
-        if !T::HAS_LINEMARKERS
+        if !Self::HAS_LINEMARKERS
             || cursor.peek() != Some(b'#')
             || cursor.seek(-1).is_some_and(|b| b != b'\n')
         {
@@ -348,7 +349,7 @@ impl<T: GasTarget> Gas<T> {
         let symbol_start = cursor.pos();
 
         match cursor.peek()? {
-            b'0'..=b'9' => {
+            b'0'..=b'9' if T::LOCAL_LABELS || T::LOCAL_LABELS_DOLLAR => {
                 let _ = cursor.eat_while(|b| b.is_ascii_digit());
                 if T::LOCAL_LABELS_DOLLAR {
                     cursor.eat(b'$');

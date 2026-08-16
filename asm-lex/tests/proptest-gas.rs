@@ -7,12 +7,12 @@ use asm_lex::source::Item;
 use proptest::{collection::vec, prelude::*};
 
 proptest! {
-    #![proptest_config(common::proptest::config_file("gas-x86_64-linux-elf.txt"))]
+    #![proptest_config(common::proptest::config_file("gas-x86-linux-elf.txt"))]
 
     #[test]
-    fn x86_64_linux_elf(bytes in vec(common::proptest::asm_byte(), 0..1000))
+    fn x86_linux_elf(bytes in vec(common::proptest::asm_byte(), 0..1000))
     {
-        let items: Vec<Item> = Lexer::<Gas<X86_64LinuxElf>>::new(&bytes).collect();
+        let items: Vec<Item> = Lexer::<Gas<X86LinuxElf>>::new(&bytes).collect();
         invariants::monotonic_valid_spans(&bytes, &items);
         invariants::starts_line_iff_lf(&bytes, &items);
         invariants::containing_item_spans(&items);
@@ -46,12 +46,12 @@ proptest! {
 }
 
 proptest! {
-    #![proptest_config(common::proptest::config_file("gas-riscv64-linux-elf.txt"))]
+    #![proptest_config(common::proptest::config_file("gas-riscv-elf.txt"))]
 
     #[test]
-    fn riscv64_linux_elf(bytes in vec(common::proptest::asm_byte(), 0..1000))
+    fn riscv_elf(bytes in vec(common::proptest::asm_byte(), 0..1000))
     {
-        let items: Vec<Item> = Lexer::<Gas<Riscv64LinuxElf>>::new(&bytes).collect();
+        let items: Vec<Item> = Lexer::<Gas<RiscvGenericElf>>::new(&bytes).collect();
         invariants::monotonic_valid_spans(&bytes, &items);
         invariants::starts_line_iff_lf(&bytes, &items);
         invariants::containing_item_spans(&items);

@@ -26,10 +26,10 @@ fn eat_string() {
         (b"\"\\\\\"...", 0..4, 4),
         (b"\"@#/**///\"...", 0..10, 10),
     ];
-    check_eat_string::<X86_64LinuxElf>(cases);
+    check_eat_string::<X86LinuxElf>(cases);
     check_eat_string::<Aarch64LinuxElf>(cases);
     check_eat_string::<ArmLinuxEabiElf>(cases);
-    check_eat_string::<Riscv64LinuxElf>(cases);
+    check_eat_string::<RiscvGenericElf>(cases);
     check_eat_string::<NoHashLineComment>(cases);
     check_eat_string::<NonSlashMultibyte>(cases);
     check_eat_string::<NoLineSeparator>(cases);

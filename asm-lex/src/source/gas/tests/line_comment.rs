@@ -62,10 +62,10 @@ fn with_hash_ln_comment() {
         (b"nop", None, 0),
         (b"nop#", None, 0),
     ];
-    check_try_line_comment::<X86_64LinuxElf>(cases);
+    check_try_line_comment::<X86LinuxElf>(cases);
     check_try_line_comment::<Aarch64LinuxElf>(cases);
     check_try_line_comment::<ArmLinuxEabiElf>(cases);
-    check_try_line_comment::<Riscv64LinuxElf>(cases);
+    check_try_line_comment::<RiscvGenericElf>(cases);
     check_try_line_comment::<NonSlashMultibyte>(cases);
     check_try_line_comment::<NoLineSeparator>(cases);
 }

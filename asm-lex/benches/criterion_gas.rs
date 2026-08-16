@@ -38,10 +38,10 @@ fn bench_target<D: Dialect>(c: &mut Criterion, group_name: &str, dir: &str) {
 }
 
 fn all(c: &mut Criterion) {
-    bench_target::<Gas<X86_64LinuxElf>>(c, "x86_64_linux_elf", "x86_64_linux_elf");
+    bench_target::<Gas<X86LinuxElf>>(c, "x86_linux_elf", "x86_linux_elf");
     // bench_target::<Gas<Aarch64LinuxElf>>(c, "aarch64_linux_elf", "aarch64_linux_elf");
     // bench_target::<Gas<ArmLinuxEabiElf>>(c, "arm_linux_eabi_elf", "arm_linux_eabi_elf");
-    // bench_target::<Gas<Riscv64LinuxElf>>(c, "riscv64_linux_elf", "riscv64_linux_elf");
+    // bench_target::<Gas<RiscvElf>>(c, "riscv64_linux_elf", "riscv64_linux_elf");
 }
 
 criterion_group!(benches, all);

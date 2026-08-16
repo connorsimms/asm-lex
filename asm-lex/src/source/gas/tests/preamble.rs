@@ -26,10 +26,10 @@ fn no_separators() {
         (b"Item\nItem", 4, true, 5),
         (b"Item\n\nItem", 4, true, 6),
     ];
-    check_lex_preamble::<X86_64LinuxElf>(cases);
+    check_lex_preamble::<X86LinuxElf>(cases);
     check_lex_preamble::<Aarch64LinuxElf>(cases);
     check_lex_preamble::<ArmLinuxEabiElf>(cases);
-    check_lex_preamble::<Riscv64LinuxElf>(cases);
+    check_lex_preamble::<RiscvGenericElf>(cases);
     check_lex_preamble::<NoHashLineComment>(cases);
     check_lex_preamble::<NonSlashMultibyte>(cases);
     check_lex_preamble::<NoLineSeparator>(cases);
@@ -46,10 +46,10 @@ fn semicolon_separators() {
         (b"Item;\n;Item", 4, true, 7),
         (b"Item;;\nItem", 4, true, 7),
     ];
-    check_lex_preamble::<X86_64LinuxElf>(cases);
+    check_lex_preamble::<X86LinuxElf>(cases);
     check_lex_preamble::<Aarch64LinuxElf>(cases);
     check_lex_preamble::<ArmLinuxEabiElf>(cases);
-    check_lex_preamble::<Riscv64LinuxElf>(cases);
+    check_lex_preamble::<RiscvGenericElf>(cases);
     check_lex_preamble::<NoHashLineComment>(cases);
     check_lex_preamble::<NonSlashMultibyte>(cases);
 }

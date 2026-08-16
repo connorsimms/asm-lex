@@ -7,10 +7,10 @@ use asm_lex::source::lexer::Lexer;
 use common::snapshot;
 
 #[test]
-fn x86_64_linux_elf() {
-    insta::glob!("fixtures/gas/x86_64_linux_elf/*.s", |path| {
+fn x86_linux_elf() {
+    insta::glob!("fixtures/gas/x86_linux_elf/*.s", |path| {
         let bytes = std::fs::read(path).unwrap();
-        let lexer = Lexer::<Gas<X86_64LinuxElf>>::new(&bytes);
+        let lexer = Lexer::<Gas<X86LinuxElf>>::new(&bytes);
         let snap_items: Vec<snapshot::Item> = lexer
             .map(|item| snapshot::Item::from_source_item(&item, &bytes))
             .collect();
@@ -43,10 +43,10 @@ fn arm_linux_eabi_elf() {
 }
 
 #[test]
-fn riscv64_linux_elf() {
-    insta::glob!("fixtures/gas/riscv64_linux_elf/*.s", |path| {
+fn riscv_elf() {
+    insta::glob!("fixtures/gas/riscv_elf/*.s", |path| {
         let bytes = std::fs::read(path).unwrap();
-        let lexer = Lexer::<Gas<Riscv64LinuxElf>>::new(&bytes);
+        let lexer = Lexer::<Gas<RiscvGenericElf>>::new(&bytes);
         let snap_items: Vec<snapshot::Item> = lexer
             .map(|item| snapshot::Item::from_source_item(&item, &bytes))
             .collect();
