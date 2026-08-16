@@ -3,6 +3,7 @@ mod tests;
 
 pub mod targets;
 
+use crate::byte;
 use crate::byte::{Class, Set, Table};
 use crate::cursor::Cursor;
 use crate::source;
@@ -19,6 +20,8 @@ pub trait GasTarget {
     // Anything from byte sequence to newline is a comment, can be placed anywhere
     const MULTI_COMMENT_CHARS: &'static [[u8; 2]];
 
+    const DOUBLESLASH_COMMENT: bool = false;
+
     // The starting bytes of multi-byte comment sequence
     const MULTI_COMMENT_START_CHARS: Set = Set::from_first_bytes(Self::MULTI_COMMENT_CHARS);
 
@@ -26,10 +29,17 @@ pub trait GasTarget {
     const LINE_SEPARATOR_CHARS: Set;
 
     // Characters that symbols can start with
-    const SYMBOL_START_CHARS: Set;
+    const SYMBOL_START_CHARS: Set = Set::from_bytes(b"._$")
+        .with_set(&byte::ASCII_ALPHA)
+        .with_set(&byte::ASCII_EXTENDED);
 
     // Characters that may follow
-    const SYMBOL_CONTINUE_CHARS: Set;
+    const SYMBOL_CONTINUE_CHARS: Set = Set::from_bytes(b"._$")
+        .with_set(&byte::ASCII_ALPHA)
+        .with_set(&byte::ASCII_DIGIT)
+        .with_set(&byte::ASCII_EXTENDED);
+
+    const LOCAL_LABELS: bool = false;
 
     // Whether (55$:) is a valid label or not
     const LOCAL_LABELS_DOLLAR: bool = false;
