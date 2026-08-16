@@ -2,6 +2,8 @@ use crate::byte;
 use crate::byte::Set;
 use crate::source::gas::GasTarget;
 
+pub struct ArmElf;
+pub struct ArmLinuxElf;
 pub struct ArmLinuxEabiElf;
 
 impl GasTarget for ArmLinuxEabiElf {
