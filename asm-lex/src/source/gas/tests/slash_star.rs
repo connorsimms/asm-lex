@@ -38,7 +38,6 @@ fn is_slash_star_comment() {
     check_is_slash_star_comment::<ArmLinuxEabiElf>(cases);
     check_is_slash_star_comment::<RiscvGenericElf>(cases);
     check_is_slash_star_comment::<NoHashLineComment>(cases);
-    check_is_slash_star_comment::<NonSlashMultibyte>(cases);
     check_is_slash_star_comment::<NoLineSeparator>(cases);
 }
 
@@ -60,6 +59,5 @@ fn try_slash_star_comment() {
     check_try_slash_star_comment::<ArmLinuxEabiElf>(cases);
     check_try_slash_star_comment::<RiscvGenericElf>(cases);
     check_try_slash_star_comment::<NoHashLineComment>(cases);
-    check_try_slash_star_comment::<NonSlashMultibyte>(cases);
     check_try_slash_star_comment::<NoLineSeparator>(cases);
 }

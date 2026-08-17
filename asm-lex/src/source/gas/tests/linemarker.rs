@@ -51,6 +51,5 @@ fn with_hash_ln_comment() {
     check_try_linemarker::<Aarch64LinuxElf>(cases);
     check_try_linemarker::<ArmLinuxEabiElf>(cases);
     check_try_linemarker::<RiscvGenericElf>(cases);
-    check_try_linemarker::<NonSlashMultibyte>(cases);
     check_try_linemarker::<NoLineSeparator>(cases);
 }

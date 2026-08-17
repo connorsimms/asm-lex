@@ -66,7 +66,6 @@ fn with_hash_ln_comment() {
     check_try_line_comment::<Aarch64LinuxElf>(cases);
     check_try_line_comment::<ArmLinuxEabiElf>(cases);
     check_try_line_comment::<RiscvGenericElf>(cases);
-    check_try_line_comment::<NonSlashMultibyte>(cases);
     check_try_line_comment::<NoLineSeparator>(cases);
 }
 

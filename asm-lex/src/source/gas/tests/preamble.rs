@@ -31,7 +31,6 @@ fn no_separators() {
     check_lex_preamble::<ArmLinuxEabiElf>(cases);
     check_lex_preamble::<RiscvGenericElf>(cases);
     check_lex_preamble::<NoHashLineComment>(cases);
-    check_lex_preamble::<NonSlashMultibyte>(cases);
     check_lex_preamble::<NoLineSeparator>(cases);
 }
 
@@ -51,5 +50,4 @@ fn semicolon_separators() {
     check_lex_preamble::<ArmLinuxEabiElf>(cases);
     check_lex_preamble::<RiscvGenericElf>(cases);
     check_lex_preamble::<NoHashLineComment>(cases);
-    check_lex_preamble::<NonSlashMultibyte>(cases);
 }

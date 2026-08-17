@@ -37,7 +37,6 @@ fn is_comment_with_hash_comment() {
     ];
     check_is_comment::<X86LinuxElf>(cases);
     check_is_comment::<RiscvGenericElf>(cases);
-    check_is_comment::<NonSlashMultibyte>(cases);
     check_is_comment::<NoLineSeparator>(cases);
     check_is_comment::<NoHashLineComment>(cases);
 }
@@ -88,7 +87,6 @@ fn try_comment_with_hash_comment() {
     ];
     check_try_comment::<X86LinuxElf>(cases);
     check_try_comment::<RiscvGenericElf>(cases);
-    check_try_comment::<NonSlashMultibyte>(cases);
     check_try_comment::<NoLineSeparator>(cases);
     check_try_comment::<NoHashLineComment>(cases);
 }

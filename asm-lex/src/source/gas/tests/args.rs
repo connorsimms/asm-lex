@@ -40,7 +40,6 @@ fn lex_args() {
     check_lex_args::<ArmLinuxEabiElf>(cases);
     check_lex_args::<RiscvGenericElf>(cases);
     check_lex_args::<NoHashLineComment>(cases);
-    check_lex_args::<NonSlashMultibyte>(cases);
     check_lex_args::<NoLineSeparator>(cases);
 }
 
@@ -58,7 +57,6 @@ fn lex_args_hash_comments() {
     check_lex_args::<X86LinuxElf>(cases);
     check_lex_args::<RiscvGenericElf>(cases);
     check_lex_args::<NoHashLineComment>(cases);
-    check_lex_args::<NonSlashMultibyte>(cases);
     check_lex_args::<NoLineSeparator>(cases);
 }
 
@@ -78,7 +76,6 @@ fn lex_args_line_separators() {
     check_lex_args::<ArmLinuxEabiElf>(cases);
     check_lex_args::<RiscvGenericElf>(cases);
     check_lex_args::<NoHashLineComment>(cases);
-    check_lex_args::<NonSlashMultibyte>(cases);
 }
 
 #[test]

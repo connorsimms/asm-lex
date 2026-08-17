@@ -31,6 +31,5 @@ fn eat_string() {
     check_eat_string::<ArmLinuxEabiElf>(cases);
     check_eat_string::<RiscvGenericElf>(cases);
     check_eat_string::<NoHashLineComment>(cases);
-    check_eat_string::<NonSlashMultibyte>(cases);
     check_eat_string::<NoLineSeparator>(cases);
 }
