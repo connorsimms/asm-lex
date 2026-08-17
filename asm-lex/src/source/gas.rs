@@ -17,13 +17,8 @@ pub trait GasTarget {
     // Anything from byte to newline is a comment, must be first character
     const LINE_COMMENT_CHARS: Set;
 
-    // Anything from byte sequence to newline is a comment, can be placed anywhere
-    const MULTI_COMMENT_CHARS: &'static [[u8; 2]];
-
+    // Whether "//" starts a comment
     const HAS_DOUBLESLASH_COMMENTS: bool = false;
-
-    // The starting bytes of multi-byte comment sequence
-    const MULTI_COMMENT_START_CHARS: Set = Set::from_first_bytes(Self::MULTI_COMMENT_CHARS);
 
     // A statement ends at a newline or line separator
     const LINE_SEPARATOR_CHARS: Set;
@@ -60,8 +55,7 @@ impl<T: GasTarget> Gas<T> {
     // Characters at which lex_args may be interrupted
     const ARG_STOP_CHARS: Set = Set::from_bytes(b"\n\"/")
         .with_set(&T::LINE_SEPARATOR_CHARS)
-        .with_set(&T::COMMENT_CHARS)
-        .with_set(&T::MULTI_COMMENT_START_CHARS);
+        .with_set(&T::COMMENT_CHARS);
 
     // Characters at which lex_args may end
     const STATEMENT_END_CHARS: Set = Set::from_bytes(b"\n")
@@ -70,7 +64,6 @@ impl<T: GasTarget> Gas<T> {
 
     // Characters that comments or linemarkers start with
     const TRIVIA_START_CHARS: Set = Set::from_bytes(b"/")
-        .with_set(&T::MULTI_COMMENT_START_CHARS)
         .with_set(&T::LINE_COMMENT_CHARS)
         .with_set(&T::COMMENT_CHARS);
 
@@ -79,7 +72,6 @@ impl<T: GasTarget> Gas<T> {
 
     const COMMENT: Class = Class::with_bit(0);
     const LINE_COMMENT: Class = Class::with_bit(1);
-    const MULTI_START: Class = Class::with_bit(2);
     const LINE_SEPARATOR: Class = Class::with_bit(3);
     const SYMBOL_START: Class = Class::with_bit(4);
     const SYMBOL_CONTINUE: Class = Class::with_bit(5);
@@ -92,7 +84,6 @@ impl<T: GasTarget> Gas<T> {
     const TABLE: Table = Table::build(&[
         (Self::COMMENT, &T::COMMENT_CHARS),
         (Self::LINE_COMMENT, &T::LINE_COMMENT_CHARS),
-        (Self::MULTI_START, &T::MULTI_COMMENT_START_CHARS),
         (Self::LINE_SEPARATOR, &T::LINE_SEPARATOR_CHARS),
         (Self::SYMBOL_START, &T::SYMBOL_START_CHARS),
         (Self::SYMBOL_CONTINUE, &T::SYMBOL_CONTINUE_CHARS),
@@ -262,20 +253,6 @@ impl<T: GasTarget> Gas<T> {
         Some(source::Kind::Comment)
     }
 
-    fn is_multibyte_comment(cursor: &Cursor<'_>) -> bool {
-        if cursor
-            .peek()
-            .is_some_and(|b| Self::class(b).contains(Self::MULTI_START))
-        {
-            for pattern in T::MULTI_COMMENT_CHARS {
-                if cursor.peek() == Some(pattern[0]) && cursor.seek(1) == Some(pattern[1]) {
-                    return true;
-                }
-            }
-        }
-        false
-    }
-
     fn is_doubleslash_comment(cursor: &Cursor<'_>) -> bool {
         if T::HAS_DOUBLESLASH_COMMENTS {
             cursor.peek() == Some(b'/') && cursor.seek(1) == Some(b'/')
@@ -284,24 +261,8 @@ impl<T: GasTarget> Gas<T> {
         }
     }
 
-    fn try_multibyte_comment(cursor: &mut Cursor<'_>) -> Option<source::Kind> {
-        if cursor
-            .peek()
-            .is_some_and(|b| Self::class(b).contains(Self::MULTI_START))
-        {
-            for pattern in T::MULTI_COMMENT_CHARS {
-                if cursor.peek() == Some(pattern[0]) && cursor.seek(1) == Some(pattern[1]) {
-                    cursor.eat_while(|b| b != b'\n');
-                    cursor.restore(Self::trim_trailing_hspace(cursor));
-                    return Some(source::Kind::Comment);
-                }
-            }
-        }
-        None
-    }
-
     fn try_doubleslash_comment(cursor: &mut Cursor<'_>) -> Option<source::Kind> {
-        if T::HAS_DOUBLESLASH_COMMENTS && Self::is_doubleslash_comment(&cursor) {
+        if T::HAS_DOUBLESLASH_COMMENTS && Self::is_doubleslash_comment(cursor) {
             cursor.eat_while(|b| b != b'\n');
             cursor.restore(Self::trim_trailing_hspace(cursor));
             Some(source::Kind::Comment)
@@ -330,9 +291,6 @@ impl<T: GasTarget> Gas<T> {
                     span.end = cursor.pos();
                 }
                 _ if class.contains(Self::STATEMENT_END) => {
-                    break;
-                }
-                _ if Self::is_multibyte_comment(cursor) => {
                     break;
                 }
                 b'/' if Self::is_doubleslash_comment(cursor) => {
@@ -457,7 +415,6 @@ impl<T: GasTarget> Dialect for Gas<T> {
         let kind = Self::try_slash_star_comment(cur)
             .or_else(|| Self::try_line_comment(cur))
             .or_else(|| Self::try_doubleslash_comment(cur))
-            .or_else(|| Self::try_multibyte_comment(cur))
             .or_else(|| Self::try_comment(cur))
             .or_else(|| Self::try_symbol_kind(cur))?;
 

@@ -11,7 +11,7 @@ pub struct ArmLinuxEabiElf;
 impl GasTarget for ArmGenericElf {
     const COMMENT_CHARS: Set = Set::from_bytes(b"@");
     const LINE_COMMENT_CHARS: Set = Set::from_bytes(b"#");
-    const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[*b"//"];
+    const HAS_DOUBLESLASH_COMMENTS: bool = true;
     const LINE_SEPARATOR_CHARS: Set = Set::from_bytes(b";");
     const HAS_LOCAL_LABELS: bool = true;
     const HAS_DOLLAR_LOCAL_LABELS: bool = true;
@@ -23,7 +23,7 @@ impl GasTarget for ArmGenericElf {
 impl GasTarget for ArmLinuxElf {
     const COMMENT_CHARS: Set = Set::from_bytes(b"@");
     const LINE_COMMENT_CHARS: Set = Set::from_bytes(b"#");
-    const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[*b"//"];
+    const HAS_DOUBLESLASH_COMMENTS: bool = true;
     const LINE_SEPARATOR_CHARS: Set = Set::from_bytes(b";");
     const HAS_LOCAL_LABELS: bool = true;
 }
@@ -34,7 +34,7 @@ impl GasTarget for ArmLinuxElf {
 impl GasTarget for ArmLinuxEabiElf {
     const COMMENT_CHARS: Set = Set::from_bytes(b"@");
     const LINE_COMMENT_CHARS: Set = Set::from_bytes(b"#");
-    const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[*b"//"];
+    const HAS_DOUBLESLASH_COMMENTS: bool = true;
     const LINE_SEPARATOR_CHARS: Set = Set::from_bytes(b";");
     const HAS_LOCAL_LABELS: bool = true;
 }

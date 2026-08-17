@@ -41,7 +41,6 @@ fn try_symbol_kind_label() {
     check_try_symbol_kind::<ArmLinuxEabiElf>(cases);
     check_try_symbol_kind::<RiscvGenericElf>(cases);
     check_try_symbol_kind::<NoHashLineComment>(cases);
-    check_try_symbol_kind::<NonSlashMultibyte>(cases);
     check_try_symbol_kind::<NoLineSeparator>(cases);
 }
 
@@ -60,7 +59,6 @@ fn try_symbol_kind_local_label() {
     check_try_symbol_kind::<ArmLinuxEabiElf>(cases);
     check_try_symbol_kind::<RiscvGenericElf>(cases);
     check_try_symbol_kind::<NoHashLineComment>(cases);
-    check_try_symbol_kind::<NonSlashMultibyte>(cases);
     check_try_symbol_kind::<NoLineSeparator>(cases);
 }
 
@@ -87,7 +85,6 @@ fn try_symbol_kind_no_local_dollar_label() {
     check_try_symbol_kind::<Aarch64LinuxElf>(cases);
     check_try_symbol_kind::<ArmLinuxEabiElf>(cases);
     check_try_symbol_kind::<NoHashLineComment>(cases);
-    check_try_symbol_kind::<NonSlashMultibyte>(cases);
     check_try_symbol_kind::<NoLineSeparator>(cases);
 }
 
@@ -138,7 +135,6 @@ fn try_symbol_kind_directive() {
     check_try_symbol_kind::<ArmLinuxEabiElf>(cases);
     check_try_symbol_kind::<RiscvGenericElf>(cases);
     check_try_symbol_kind::<NoHashLineComment>(cases);
-    check_try_symbol_kind::<NonSlashMultibyte>(cases);
     check_try_symbol_kind::<NoLineSeparator>(cases);
 }
 
@@ -160,7 +156,6 @@ fn try_symbol_kind_directive_line_separator() {
     check_try_symbol_kind::<ArmLinuxEabiElf>(cases);
     check_try_symbol_kind::<RiscvGenericElf>(cases);
     check_try_symbol_kind::<NoHashLineComment>(cases);
-    check_try_symbol_kind::<NonSlashMultibyte>(cases);
 }
 
 #[test]
@@ -179,7 +174,6 @@ fn try_symbol_kind_directive_hash_comment() {
     check_try_symbol_kind::<X86LinuxElf>(cases);
     check_try_symbol_kind::<RiscvGenericElf>(cases);
     check_try_symbol_kind::<NoHashLineComment>(cases);
-    check_try_symbol_kind::<NonSlashMultibyte>(cases);
     check_try_symbol_kind::<NoLineSeparator>(cases);
 }
 
@@ -239,7 +233,6 @@ fn try_symbol_kind_instruction() {
     check_try_symbol_kind::<ArmLinuxEabiElf>(cases);
     check_try_symbol_kind::<RiscvGenericElf>(cases);
     check_try_symbol_kind::<NoHashLineComment>(cases);
-    check_try_symbol_kind::<NonSlashMultibyte>(cases);
     check_try_symbol_kind::<NoLineSeparator>(cases);
 }
 
@@ -272,7 +265,6 @@ fn try_symbol_kind_definition() {
     check_try_symbol_kind::<ArmLinuxEabiElf>(cases);
     check_try_symbol_kind::<RiscvGenericElf>(cases);
     check_try_symbol_kind::<NoHashLineComment>(cases);
-    check_try_symbol_kind::<NonSlashMultibyte>(cases);
     check_try_symbol_kind::<NoLineSeparator>(cases);
 }
 
@@ -291,6 +283,5 @@ fn try_symbol_kind_unknown() {
     check_try_symbol_kind::<ArmLinuxEabiElf>(cases);
     check_try_symbol_kind::<RiscvGenericElf>(cases);
     check_try_symbol_kind::<NoHashLineComment>(cases);
-    check_try_symbol_kind::<NonSlashMultibyte>(cases);
     check_try_symbol_kind::<NoLineSeparator>(cases);
 }
