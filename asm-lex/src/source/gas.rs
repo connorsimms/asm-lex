@@ -20,7 +20,7 @@ pub trait GasTarget {
     // Anything from byte sequence to newline is a comment, can be placed anywhere
     const MULTI_COMMENT_CHARS: &'static [[u8; 2]];
 
-    const DOUBLESLASH_COMMENT: bool = false;
+    const HAS_DOUBLESLASH_COMMENTS: bool = false;
 
     // The starting bytes of multi-byte comment sequence
     const MULTI_COMMENT_START_CHARS: Set = Set::from_first_bytes(Self::MULTI_COMMENT_CHARS);
@@ -40,10 +40,10 @@ pub trait GasTarget {
         .with_set(&byte::ASCII_EXTENDED);
 
     // Whether (55:) is a valid label or not
-    const LOCAL_LABELS: bool = false;
+    const HAS_LOCAL_LABELS: bool = false;
 
     // Whether (55$:) is a valid label or not
-    const LOCAL_LABELS_DOLLAR: bool = false;
+    const HAS_DOLLAR_LOCAL_LABELS: bool = false;
 }
 
 pub struct Gas<T: GasTarget> {
@@ -276,6 +276,14 @@ impl<T: GasTarget> Gas<T> {
         false
     }
 
+    fn is_doubleslash_comment(cursor: &Cursor<'_>) -> bool {
+        if T::HAS_DOUBLESLASH_COMMENTS {
+            cursor.peek() == Some(b'/') && cursor.seek(1) == Some(b'/')
+        } else {
+            false
+        }
+    }
+
     fn try_multibyte_comment(cursor: &mut Cursor<'_>) -> Option<source::Kind> {
         if cursor
             .peek()
@@ -290,6 +298,16 @@ impl<T: GasTarget> Gas<T> {
             }
         }
         None
+    }
+
+    fn try_doubleslash_comment(cursor: &mut Cursor<'_>) -> Option<source::Kind> {
+        if T::HAS_DOUBLESLASH_COMMENTS && Self::is_doubleslash_comment(&cursor) {
+            cursor.eat_while(|b| b != b'\n');
+            cursor.restore(Self::trim_trailing_hspace(cursor));
+            Some(source::Kind::Comment)
+        } else {
+            None
+        }
     }
 
     // this function does more than it looks
@@ -315,6 +333,9 @@ impl<T: GasTarget> Gas<T> {
                     break;
                 }
                 _ if Self::is_multibyte_comment(cursor) => {
+                    break;
+                }
+                b'/' if Self::is_doubleslash_comment(cursor) => {
                     break;
                 }
                 b'"' => {
@@ -349,9 +370,9 @@ impl<T: GasTarget> Gas<T> {
         let symbol_start = cursor.pos();
 
         match cursor.peek()? {
-            b'0'..=b'9' if T::LOCAL_LABELS || T::LOCAL_LABELS_DOLLAR => {
+            b'0'..=b'9' if T::HAS_LOCAL_LABELS || T::HAS_DOLLAR_LOCAL_LABELS => {
                 let _ = cursor.eat_while(|b| b.is_ascii_digit());
-                if T::LOCAL_LABELS_DOLLAR {
+                if T::HAS_DOLLAR_LOCAL_LABELS {
                     cursor.eat(b'$');
                 }
                 let symbol_end = cursor.pos();
@@ -435,6 +456,7 @@ impl<T: GasTarget> Dialect for Gas<T> {
 
         let kind = Self::try_slash_star_comment(cur)
             .or_else(|| Self::try_line_comment(cur))
+            .or_else(|| Self::try_doubleslash_comment(cur))
             .or_else(|| Self::try_multibyte_comment(cur))
             .or_else(|| Self::try_comment(cur))
             .or_else(|| Self::try_symbol_kind(cur))?;

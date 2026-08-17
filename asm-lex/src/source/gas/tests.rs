@@ -21,7 +21,7 @@ impl GasTarget for NoHashLineComment {
     const LINE_COMMENT_CHARS: Set = Set::from_bytes(b"/");
     const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[];
     const LINE_SEPARATOR_CHARS: Set = Set::from_bytes(b";");
-    const LOCAL_LABELS: bool = true;
+    const HAS_LOCAL_LABELS: bool = true;
 }
 
 impl GasTarget for NonSlashMultibyte {
@@ -29,7 +29,7 @@ impl GasTarget for NonSlashMultibyte {
     const LINE_COMMENT_CHARS: Set = Set::from_bytes(b"#/");
     const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[*b"@@"];
     const LINE_SEPARATOR_CHARS: Set = Set::from_bytes(b";");
-    const LOCAL_LABELS: bool = true;
+    const HAS_LOCAL_LABELS: bool = true;
 }
 
 impl GasTarget for NoLineSeparator {
@@ -37,5 +37,5 @@ impl GasTarget for NoLineSeparator {
     const LINE_COMMENT_CHARS: Set = Set::from_bytes(b"#/");
     const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[];
     const LINE_SEPARATOR_CHARS: Set = Set::from_bytes(b"");
-    const LOCAL_LABELS: bool = true;
+    const HAS_LOCAL_LABELS: bool = true;
 }

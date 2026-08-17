@@ -13,8 +13,8 @@ impl GasTarget for ArmGenericElf {
     const LINE_COMMENT_CHARS: Set = Set::from_bytes(b"#");
     const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[*b"//"];
     const LINE_SEPARATOR_CHARS: Set = Set::from_bytes(b";");
-    const LOCAL_LABELS: bool = true;
-    const LOCAL_LABELS_DOLLAR: bool = true;
+    const HAS_LOCAL_LABELS: bool = true;
+    const HAS_DOLLAR_LOCAL_LABELS: bool = true;
 }
 
 // tc-arm
@@ -25,7 +25,7 @@ impl GasTarget for ArmLinuxElf {
     const LINE_COMMENT_CHARS: Set = Set::from_bytes(b"#");
     const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[*b"//"];
     const LINE_SEPARATOR_CHARS: Set = Set::from_bytes(b";");
-    const LOCAL_LABELS: bool = true;
+    const HAS_LOCAL_LABELS: bool = true;
 }
 
 // tc-arm
@@ -36,5 +36,5 @@ impl GasTarget for ArmLinuxEabiElf {
     const LINE_COMMENT_CHARS: Set = Set::from_bytes(b"#");
     const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[*b"//"];
     const LINE_SEPARATOR_CHARS: Set = Set::from_bytes(b";");
-    const LOCAL_LABELS: bool = true;
+    const HAS_LOCAL_LABELS: bool = true;
 }

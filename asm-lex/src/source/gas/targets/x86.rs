@@ -14,7 +14,7 @@ impl GasTarget for X86GenericElf {
     const LINE_COMMENT_CHARS: Set = Set::from_bytes(b"#/");
     const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[];
     const LINE_SEPARATOR_CHARS: Set = Set::from_bytes(b";");
-    const LOCAL_LABELS: bool = true;
+    const HAS_LOCAL_LABELS: bool = true;
 }
 
 // tc-i386
@@ -25,7 +25,7 @@ impl GasTarget for X86LinuxElf {
     const LINE_COMMENT_CHARS: Set = Set::from_bytes(b"#/");
     const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[];
     const LINE_SEPARATOR_CHARS: Set = Set::from_bytes(b";");
-    const LOCAL_LABELS: bool = true;
+    const HAS_LOCAL_LABELS: bool = true;
 }
 
 // tc-i386
@@ -36,7 +36,7 @@ impl GasTarget for X86GnuElf {
     const LINE_COMMENT_CHARS: Set = Set::from_bytes(b"#/");
     const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[];
     const LINE_SEPARATOR_CHARS: Set = Set::from_bytes(b";");
-    const LOCAL_LABELS: bool = true;
+    const HAS_LOCAL_LABELS: bool = true;
 }
 
 // tc-i386
@@ -47,5 +47,5 @@ impl GasTarget for X86Darwin {
     const LINE_COMMENT_CHARS: Set = Set::from_bytes(b"#/");
     const MULTI_COMMENT_CHARS: &'static [[u8; 2]] = &[];
     const LINE_SEPARATOR_CHARS: Set = Set::from_bytes(b";");
-    const LOCAL_LABELS: bool = true;
+    const HAS_LOCAL_LABELS: bool = true;
 }
