@@ -1,5 +1,4 @@
 #![allow(dead_code)]
-#![allow(clippy::incompatible_msrv)]
 
 pub struct Escaped(String);
 

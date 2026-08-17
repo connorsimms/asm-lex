@@ -38,6 +38,20 @@
           cargoHash = "sha256-J9eInyzbvVRz9SDEKaJoLCNe2zNym2t/unPh0CrZxzQ=";
           doCheck = false;
         };
+
+        mkGnuCrossShell = triple:
+          let
+            crossPkgs = import pkgs.path {
+              localSystem = pkgs.system;
+              crossSystem = { config = triple; };
+            };
+          in
+          crossPkgs.mkShell {
+            nativeBuildInputs = [
+              crossPkgs.buildPackages.gcc
+              crossPkgs.buildPackages.binutils
+            ];
+          };
       in
       {
         devShells = {
@@ -75,33 +89,28 @@
             '';
           };
 
-          gnu64-gnu = pkgs.mkShell {
-            nativeBuildInputs = with pkgs; [
-              pkgsCross.gnu64.buildPackages.gcc
-              pkgsCross.gnu64.buildPackages.binutils
-            ];
-          };
-
-          aarch64-gnu = pkgs.mkShell {
+          aarch64-multiplatform = pkgs.mkShell {
             nativeBuildInputs = with pkgs; [
               pkgsCross.aarch64-multiplatform.buildPackages.gcc
               pkgsCross.aarch64-multiplatform.buildPackages.binutils
             ];
           };
 
-          arm-gnu = pkgs.mkShell {
-            nativeBuildInputs = with pkgs; [
-              pkgsCross.armv7l-hf-multiplatform.buildPackages.gcc
-              pkgsCross.armv7l-hf-multiplatform.buildPackages.binutils
-            ];
-          };
+          aarch64-linux = mkGnuCrossShell "aarch64-unknown-linux-gnu";
+          aarch64-windows = mkGnuCrossShell "aarch64-w64-mingw32";
+          aarch64-none = mkGnuCrossShell "aarch64-none-elf";
 
-          riscv64-gnu = pkgs.mkShell {
-            nativeBuildInputs = with pkgs; [
-              pkgsCross.riscv64.buildPackages.gcc
-              pkgsCross.riscv64.buildPackages.binutils
-            ];
-          };
+          x86_64-linux = mkGnuCrossShell "x86_64-unknown-linux-gnu";
+          x86_64-darwin = mkGnuCrossShell "x86_64-apple-darwin";
+          x86_64-windows = mkGnuCrossShell "x86_64-w64-mingw32";
+          x86_64-none = mkGnuCrossShell "x86_64-elf";
+
+          arm-linux-gnueabihf = mkGnuCrossShell "armv7l-unknown-linux-gnueabihf";
+          arm-windows = mkGnuCrossShell "armv7-w64-mingw32";
+          arm-none = mkGnuCrossShell "arm-none-eabi";
+
+          riscv64-linux = mkGnuCrossShell "riscv64-unknown-linux-gnu";
+          riscv64-none = mkGnuCrossShell "riscv64-none-elf";
 
           llvm = pkgs.mkShell {
             nativeBuildInputs = with pkgs; [

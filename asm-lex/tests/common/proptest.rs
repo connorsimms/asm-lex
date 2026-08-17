@@ -1,6 +1,7 @@
 use proptest::prelude::*;
 use proptest::test_runner::{Config, FileFailurePersistence};
 
+#[allow(clippy::incompatible_msrv)]
 pub fn config_file(file: &'static str) -> Config {
     Config {
         failure_persistence: Some(Box::new(FileFailurePersistence::Direct(String::leak::<
