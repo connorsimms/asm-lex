@@ -39,19 +39,25 @@
           doCheck = false;
         };
 
+        gnuCrossFor = triple: (import pkgs.path {
+          localSystem = pkgs.system;
+          crossSystem = { config = triple; };
+        }).buildPackages;
+
         mkGnuCrossShell = triple:
-          let
-            crossPkgs = import pkgs.path {
-              localSystem = pkgs.system;
-              crossSystem = { config = triple; };
-            };
-          in
-          crossPkgs.mkShell {
-            nativeBuildInputs = [
-              crossPkgs.buildPackages.gcc
-              crossPkgs.buildPackages.binutils
-            ];
-          };
+          let bp = gnuCrossFor triple;
+          in pkgs.mkShell { nativeBuildInputs = [ bp.gcc bp.binutils ]; };
+
+        fixtureTriples = [
+          "x86_64-unknown-linux-gnu"
+          "aarch64-unknown-linux-gnu"
+          "armv7l-unknown-linux-gnueabihf"
+          "riscv64-unknown-linux-gnu"
+        ];
+
+        gnuToolchains = builtins.concatMap
+          (t: let bp = gnuCrossFor t; in [ bp.gcc bp.binutils ])
+          fixtureTriples;
       in
       {
         devShells = {
@@ -89,24 +95,15 @@
             '';
           };
 
-          aarch64-multiplatform = pkgs.mkShell {
-            nativeBuildInputs = with pkgs; [
-              pkgsCross.aarch64-multiplatform.buildPackages.gcc
-              pkgsCross.aarch64-multiplatform.buildPackages.binutils
-            ];
-          };
-
           aarch64-linux = mkGnuCrossShell "aarch64-unknown-linux-gnu";
           aarch64-windows = mkGnuCrossShell "aarch64-w64-mingw32";
           aarch64-none = mkGnuCrossShell "aarch64-none-elf";
 
           x86_64-linux = mkGnuCrossShell "x86_64-unknown-linux-gnu";
-          x86_64-darwin = mkGnuCrossShell "x86_64-apple-darwin";
           x86_64-windows = mkGnuCrossShell "x86_64-w64-mingw32";
           x86_64-none = mkGnuCrossShell "x86_64-elf";
 
           arm-linux-gnueabihf = mkGnuCrossShell "armv7l-unknown-linux-gnueabihf";
-          arm-windows = mkGnuCrossShell "armv7-w64-mingw32";
           arm-none = mkGnuCrossShell "arm-none-eabi";
 
           riscv64-linux = mkGnuCrossShell "riscv64-unknown-linux-gnu";
@@ -114,9 +111,18 @@
 
           llvm = pkgs.mkShell {
             nativeBuildInputs = with pkgs; [
-              llvmPackages.clang
-              llvmPackages.llvm
+              llvmPackages_21.clang
+              llvmPackages_21.llvm
             ];
+          };
+
+          test-fixtures = pkgs.mkShell {
+            nativeBuildInputs = gnuToolchains ++ [
+              pkgs.llvmPackages_21.clang-unwrapped
+              pkgs.llvmPackages_21.llvm
+              rustLatest
+            ];
+            hardeningDisable = [ "all" ];
           };
         };
       }

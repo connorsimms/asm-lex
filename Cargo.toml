@@ -1,5 +1,5 @@
 [workspace]
-members = ["asm-lex"]
+members = ["asm-lex", "xtask"]
 resolver = "2"
 
 [workspace.package]
