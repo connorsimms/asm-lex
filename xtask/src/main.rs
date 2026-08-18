@@ -124,6 +124,7 @@ fn normalize(s: &str) -> String {
 fn generate(t: &Target, v: &Variant) -> Result<String, String> {
     let src_dir = root().join("asm-lex/tests/fixtures");
     let output = Command::new(t.cc)
+        .env_remove("NIX_CFLAGS_COMPILE")
         .current_dir(&src_dir)
         .args(BASE)
         .args(t.args)
@@ -149,6 +150,10 @@ fn generate(t: &Target, v: &Variant) -> Result<String, String> {
 fn main() {
     let check = std::env::args().any(|a| a == "--check");
     let filter: Option<String> = std::env::args().skip(1).find(|a| !a.starts_with("--"));
+
+    for (var, value) in std::env::vars() {
+        println!("{var}: {value}");
+    }
 
     let mut failures = Vec::new();
     let mut stale = Vec::new();

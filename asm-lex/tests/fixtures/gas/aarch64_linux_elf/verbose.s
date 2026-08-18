@@ -4,7 +4,7 @@
 //	compiled by GNU C version 15.2.0, GMP version 6.3.0, MPFR version 4.2.2, MPC version 1.4.1, isl version isl-0.20-GMP
 
 // GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
-// options passed: -mno-omit-leaf-frame-pointer -march=armv8-a -mlittle-endian -mabi=lp64 -O0 -fno-omit-frame-pointer -ffreestanding -frandom-seed=0 -frandom-seed=dgd206xm0s
+// options passed: -mno-omit-leaf-frame-pointer -march=armv8-a -mlittle-endian -mabi=lp64 -O0 -fno-omit-frame-pointer -ffreestanding -frandom-seed=0
 	.text
 	.section	.rodata
 	.align	3

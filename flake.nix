@@ -46,7 +46,7 @@
 
         mkGnuCrossShell = triple:
           let bp = gnuCrossFor triple;
-          in pkgs.mkShell { nativeBuildInputs = [ bp.gcc bp.binutils ]; };
+          in pkgs.mkShell { nativeBuildInputs = [ bp.gcc.cc bp.binutils ]; };
 
         fixtureTriples = [
           "x86_64-unknown-linux-gnu"
