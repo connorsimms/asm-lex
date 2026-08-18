@@ -10,6 +10,8 @@ pub struct Aarch64GnuCoff;
 impl LlvmTarget for Aarch64Darwin {
     const SEPARATOR_STR: &'static [u8] = b"%%";
     const COMMENT_STR: &'static [u8] = b";";
+    const INLINE_ASM_START: &'static [u8] = b" InlineAsm Start";
+    const INLINE_ASM_END: &'static [u8] = b" InlineAsm End";
 }
 
 impl LlvmTarget for Aarch64Elf {

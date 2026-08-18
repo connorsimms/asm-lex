@@ -10,4 +10,6 @@ impl LlvmTarget for RiscvElf {}
 impl LlvmTarget for RiscvDarwin {
     const SEPARATOR_STR: &'static [u8] = b"%%";
     const COMMENT_STR: &'static [u8] = b";";
+    const INLINE_ASM_START: &'static [u8] = b" InlineAsm Start";
+    const INLINE_ASM_END: &'static [u8] = b" InlineAsm End";
 }

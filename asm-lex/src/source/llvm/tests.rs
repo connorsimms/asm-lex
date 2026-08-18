@@ -7,3 +7,4 @@ mod preamble;
 mod quoted;
 mod slash_star;
 mod symbol_kind;
+mod inline_asm_marker;

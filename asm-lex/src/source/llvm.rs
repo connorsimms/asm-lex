@@ -19,6 +19,8 @@ pub trait LlvmTarget {
     const QUESTION_STARTS_IDENTIFIER: bool = false;
     const DOLLAR_STARTS_IDENTIFIER: bool = false;
     const AT_STARTS_IDENTIFIER: bool = false;
+    const INLINE_ASM_START: &'static [u8] = b"APP";
+    const INLINE_ASM_END: &'static [u8] = b"NO_APP";
 }
 
 pub struct Llvm<T: LlvmTarget> {
@@ -162,6 +164,32 @@ impl<T: LlvmTarget> Llvm<T> {
         (starts_line, starts_statement)
     }
 
+    fn try_inline_asm_marker(cursor: &mut Cursor<'_>) -> Option<Kind> {
+        if !cursor.starts_with(T::COMMENT_STR) {
+            return None;
+        }
+
+        let save = cursor.pos();
+        cursor.advance(T::COMMENT_STR.len());
+
+        if cursor.starts_with(T::INLINE_ASM_START) {
+            cursor.advance(T::INLINE_ASM_START.len());
+            if !cursor.peek().is_some_and(|b| !Self::is_end_of_line(b)) {
+                return Some(source::Kind::Preprocessor);
+            }
+        }
+
+        if cursor.starts_with(T::INLINE_ASM_END) {
+            cursor.advance(T::INLINE_ASM_END.len());
+            if !cursor.peek().is_some_and(|b| !Self::is_end_of_line(b)) {
+                return Some(source::Kind::Preprocessor);
+            }
+        }
+
+        cursor.restore(save);
+        None
+    }
+
     fn try_linemarker(cursor: &mut Cursor<'_>) -> Option<Kind> {
         if cursor.peek() != Some(b'#')
             || cursor
@@ -212,6 +240,10 @@ impl<T: LlvmTarget> Llvm<T> {
         }
 
         if let Some(kind) = Self::try_linemarker(cursor) {
+            return Some(kind);
+        }
+
+        if let Some(kind) = Self::try_inline_asm_marker(cursor) {
             return Some(kind);
         }
 

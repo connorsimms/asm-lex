@@ -10,6 +10,8 @@ pub struct ArmGnuCoff;
 impl LlvmTarget for ArmDarwin {
     const COMMENT_STR: &'static [u8] = b"@";
     const USE_AT_FOR_SPECIFIER: bool = true;
+    const INLINE_ASM_START: &'static [u8] = b" InlineAsm Start";
+    const INLINE_ASM_END: &'static [u8] = b" InlineAsm End";
 }
 
 impl LlvmTarget for ArmElf {
