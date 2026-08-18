@@ -1,5 +1,6 @@
 mod args;
 mod comment;
+mod inline_asm_marker;
 mod line_comment;
 mod linemarker;
 mod preamble;

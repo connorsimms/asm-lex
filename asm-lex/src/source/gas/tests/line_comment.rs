@@ -18,6 +18,7 @@ fn check_try_line_comment<T: GasTarget>(cases: &[(&[u8], Option<Kind>, usize)]) 
 fn with_hash_ln_comment() {
     use Kind::{Comment, Preprocessor};
     let cases: &[(&[u8], Option<Kind>, usize)] = &[
+        /* linemarkers */
         // whitespace
         (b"# 100 \"file\"", Some(Preprocessor), 12),
         (b"#100 \"file\"", Some(Preprocessor), 11),
@@ -34,7 +35,12 @@ fn with_hash_ln_comment() {
         (b"# 100 \"filename\" 1", Some(Preprocessor), 18),
         (b"# 100 \"filename\"1", Some(Preprocessor), 17),
         (b"# 100 \"filename\" 1 2 3", Some(Preprocessor), 22),
-        // comments
+        /* inline asm markers */
+        (b"#APP", Some(Preprocessor), 4),
+        (b"#NO_APP", Some(Preprocessor), 7),
+        (b"#APP\n", Some(Preprocessor), 4),
+        (b"#NO_APP\n", Some(Preprocessor), 7),
+        /* comments */
         (b"#", Some(Comment), 1),
         (b"# 100", Some(Comment), 5),
         (b"# junk", Some(Comment), 6),
@@ -71,18 +77,21 @@ fn with_hash_ln_comment() {
 
 #[test]
 fn no_hash_ln_comment() {
+    use Kind::{Comment, Preprocessor};
     let cases: &[(&[u8], Option<Kind>, usize)] = &[
-        (b"# 100 \"file\"", None, 0),
-        (b"#100 \"file\"", None, 0),
-        (b"# 100\"file\"", None, 0),
-        (b"#100\"file\"", None, 0),
-        (b"#\t100\t\"file\"", None, 0),
-        (b"# 100 \"\"", None, 0),
-        (b"# 100 \"\n\"", None, 0),
-        (b"# 100 \";@#//\"", None, 0),
-        (b"# 100 \"filename\" 1", None, 0),
-        (b"# 100 \"filename\"1", None, 0),
-        (b"# 100 \"filename\" 1 2 3", None, 0),
+        /* inline asm markers */
+        (b"/APP", Some(Preprocessor), 4),
+        (b"/NO_APP", Some(Preprocessor), 7),
+        (b"/APP\n", Some(Preprocessor), 4),
+        (b"/NO_APP\n", Some(Preprocessor), 7),
+        /* comments */
+        (b"/ 100 \"file\"", Some(Comment), 12),
+        (b"/100 \"file\"", Some(Comment), 11),
+        (b"/ 100\"file\"", Some(Comment), 11),
+        (b"/100\"file\"", Some(Comment), 10),
+        (b"/\t100\t\"file\"", Some(Comment), 12),
+        (b"/ 100 \"\"", Some(Comment), 8),
+        (b"/ 100 \";@#//\"", Some(Comment), 13),
         (b"# 1000 \"filename\"", None, 0),
         (b"# ...", None, 0),
         (b"## ...", None, 0),

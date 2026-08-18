@@ -104,6 +104,11 @@ impl<T: GasTarget> Gas<T> {
         matches!(b, b' ' | b'\t' | b'\r')
     }
 
+    #[inline]
+    fn is_end_of_line(b: u8) -> bool {
+        matches!(b, b'\x00' | b'\n')
+    }
+
     // return position of last non-whitespace byte
     fn trim_trailing_hspace(cursor: &Cursor) -> usize {
         let mut i = -1;
@@ -150,6 +155,39 @@ impl<T: GasTarget> Gas<T> {
             cursor.bump();
         }
         starts_line
+    }
+
+    fn try_inline_asm_marker(cursor: &mut Cursor<'_>) -> Option<source::Kind> {
+        if cursor.seek(-1).is_some_and(|b| !Self::is_end_of_line(b)) {
+            return None;
+        }
+
+        let save = cursor.pos();
+
+        if !cursor
+            .bump()
+            .is_some_and(|b| Self::class(b).contains(Self::LINE_COMMENT))
+        {
+            cursor.restore(save);
+            return None;
+        }
+
+        if cursor.starts_with(b"APP") {
+            cursor.advance(3);
+            if !cursor.peek().is_some_and(|b| !Self::is_end_of_line(b)) {
+                return Some(source::Kind::Preprocessor);
+            }
+        }
+
+        if cursor.starts_with(b"NO_APP") {
+            cursor.advance(6);
+            if !cursor.peek().is_some_and(|b| !Self::is_end_of_line(b)) {
+                return Some(source::Kind::Preprocessor);
+            }
+        }
+
+        cursor.restore(save);
+        None
     }
 
     fn try_linemarker(cursor: &mut Cursor<'_>) -> Option<source::Kind> {
@@ -200,6 +238,10 @@ impl<T: GasTarget> Gas<T> {
         }
 
         if let Some(kind) = Self::try_linemarker(cursor) {
+            return Some(kind);
+        }
+
+        if let Some(kind) = Self::try_inline_asm_marker(cursor) {
             return Some(kind);
         }
 
