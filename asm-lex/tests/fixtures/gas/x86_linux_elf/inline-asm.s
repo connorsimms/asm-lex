@@ -1,4 +1,4 @@
-	.file	"hello_world.c"
+	.file	"hello-world-inline-asm.c"
 	.text
 	.section	.rodata
 .LC0:
@@ -17,6 +17,11 @@ main:
 	leaq	.LC0(%rip), %rax
 	movq	%rax, %rdi
 	call	puts@PLT
+#APP
+# 5 "hello-world-inline-asm.c" 1
+	nop
+# 0 "" 2
+#NO_APP
 	movl	$0, %eax
 	popq	%rbp
 	.cfi_def_cfa 7, 8
@@ -24,5 +29,5 @@ main:
 	.cfi_endproc
 .LFE0:
 	.size	main, .-main
-	.ident	"GCC: (GNU) 15.2.0"
+	.ident	"<toolchain>"
 	.section	.note.GNU-stack,"",@progbits

@@ -1,25 +1,24 @@
 	.arch armv8-a
-	.file	"hello_world.c"
+	.file	"hello-world.c"
 	.text
-	.section	.rodata.str1.8,"aMS",@progbits,1
+	.section	.rodata
 	.align	3
 .LC0:
 	.string	"Hello World!\n"
-	.section	.text.startup,"ax",@progbits
+	.text
 	.align	2
-	.p2align 5,,15
 	.global	main
 	.type	main, %function
 main:
-.LFB23:
+.LFB0:
 	.cfi_startproc
 	stp	x29, x30, [sp, -16]!
 	.cfi_def_cfa_offset 16
 	.cfi_offset 29, -16
 	.cfi_offset 30, -8
+	mov	x29, sp
 	adrp	x0, .LC0
 	add	x0, x0, :lo12:.LC0
-	mov	x29, sp
 	bl	puts
 	mov	w0, 0
 	ldp	x29, x30, [sp], 16
@@ -28,7 +27,7 @@ main:
 	.cfi_def_cfa_offset 0
 	ret
 	.cfi_endproc
-.LFE23:
+.LFE0:
 	.size	main, .-main
-	.ident	"GCC: (GNU) 15.2.0"
+	.ident	"<toolchain>"
 	.section	.note.GNU-stack,"",@progbits
