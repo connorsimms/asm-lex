@@ -1,0 +1,182 @@
+---
+source: asm-lex/tests/snapshot-llvm.rs
+expression: snap_items
+input_file: asm-lex/tests/fixtures/llvm/x86_darwin/verbose.s
+---
+[
+    Item {
+        span: 1..26 ".macosx_version_min 10, 4",
+        kind: Directive {
+            name: 1..20 ".macosx_version_min",
+            args: Some(
+                21..26 "10, 4",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 28..76 ".section\t__TEXT,__text,regular,pure_instructions",
+        kind: Directive {
+            name: 28..36 ".section",
+            args: Some(
+                37..76 "__TEXT,__text,regular,pure_instructions",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 78..90 ".globl\t_main",
+        kind: Directive {
+            name: 78..84 ".globl",
+            args: Some(
+                85..90 "_main",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 117..142 "## -- Begin function main",
+        kind: Comment,
+        starts_line: false,
+    },
+    Item {
+        span: 144..154 ".p2align\t4",
+        kind: Directive {
+            name: 144..152 ".p2align",
+            args: Some(
+                153..154 "4",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 155..161 "_main:",
+        kind: Label {
+            name: 155..160 "_main",
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 195..203 "## @main",
+        kind: Comment,
+        starts_line: false,
+    },
+    Item {
+        span: 204..213 "## %bb.0:",
+        kind: Comment,
+        starts_line: true,
+    },
+    Item {
+        span: 215..225 "pushq\t%rbp",
+        kind: Instruction {
+            mnemonic: 215..220 "pushq",
+            args: Some(
+                221..225 "%rbp",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 227..242 "movq\t%rsp, %rbp",
+        kind: Instruction {
+            mnemonic: 227..231 "movq",
+            args: Some(
+                232..242 "%rsp, %rbp",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 244..267 "leaq\tL_.str(%rip), %rdi",
+        kind: Instruction {
+            mnemonic: 244..248 "leaq",
+            args: Some(
+                249..267 "L_.str(%rip), %rdi",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 269..280 "callq\t_puts",
+        kind: Instruction {
+            mnemonic: 269..274 "callq",
+            args: Some(
+                275..280 "_puts",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 282..297 "xorl\t%eax, %eax",
+        kind: Instruction {
+            mnemonic: 282..286 "xorl",
+            args: Some(
+                287..297 "%eax, %eax",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 299..308 "popq\t%rbp",
+        kind: Instruction {
+            mnemonic: 299..303 "popq",
+            args: Some(
+                304..308 "%rbp",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 310..314 "retq",
+        kind: Instruction {
+            mnemonic: 310..314 "retq",
+            args: None,
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 355..373 "## -- End function",
+        kind: Comment,
+        starts_line: true,
+    },
+    Item {
+        span: 375..417 ".section\t__TEXT,__cstring,cstring_literals",
+        kind: Directive {
+            name: 375..383 ".section",
+            args: Some(
+                384..417 "__TEXT,__cstring,cstring_literals",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 418..425 "L_.str:",
+        kind: Label {
+            name: 418..424 "L_.str",
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 458..466 "## @.str",
+        kind: Comment,
+        starts_line: false,
+    },
+    Item {
+        span: 468..491 ".asciz\t\"Hello World!\\n\"",
+        kind: Directive {
+            name: 468..474 ".asciz",
+            args: Some(
+                475..491 "\"Hello World!\\n\"",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 493..517 ".subsections_via_symbols",
+        kind: Directive {
+            name: 493..517 ".subsections_via_symbols",
+            args: None,
+        },
+        starts_line: true,
+    },
+]

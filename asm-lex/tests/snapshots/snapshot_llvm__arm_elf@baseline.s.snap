@@ -1,0 +1,542 @@
+---
+source: asm-lex/tests/snapshot-llvm.rs
+expression: snap_items
+input_file: asm-lex/tests/fixtures/llvm/arm_elf/baseline.s
+---
+[
+    Item {
+        span: 1..16 ".syntax\tunified",
+        kind: Directive {
+            name: 1..8 ".syntax",
+            args: Some(
+                9..16 "unified",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 18..44 ".eabi_attribute\t67, \"2.09\"",
+        kind: Directive {
+            name: 18..33 ".eabi_attribute",
+            args: Some(
+                34..44 "67, \"2.09\"",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 46..67 ".eabi_attribute\t6, 10",
+        kind: Directive {
+            name: 46..61 ".eabi_attribute",
+            args: Some(
+                62..67 "6, 10",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 69..90 ".eabi_attribute\t7, 65",
+        kind: Directive {
+            name: 69..84 ".eabi_attribute",
+            args: Some(
+                85..90 "7, 65",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 92..112 ".eabi_attribute\t8, 1",
+        kind: Directive {
+            name: 92..107 ".eabi_attribute",
+            args: Some(
+                108..112 "8, 1",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 114..134 ".eabi_attribute\t9, 2",
+        kind: Directive {
+            name: 114..129 ".eabi_attribute",
+            args: Some(
+                130..134 "9, 2",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 136..145 ".fpu\tneon",
+        kind: Directive {
+            name: 136..140 ".fpu",
+            args: Some(
+                141..145 "neon",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 147..168 ".eabi_attribute\t34, 1",
+        kind: Directive {
+            name: 147..162 ".eabi_attribute",
+            args: Some(
+                163..168 "34, 1",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 170..191 ".eabi_attribute\t15, 1",
+        kind: Directive {
+            name: 170..185 ".eabi_attribute",
+            args: Some(
+                186..191 "15, 1",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 193..214 ".eabi_attribute\t16, 1",
+        kind: Directive {
+            name: 193..208 ".eabi_attribute",
+            args: Some(
+                209..214 "16, 1",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 216..237 ".eabi_attribute\t17, 2",
+        kind: Directive {
+            name: 216..231 ".eabi_attribute",
+            args: Some(
+                232..237 "17, 2",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 239..260 ".eabi_attribute\t20, 1",
+        kind: Directive {
+            name: 239..254 ".eabi_attribute",
+            args: Some(
+                255..260 "20, 1",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 262..283 ".eabi_attribute\t21, 0",
+        kind: Directive {
+            name: 262..277 ".eabi_attribute",
+            args: Some(
+                278..283 "21, 0",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 285..306 ".eabi_attribute\t23, 3",
+        kind: Directive {
+            name: 285..300 ".eabi_attribute",
+            args: Some(
+                301..306 "23, 3",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 308..329 ".eabi_attribute\t24, 1",
+        kind: Directive {
+            name: 308..323 ".eabi_attribute",
+            args: Some(
+                324..329 "24, 1",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 331..352 ".eabi_attribute\t25, 1",
+        kind: Directive {
+            name: 331..346 ".eabi_attribute",
+            args: Some(
+                347..352 "25, 1",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 354..375 ".eabi_attribute\t28, 1",
+        kind: Directive {
+            name: 354..369 ".eabi_attribute",
+            args: Some(
+                370..375 "28, 1",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 377..398 ".eabi_attribute\t38, 1",
+        kind: Directive {
+            name: 377..392 ".eabi_attribute",
+            args: Some(
+                393..398 "38, 1",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 400..421 ".eabi_attribute\t18, 4",
+        kind: Directive {
+            name: 400..415 ".eabi_attribute",
+            args: Some(
+                416..421 "18, 4",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 423..444 ".eabi_attribute\t26, 2",
+        kind: Directive {
+            name: 423..438 ".eabi_attribute",
+            args: Some(
+                439..444 "26, 2",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 446..467 ".eabi_attribute\t14, 0",
+        kind: Directive {
+            name: 446..461 ".eabi_attribute",
+            args: Some(
+                462..467 "14, 0",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 469..490 ".file\t\"hello-world.c\"",
+        kind: Directive {
+            name: 469..474 ".file",
+            args: Some(
+                475..490 "\"hello-world.c\"",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 492..497 ".text",
+        kind: Directive {
+            name: 492..497 ".text",
+            args: None,
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 499..510 ".globl\tmain",
+        kind: Directive {
+            name: 499..505 ".globl",
+            args: Some(
+                506..510 "main",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 512..522 ".p2align\t2",
+        kind: Directive {
+            name: 512..520 ".p2align",
+            args: Some(
+                521..522 "2",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 524..544 ".type\tmain,%function",
+        kind: Directive {
+            name: 524..529 ".type",
+            args: Some(
+                530..544 "main,%function",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 546..554 ".code\t32",
+        kind: Directive {
+            name: 546..551 ".code",
+            args: Some(
+                552..554 "32",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 555..560 "main:",
+        kind: Label {
+            name: 555..559 "main",
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 562..570 ".fnstart",
+        kind: Directive {
+            name: 562..570 ".fnstart",
+            args: None,
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 572..587 ".save\t{r11, lr}",
+        kind: Directive {
+            name: 572..577 ".save",
+            args: Some(
+                578..587 "{r11, lr}",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 589..603 "push\t{r11, lr}",
+        kind: Instruction {
+            mnemonic: 589..593 "push",
+            args: Some(
+                594..603 "{r11, lr}",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 605..619 ".setfp\tr11, sp",
+        kind: Directive {
+            name: 605..611 ".setfp",
+            args: Some(
+                612..619 "r11, sp",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 621..632 "mov\tr11, sp",
+        kind: Instruction {
+            mnemonic: 621..624 "mov",
+            args: Some(
+                625..632 "r11, sp",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 634..650 "ldr\tr0, .LCPI0_0",
+        kind: Instruction {
+            mnemonic: 634..637 "ldr",
+            args: Some(
+                638..650 "r0, .LCPI0_0",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 651..659 ".LPC0_0:",
+        kind: Label {
+            name: 651..658 ".LPC0_0",
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 661..675 "add\tr0, pc, r0",
+        kind: Instruction {
+            mnemonic: 661..664 "add",
+            args: Some(
+                665..675 "r0, pc, r0",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 677..684 "bl\tputs",
+        kind: Instruction {
+            mnemonic: 677..679 "bl",
+            args: Some(
+                680..684 "puts",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 686..697 "movw\tr0, #0",
+        kind: Instruction {
+            mnemonic: 686..690 "movw",
+            args: Some(
+                691..697 "r0, #0",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 699..712 "pop\t{r11, pc}",
+        kind: Instruction {
+            mnemonic: 699..702 "pop",
+            args: Some(
+                703..712 "{r11, pc}",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 714..724 ".p2align\t2",
+        kind: Directive {
+            name: 714..722 ".p2align",
+            args: Some(
+                723..724 "2",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 725..734 ".LCPI0_0:",
+        kind: Label {
+            name: 725..733 ".LCPI0_0",
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 736..760 ".long\t.L.str-(.LPC0_0+8)",
+        kind: Directive {
+            name: 736..741 ".long",
+            args: Some(
+                742..760 ".L.str-(.LPC0_0+8)",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 761..773 ".Lfunc_end0:",
+        kind: Label {
+            name: 761..772 ".Lfunc_end0",
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 775..803 ".size\tmain, .Lfunc_end0-main",
+        kind: Directive {
+            name: 775..780 ".size",
+            args: Some(
+                781..803 "main, .Lfunc_end0-main",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 805..816 ".cantunwind",
+        kind: Directive {
+            name: 805..816 ".cantunwind",
+            args: None,
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 818..824 ".fnend",
+        kind: Directive {
+            name: 818..824 ".fnend",
+            args: None,
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 827..847 ".type\t.L.str,%object",
+        kind: Directive {
+            name: 827..832 ".type",
+            args: Some(
+                833..847 ".L.str,%object",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 849..890 ".section\t.rodata.str1.1,\"aMS\",%progbits,1",
+        kind: Directive {
+            name: 849..857 ".section",
+            args: Some(
+                858..890 ".rodata.str1.1,\"aMS\",%progbits,1",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 891..898 ".L.str:",
+        kind: Label {
+            name: 891..897 ".L.str",
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 900..923 ".asciz\t\"Hello World!\\n\"",
+        kind: Directive {
+            name: 900..906 ".asciz",
+            args: Some(
+                907..923 "\"Hello World!\\n\"",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 925..941 ".size\t.L.str, 14",
+        kind: Directive {
+            name: 925..930 ".size",
+            args: Some(
+                931..941 ".L.str, 14",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 944..964 ".ident\t\"<toolchain>\"",
+        kind: Directive {
+            name: 944..950 ".ident",
+            args: Some(
+                951..964 "\"<toolchain>\"",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 966..1005 ".section\t\".note.GNU-stack\",\"\",%progbits",
+        kind: Directive {
+            name: 966..974 ".section",
+            args: Some(
+                975..1005 "\".note.GNU-stack\",\"\",%progbits",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 1007..1015 ".addrsig",
+        kind: Directive {
+            name: 1007..1015 ".addrsig",
+            args: None,
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 1017..1034 ".addrsig_sym puts",
+        kind: Directive {
+            name: 1017..1029 ".addrsig_sym",
+            args: Some(
+                1030..1034 "puts",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 1036..1057 ".eabi_attribute\t30, 6",
+        kind: Directive {
+            name: 1036..1051 ".eabi_attribute",
+            args: Some(
+                1052..1057 "30, 6",
+            ),
+        },
+        starts_line: true,
+    },
+]

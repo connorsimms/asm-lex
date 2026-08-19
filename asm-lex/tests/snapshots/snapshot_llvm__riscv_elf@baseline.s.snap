@@ -1,0 +1,309 @@
+---
+source: asm-lex/tests/snapshot-llvm.rs
+expression: snap_items
+input_file: asm-lex/tests/fixtures/llvm/riscv_elf/baseline.s
+---
+[
+    Item {
+        span: 1..17 ".attribute\t4, 16",
+        kind: Directive {
+            name: 1..11 ".attribute",
+            args: Some(
+                12..17 "4, 16",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 19..119 ".attribute\t5, \"rv64i2p1_m2p0_a2p1_f2p2_d2p2_c2p0_zicsr2p0_zmmul1p0_zaamo1p0_zalrsc1p0_zca1p0_zcd1p0\"",
+        kind: Directive {
+            name: 19..29 ".attribute",
+            args: Some(
+                30..119 "5, \"rv64i2p1_m2p0_a2p1_f2p2_d2p2_c2p0_zicsr2p0_zmmul1p0_zaamo1p0_zalrsc1p0_zca1p0_zcd1p0\"",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 121..142 ".file\t\"hello-world.c\"",
+        kind: Directive {
+            name: 121..126 ".file",
+            args: Some(
+                127..142 "\"hello-world.c\"",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 144..149 ".text",
+        kind: Directive {
+            name: 144..149 ".text",
+            args: None,
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 151..162 ".globl\tmain",
+        kind: Directive {
+            name: 151..157 ".globl",
+            args: Some(
+                158..162 "main",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 164..174 ".p2align\t1",
+        kind: Directive {
+            name: 164..172 ".p2align",
+            args: Some(
+                173..174 "1",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 176..196 ".type\tmain,@function",
+        kind: Directive {
+            name: 176..181 ".type",
+            args: Some(
+                182..196 "main,@function",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 197..202 "main:",
+        kind: Label {
+            name: 197..201 "main",
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 204..220 "addi\tsp, sp, -16",
+        kind: Instruction {
+            mnemonic: 204..208 "addi",
+            args: Some(
+                209..220 "sp, sp, -16",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 222..234 "sd\tra, 8(sp)",
+        kind: Instruction {
+            mnemonic: 222..224 "sd",
+            args: Some(
+                225..234 "ra, 8(sp)",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 236..248 "sd\ts0, 0(sp)",
+        kind: Instruction {
+            mnemonic: 236..238 "sd",
+            args: Some(
+                239..248 "s0, 0(sp)",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 250..265 "addi\ts0, sp, 16",
+        kind: Instruction {
+            mnemonic: 250..254 "addi",
+            args: Some(
+                255..265 "s0, sp, 16",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 266..278 ".Lpcrel_hi0:",
+        kind: Label {
+            name: 266..277 ".Lpcrel_hi0",
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 280..307 "auipc\ta0, %pcrel_hi(.L.str)",
+        kind: Instruction {
+            mnemonic: 280..285 "auipc",
+            args: Some(
+                286..307 "a0, %pcrel_hi(.L.str)",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 309..344 "addi\ta0, a0, %pcrel_lo(.Lpcrel_hi0)",
+        kind: Instruction {
+            mnemonic: 309..313 "addi",
+            args: Some(
+                314..344 "a0, a0, %pcrel_lo(.Lpcrel_hi0)",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 346..355 "call\tputs",
+        kind: Instruction {
+            mnemonic: 346..350 "call",
+            args: Some(
+                351..355 "puts",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 357..365 "li\ta0, 0",
+        kind: Instruction {
+            mnemonic: 357..359 "li",
+            args: Some(
+                360..365 "a0, 0",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 367..379 "ld\tra, 8(sp)",
+        kind: Instruction {
+            mnemonic: 367..369 "ld",
+            args: Some(
+                370..379 "ra, 8(sp)",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 381..393 "ld\ts0, 0(sp)",
+        kind: Instruction {
+            mnemonic: 381..383 "ld",
+            args: Some(
+                384..393 "s0, 0(sp)",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 395..410 "addi\tsp, sp, 16",
+        kind: Instruction {
+            mnemonic: 395..399 "addi",
+            args: Some(
+                400..410 "sp, sp, 16",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 412..415 "ret",
+        kind: Instruction {
+            mnemonic: 412..415 "ret",
+            args: None,
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 416..428 ".Lfunc_end0:",
+        kind: Label {
+            name: 416..427 ".Lfunc_end0",
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 430..458 ".size\tmain, .Lfunc_end0-main",
+        kind: Directive {
+            name: 430..435 ".size",
+            args: Some(
+                436..458 "main, .Lfunc_end0-main",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 461..481 ".type\t.L.str,@object",
+        kind: Directive {
+            name: 461..466 ".type",
+            args: Some(
+                467..481 ".L.str,@object",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 483..524 ".section\t.rodata.str1.1,\"aMS\",@progbits,1",
+        kind: Directive {
+            name: 483..491 ".section",
+            args: Some(
+                492..524 ".rodata.str1.1,\"aMS\",@progbits,1",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 525..532 ".L.str:",
+        kind: Label {
+            name: 525..531 ".L.str",
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 534..557 ".asciz\t\"Hello World!\\n\"",
+        kind: Directive {
+            name: 534..540 ".asciz",
+            args: Some(
+                541..557 "\"Hello World!\\n\"",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 559..575 ".size\t.L.str, 14",
+        kind: Directive {
+            name: 559..564 ".size",
+            args: Some(
+                565..575 ".L.str, 14",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 578..598 ".ident\t\"<toolchain>\"",
+        kind: Directive {
+            name: 578..584 ".ident",
+            args: Some(
+                585..598 "\"<toolchain>\"",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 600..639 ".section\t\".note.GNU-stack\",\"\",@progbits",
+        kind: Directive {
+            name: 600..608 ".section",
+            args: Some(
+                609..639 "\".note.GNU-stack\",\"\",@progbits",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 641..649 ".addrsig",
+        kind: Directive {
+            name: 641..649 ".addrsig",
+            args: None,
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 651..668 ".addrsig_sym puts",
+        kind: Directive {
+            name: 651..663 ".addrsig_sym",
+            args: Some(
+                664..668 "puts",
+            ),
+        },
+        starts_line: true,
+    },
+]

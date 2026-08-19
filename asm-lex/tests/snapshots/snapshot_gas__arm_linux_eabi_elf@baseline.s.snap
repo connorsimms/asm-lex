@@ -1,0 +1,416 @@
+---
+source: asm-lex/tests/snapshot-gas.rs
+expression: snap_items
+input_file: asm-lex/tests/fixtures/gas/arm_linux_eabi_elf/baseline.s
+---
+[
+    Item {
+        span: 1..14 ".arch armv7-a",
+        kind: Directive {
+            name: 1..6 ".arch",
+            args: Some(
+                7..14 "armv7-a",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 16..30 ".fpu vfpv3-d16",
+        kind: Directive {
+            name: 16..20 ".fpu",
+            args: Some(
+                21..30 "vfpv3-d16",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 32..53 ".eabi_attribute 28, 1",
+        kind: Directive {
+            name: 32..47 ".eabi_attribute",
+            args: Some(
+                48..53 "28, 1",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 55..76 ".eabi_attribute 20, 1",
+        kind: Directive {
+            name: 55..70 ".eabi_attribute",
+            args: Some(
+                71..76 "20, 1",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 78..99 ".eabi_attribute 21, 1",
+        kind: Directive {
+            name: 78..93 ".eabi_attribute",
+            args: Some(
+                94..99 "21, 1",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 101..122 ".eabi_attribute 23, 3",
+        kind: Directive {
+            name: 101..116 ".eabi_attribute",
+            args: Some(
+                117..122 "23, 3",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 124..145 ".eabi_attribute 24, 1",
+        kind: Directive {
+            name: 124..139 ".eabi_attribute",
+            args: Some(
+                140..145 "24, 1",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 147..168 ".eabi_attribute 25, 1",
+        kind: Directive {
+            name: 147..162 ".eabi_attribute",
+            args: Some(
+                163..168 "25, 1",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 170..191 ".eabi_attribute 26, 2",
+        kind: Directive {
+            name: 170..185 ".eabi_attribute",
+            args: Some(
+                186..191 "26, 2",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 193..214 ".eabi_attribute 30, 6",
+        kind: Directive {
+            name: 193..208 ".eabi_attribute",
+            args: Some(
+                209..214 "30, 6",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 216..237 ".eabi_attribute 34, 1",
+        kind: Directive {
+            name: 216..231 ".eabi_attribute",
+            args: Some(
+                232..237 "34, 1",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 239..260 ".eabi_attribute 18, 4",
+        kind: Directive {
+            name: 239..254 ".eabi_attribute",
+            args: Some(
+                255..260 "18, 4",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 262..283 ".file\t\"hello-world.c\"",
+        kind: Directive {
+            name: 262..267 ".file",
+            args: Some(
+                268..283 "\"hello-world.c\"",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 285..290 ".text",
+        kind: Directive {
+            name: 285..290 ".text",
+            args: None,
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 292..308 ".section\t.rodata",
+        kind: Directive {
+            name: 292..300 ".section",
+            args: Some(
+                301..308 ".rodata",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 310..318 ".align\t2",
+        kind: Directive {
+            name: 310..316 ".align",
+            args: Some(
+                317..318 "2",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 319..324 ".LC0:",
+        kind: Label {
+            name: 319..323 ".LC0",
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 326..355 ".ascii\t\"Hello World!\\012\\000\"",
+        kind: Directive {
+            name: 326..332 ".ascii",
+            args: Some(
+                333..355 "\"Hello World!\\012\\000\"",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 357..362 ".text",
+        kind: Directive {
+            name: 357..362 ".text",
+            args: None,
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 364..372 ".align\t2",
+        kind: Directive {
+            name: 364..370 ".align",
+            args: Some(
+                371..372 "2",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 374..386 ".global\tmain",
+        kind: Directive {
+            name: 374..381 ".global",
+            args: Some(
+                382..386 "main",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 388..403 ".syntax unified",
+        kind: Directive {
+            name: 388..395 ".syntax",
+            args: Some(
+                396..403 "unified",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 405..409 ".arm",
+        kind: Directive {
+            name: 405..409 ".arm",
+            args: None,
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 411..432 ".type\tmain, %function",
+        kind: Directive {
+            name: 411..416 ".type",
+            args: Some(
+                417..432 "main, %function",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 433..438 "main:",
+        kind: Label {
+            name: 433..437 "main",
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 440..474 "@ args = 0, pretend = 0, frame = 0",
+        kind: Comment,
+        starts_line: true,
+    },
+    Item {
+        span: 476..519 "@ frame_needed = 1, uses_anonymous_args = 0",
+        kind: Comment,
+        starts_line: true,
+    },
+    Item {
+        span: 521..534 "push\t{fp, lr}",
+        kind: Instruction {
+            mnemonic: 521..525 "push",
+            args: Some(
+                526..534 "{fp, lr}",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 536..550 "add\tfp, sp, #4",
+        kind: Instruction {
+            mnemonic: 536..539 "add",
+            args: Some(
+                540..550 "fp, sp, #4",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 552..563 "ldr\tr3, .L3",
+        kind: Instruction {
+            mnemonic: 552..555 "ldr",
+            args: Some(
+                556..563 "r3, .L3",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 564..571 ".LPIC0:",
+        kind: Label {
+            name: 564..570 ".LPIC0",
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 573..587 "add\tr3, pc, r3",
+        kind: Instruction {
+            mnemonic: 573..576 "add",
+            args: Some(
+                577..587 "r3, pc, r3",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 589..599 "mov\tr0, r3",
+        kind: Instruction {
+            mnemonic: 589..592 "mov",
+            args: Some(
+                593..599 "r0, r3",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 601..613 "bl\tputs(PLT)",
+        kind: Instruction {
+            mnemonic: 601..603 "bl",
+            args: Some(
+                604..613 "puts(PLT)",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 615..625 "mov\tr3, #0",
+        kind: Instruction {
+            mnemonic: 615..618 "mov",
+            args: Some(
+                619..625 "r3, #0",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 627..637 "mov\tr0, r3",
+        kind: Instruction {
+            mnemonic: 627..630 "mov",
+            args: Some(
+                631..637 "r0, r3",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 639..651 "pop\t{fp, pc}",
+        kind: Instruction {
+            mnemonic: 639..642 "pop",
+            args: Some(
+                643..651 "{fp, pc}",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 652..656 ".L4:",
+        kind: Label {
+            name: 652..655 ".L4",
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 658..666 ".align\t2",
+        kind: Directive {
+            name: 658..664 ".align",
+            args: Some(
+                665..666 "2",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 667..671 ".L3:",
+        kind: Label {
+            name: 667..670 ".L3",
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 673..694 ".word\t.LC0-(.LPIC0+8)",
+        kind: Directive {
+            name: 673..678 ".word",
+            args: Some(
+                679..694 ".LC0-(.LPIC0+8)",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 696..714 ".size\tmain, .-main",
+        kind: Directive {
+            name: 696..701 ".size",
+            args: Some(
+                702..714 "main, .-main",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 716..736 ".ident\t\"<toolchain>\"",
+        kind: Directive {
+            name: 716..722 ".ident",
+            args: Some(
+                723..736 "\"<toolchain>\"",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 738..775 ".section\t.note.GNU-stack,\"\",%progbits",
+        kind: Directive {
+            name: 738..746 ".section",
+            args: Some(
+                747..775 ".note.GNU-stack,\"\",%progbits",
+            ),
+        },
+        starts_line: true,
+    },
+]

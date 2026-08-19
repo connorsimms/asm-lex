@@ -1,0 +1,185 @@
+---
+source: asm-lex/tests/snapshot-llvm.rs
+expression: snap_items
+input_file: asm-lex/tests/fixtures/llvm/aarch64_darwin/inline-asm.s
+---
+[
+    Item {
+        span: 1..28 ".build_version macos, 11, 0",
+        kind: Directive {
+            name: 1..15 ".build_version",
+            args: Some(
+                16..28 "macos, 11, 0",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 30..78 ".section\t__TEXT,__text,regular,pure_instructions",
+        kind: Directive {
+            name: 30..38 ".section",
+            args: Some(
+                39..78 "__TEXT,__text,regular,pure_instructions",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 80..92 ".globl\t_main",
+        kind: Directive {
+            name: 80..86 ".globl",
+            args: Some(
+                87..92 "_main",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 94..104 ".p2align\t2",
+        kind: Directive {
+            name: 94..102 ".p2align",
+            args: Some(
+                103..104 "2",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 105..111 "_main:",
+        kind: Label {
+            name: 105..110 "_main",
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 113..138 "stp\tx29, x30, [sp, #-16]!",
+        kind: Instruction {
+            mnemonic: 113..116 "stp",
+            args: Some(
+                117..138 "x29, x30, [sp, #-16]!",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 140..151 "mov\tx29, sp",
+        kind: Instruction {
+            mnemonic: 140..143 "mov",
+            args: Some(
+                144..151 "x29, sp",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 153..173 "adrp\tx0, l_.str@PAGE",
+        kind: Instruction {
+            mnemonic: 153..157 "adrp",
+            args: Some(
+                158..173 "x0, l_.str@PAGE",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 175..201 "add\tx0, x0, l_.str@PAGEOFF",
+        kind: Instruction {
+            mnemonic: 175..178 "add",
+            args: Some(
+                179..201 "x0, x0, l_.str@PAGEOFF",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 203..211 "bl\t_puts",
+        kind: Instruction {
+            mnemonic: 203..205 "bl",
+            args: Some(
+                206..211 "_puts",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 213..230 "; InlineAsm Start",
+        kind: Preprocessor,
+        starts_line: true,
+    },
+    Item {
+        span: 232..235 "nop",
+        kind: Instruction {
+            mnemonic: 232..235 "nop",
+            args: None,
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 237..252 "; InlineAsm End",
+        kind: Preprocessor,
+        starts_line: true,
+    },
+    Item {
+        span: 254..264 "mov\tw0, #0",
+        kind: Instruction {
+            mnemonic: 254..257 "mov",
+            args: Some(
+                258..264 "w0, #0",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 266..289 "ldp\tx29, x30, [sp], #16",
+        kind: Instruction {
+            mnemonic: 266..269 "ldp",
+            args: Some(
+                270..289 "x29, x30, [sp], #16",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 291..294 "ret",
+        kind: Instruction {
+            mnemonic: 291..294 "ret",
+            args: None,
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 297..339 ".section\t__TEXT,__cstring,cstring_literals",
+        kind: Directive {
+            name: 297..305 ".section",
+            args: Some(
+                306..339 "__TEXT,__cstring,cstring_literals",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 340..347 "l_.str:",
+        kind: Label {
+            name: 340..346 "l_.str",
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 349..372 ".asciz\t\"Hello World!\\n\"",
+        kind: Directive {
+            name: 349..355 ".asciz",
+            args: Some(
+                356..372 "\"Hello World!\\n\"",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 374..398 ".subsections_via_symbols",
+        kind: Directive {
+            name: 374..398 ".subsections_via_symbols",
+            args: None,
+        },
+        starts_line: true,
+    },
+]

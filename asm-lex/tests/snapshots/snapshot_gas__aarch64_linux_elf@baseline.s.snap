@@ -1,0 +1,315 @@
+---
+source: asm-lex/tests/snapshot-gas.rs
+expression: snap_items
+input_file: asm-lex/tests/fixtures/gas/aarch64_linux_elf/baseline.s
+---
+[
+    Item {
+        span: 1..14 ".arch armv8-a",
+        kind: Directive {
+            name: 1..6 ".arch",
+            args: Some(
+                7..14 "armv8-a",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 16..37 ".file\t\"hello-world.c\"",
+        kind: Directive {
+            name: 16..21 ".file",
+            args: Some(
+                22..37 "\"hello-world.c\"",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 39..44 ".text",
+        kind: Directive {
+            name: 39..44 ".text",
+            args: None,
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 46..62 ".section\t.rodata",
+        kind: Directive {
+            name: 46..54 ".section",
+            args: Some(
+                55..62 ".rodata",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 64..72 ".align\t3",
+        kind: Directive {
+            name: 64..70 ".align",
+            args: Some(
+                71..72 "3",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 73..78 ".LC0:",
+        kind: Label {
+            name: 73..77 ".LC0",
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 80..104 ".string\t\"Hello World!\\n\"",
+        kind: Directive {
+            name: 80..87 ".string",
+            args: Some(
+                88..104 "\"Hello World!\\n\"",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 106..111 ".text",
+        kind: Directive {
+            name: 106..111 ".text",
+            args: None,
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 113..121 ".align\t2",
+        kind: Directive {
+            name: 113..119 ".align",
+            args: Some(
+                120..121 "2",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 123..135 ".global\tmain",
+        kind: Directive {
+            name: 123..130 ".global",
+            args: Some(
+                131..135 "main",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 137..158 ".type\tmain, %function",
+        kind: Directive {
+            name: 137..142 ".type",
+            args: Some(
+                143..158 "main, %function",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 159..164 "main:",
+        kind: Label {
+            name: 159..163 "main",
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 165..171 ".LFB0:",
+        kind: Label {
+            name: 165..170 ".LFB0",
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 173..187 ".cfi_startproc",
+        kind: Directive {
+            name: 173..187 ".cfi_startproc",
+            args: None,
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 189..213 "stp\tx29, x30, [sp, -16]!",
+        kind: Instruction {
+            mnemonic: 189..192 "stp",
+            args: Some(
+                193..213 "x29, x30, [sp, -16]!",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 215..237 ".cfi_def_cfa_offset 16",
+        kind: Directive {
+            name: 215..234 ".cfi_def_cfa_offset",
+            args: Some(
+                235..237 "16",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 239..258 ".cfi_offset 29, -16",
+        kind: Directive {
+            name: 239..250 ".cfi_offset",
+            args: Some(
+                251..258 "29, -16",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 260..278 ".cfi_offset 30, -8",
+        kind: Directive {
+            name: 260..271 ".cfi_offset",
+            args: Some(
+                272..278 "30, -8",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 280..291 "mov\tx29, sp",
+        kind: Instruction {
+            mnemonic: 280..283 "mov",
+            args: Some(
+                284..291 "x29, sp",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 293..306 "adrp\tx0, .LC0",
+        kind: Instruction {
+            mnemonic: 293..297 "adrp",
+            args: Some(
+                298..306 "x0, .LC0",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 308..330 "add\tx0, x0, :lo12:.LC0",
+        kind: Instruction {
+            mnemonic: 308..311 "add",
+            args: Some(
+                312..330 "x0, x0, :lo12:.LC0",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 332..339 "bl\tputs",
+        kind: Instruction {
+            mnemonic: 332..334 "bl",
+            args: Some(
+                335..339 "puts",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 341..350 "mov\tw0, 0",
+        kind: Instruction {
+            mnemonic: 341..344 "mov",
+            args: Some(
+                345..350 "w0, 0",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 352..374 "ldp\tx29, x30, [sp], 16",
+        kind: Instruction {
+            mnemonic: 352..355 "ldp",
+            args: Some(
+                356..374 "x29, x30, [sp], 16",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 376..391 ".cfi_restore 30",
+        kind: Directive {
+            name: 376..388 ".cfi_restore",
+            args: Some(
+                389..391 "30",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 393..408 ".cfi_restore 29",
+        kind: Directive {
+            name: 393..405 ".cfi_restore",
+            args: Some(
+                406..408 "29",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 410..431 ".cfi_def_cfa_offset 0",
+        kind: Directive {
+            name: 410..429 ".cfi_def_cfa_offset",
+            args: Some(
+                430..431 "0",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 433..436 "ret",
+        kind: Instruction {
+            mnemonic: 433..436 "ret",
+            args: None,
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 438..450 ".cfi_endproc",
+        kind: Directive {
+            name: 438..450 ".cfi_endproc",
+            args: None,
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 451..457 ".LFE0:",
+        kind: Label {
+            name: 451..456 ".LFE0",
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 459..477 ".size\tmain, .-main",
+        kind: Directive {
+            name: 459..464 ".size",
+            args: Some(
+                465..477 "main, .-main",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 479..499 ".ident\t\"<toolchain>\"",
+        kind: Directive {
+            name: 479..485 ".ident",
+            args: Some(
+                486..499 "\"<toolchain>\"",
+            ),
+        },
+        starts_line: true,
+    },
+    Item {
+        span: 501..538 ".section\t.note.GNU-stack,\"\",@progbits",
+        kind: Directive {
+            name: 501..509 ".section",
+            args: Some(
+                510..538 ".note.GNU-stack,\"\",@progbits",
+            ),
+        },
+        starts_line: true,
+    },
+]
