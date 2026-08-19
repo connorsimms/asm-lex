@@ -44,7 +44,7 @@ fn arm_linux_eabi_elf() {
 
 #[test]
 fn riscv_elf() {
-    insta::glob!("fixtures/gas/riscv_elf/*.s", |path| {
+    insta::glob!("fixtures/gas/riscv_generic_elf/*.s", |path| {
         let bytes = std::fs::read(path).unwrap();
         let lexer = Lexer::<Gas<RiscvGenericElf>>::new(&bytes);
         let snap_items: Vec<snapshot::Item> = lexer

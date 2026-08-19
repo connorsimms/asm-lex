@@ -124,7 +124,9 @@ fn normalize(s: &str) -> String {
 fn generate(t: &Target, v: &Variant) -> Result<String, String> {
     let src_dir = root().join("asm-lex/tests/fixtures");
     let output = Command::new(t.cc)
-        .env_remove("NIX_CFLAGS_COMPILE")
+        .env_clear()
+        .env("PATH", std::env::var("PATH").unwrap())
+        .env("LC_ALL", "C")
         .current_dir(&src_dir)
         .args(BASE)
         .args(t.args)
