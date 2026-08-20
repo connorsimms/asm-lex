@@ -1,0 +1,181 @@
+gas/x86_linux_elf/bytes/baseline/10KiB
+                        time:   [9.2860 µs 9.2935 µs 9.3012 µs]
+                        thrpt:  [1.0233 GiB/s 1.0242 GiB/s 1.0250 GiB/s]
+Found 6 outliers among 100 measurements (6.00%)
+  6 (6.00%) high mild
+gas/x86_linux_elf/bytes/baseline/100KiB
+                        time:   [111.45 µs 111.49 µs 111.53 µs]
+                        thrpt:  [875.60 MiB/s 875.94 MiB/s 876.26 MiB/s]
+Found 2 outliers among 100 measurements (2.00%)
+  2 (2.00%) high mild
+gas/x86_linux_elf/bytes/baseline/1MiB
+                        time:   [1.1434 ms 1.1438 ms 1.1443 ms]
+                        thrpt:  [873.91 MiB/s 874.25 MiB/s 874.56 MiB/s]
+Found 6 outliers among 100 measurements (6.00%)
+  2 (2.00%) high mild
+  4 (4.00%) high severe
+gas/x86_linux_elf/bytes/dense/10KiB
+                        time:   [10.861 µs 10.865 µs 10.868 µs]
+                        thrpt:  [898.47 MiB/s 898.76 MiB/s 899.03 MiB/s]
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high mild
+gas/x86_linux_elf/bytes/dense/100KiB
+                        time:   [120.69 µs 120.73 µs 120.78 µs]
+                        thrpt:  [808.54 MiB/s 808.83 MiB/s 809.12 MiB/s]
+Found 7 outliers among 100 measurements (7.00%)
+  1 (1.00%) low mild
+  6 (6.00%) high mild
+gas/x86_linux_elf/bytes/dense/1MiB
+                        time:   [1.2803 ms 1.2808 ms 1.2815 ms]
+                        thrpt:  [780.35 MiB/s 780.73 MiB/s 781.08 MiB/s]
+Found 5 outliers among 100 measurements (5.00%)
+  2 (2.00%) high mild
+  3 (3.00%) high severe
+gas/x86_linux_elf/bytes/verbose/10KiB
+                        time:   [9.0797 µs 9.0960 µs 9.1179 µs]
+                        thrpt:  [1.0441 GiB/s 1.0466 GiB/s 1.0485 GiB/s]
+Found 3 outliers among 100 measurements (3.00%)
+  1 (1.00%) high mild
+  2 (2.00%) high severe
+gas/x86_linux_elf/bytes/verbose/100KiB
+                        time:   [96.343 µs 96.661 µs 97.184 µs]
+                        thrpt:  [1004.8 MiB/s 1010.2 MiB/s 1013.5 MiB/s]
+Found 2 outliers among 100 measurements (2.00%)
+  2 (2.00%) high severe
+gas/x86_linux_elf/bytes/verbose/1MiB
+                        time:   [997.78 µs 998.73 µs 1.0000 ms]
+                        thrpt:  [999.98 MiB/s 1001.3 MiB/s 1002.2 MiB/s]
+Found 4 outliers among 100 measurements (4.00%)
+  1 (1.00%) low mild
+  2 (2.00%) high mild
+  1 (1.00%) high severe
+gas/x86_linux_elf/bytes/debug/10KiB
+                        time:   [9.3962 µs 9.4109 µs 9.4292 µs]
+                        thrpt:  [1.0114 GiB/s 1.0134 GiB/s 1.0150 GiB/s]
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high severe
+gas/x86_linux_elf/bytes/debug/100KiB
+                        time:   [113.17 µs 113.21 µs 113.26 µs]
+                        thrpt:  [862.16 MiB/s 862.53 MiB/s 862.87 MiB/s]
+Found 6 outliers among 100 measurements (6.00%)
+  3 (3.00%) high mild
+  3 (3.00%) high severe
+gas/x86_linux_elf/bytes/debug/1MiB
+                        time:   [1.1781 ms 1.1792 ms 1.1808 ms]
+                        thrpt:  [846.87 MiB/s 848.03 MiB/s 848.84 MiB/s]
+Found 6 outliers among 100 measurements (6.00%)
+  4 (4.00%) high mild
+  2 (2.00%) high severe
+
+gas/x86_linux_elf/items/baseline/1MiB
+                        time:   [1.1611 ms 1.1658 ms 1.1723 ms]
+                        thrpt:  [49.141 Melem/s 49.416 Melem/s 49.614 Melem/s]
+Found 2 outliers among 100 measurements (2.00%)
+  2 (2.00%) high severe
+gas/x86_linux_elf/items/dense/1MiB
+                        time:   [1.3161 ms 1.3193 ms 1.3239 ms]
+                        thrpt:  [46.792 Melem/s 46.955 Melem/s 47.069 Melem/s]
+Found 21 outliers among 100 measurements (21.00%)
+  14 (14.00%) low severe
+  2 (2.00%) low mild
+  3 (3.00%) high mild
+  2 (2.00%) high severe
+gas/x86_linux_elf/items/verbose/1MiB
+                        time:   [1.0181 ms 1.0200 ms 1.0227 ms]
+                        thrpt:  [48.962 Melem/s 49.090 Melem/s 49.183 Melem/s]
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high severe
+gas/x86_linux_elf/items/debug/1MiB
+                        time:   [1.1837 ms 1.1842 ms 1.1849 ms]
+                        thrpt:  [48.249 Melem/s 48.278 Melem/s 48.298 Melem/s]
+Found 3 outliers among 100 measurements (3.00%)
+  1 (1.00%) high mild
+  2 (2.00%) high severe
+
+gas/x86_linux_elf/collect/dense/1MiB
+                        time:   [1.2896 ms 1.2918 ms 1.2950 ms]
+                        thrpt:  [772.21 MiB/s 774.08 MiB/s 775.42 MiB/s]
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high severe
+
+llvm/x86_elf/bytes/baseline/10KiB
+                        time:   [13.357 µs 13.399 µs 13.448 µs]
+                        thrpt:  [725.27 MiB/s 727.89 MiB/s 730.22 MiB/s]
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high severe
+llvm/x86_elf/bytes/baseline/100KiB
+                        time:   [142.18 µs 142.48 µs 142.78 µs]
+                        thrpt:  [683.91 MiB/s 685.32 MiB/s 686.78 MiB/s]
+llvm/x86_elf/bytes/baseline/1MiB
+                        time:   [1.4428 ms 1.4442 ms 1.4459 ms]
+                        thrpt:  [691.60 MiB/s 692.40 MiB/s 693.08 MiB/s]
+Found 5 outliers among 100 measurements (5.00%)
+  1 (1.00%) low mild
+  3 (3.00%) high mild
+  1 (1.00%) high severe
+llvm/x86_elf/bytes/dense/10KiB
+                        time:   [15.016 µs 15.048 µs 15.080 µs]
+                        thrpt:  [647.15 MiB/s 648.54 MiB/s 649.92 MiB/s]
+llvm/x86_elf/bytes/dense/100KiB
+                        time:   [156.89 µs 157.47 µs 158.14 µs]
+                        thrpt:  [617.50 MiB/s 620.11 MiB/s 622.44 MiB/s]
+Found 3 outliers among 100 measurements (3.00%)
+  2 (2.00%) high mild
+  1 (1.00%) high severe
+llvm/x86_elf/bytes/dense/1MiB
+                        time:   [1.6071 ms 1.6082 ms 1.6094 ms]
+                        thrpt:  [621.35 MiB/s 621.79 MiB/s 622.24 MiB/s]
+llvm/x86_elf/bytes/verbose/10KiB
+                        time:   [13.194 µs 13.215 µs 13.239 µs]
+                        thrpt:  [737.63 MiB/s 738.99 MiB/s 740.18 MiB/s]
+Found 2 outliers among 100 measurements (2.00%)
+  1 (1.00%) high mild
+  1 (1.00%) high severe
+llvm/x86_elf/bytes/verbose/100KiB
+                        time:   [127.80 µs 127.96 µs 128.12 µs]
+                        thrpt:  [762.12 MiB/s 763.06 MiB/s 763.99 MiB/s]
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high mild
+llvm/x86_elf/bytes/verbose/1MiB
+                        time:   [1.3730 ms 1.3737 ms 1.3745 ms]
+                        thrpt:  [727.53 MiB/s 727.92 MiB/s 728.30 MiB/s]
+Found 3 outliers among 100 measurements (3.00%)
+  3 (3.00%) high mild
+llvm/x86_elf/bytes/debug/10KiB
+                        time:   [11.957 µs 11.989 µs 12.021 µs]
+                        thrpt:  [812.24 MiB/s 814.41 MiB/s 816.55 MiB/s]
+llvm/x86_elf/bytes/debug/100KiB
+                        time:   [137.45 µs 137.76 µs 138.07 µs]
+                        thrpt:  [707.20 MiB/s 708.83 MiB/s 710.40 MiB/s]
+llvm/x86_elf/bytes/debug/1MiB
+                        time:   [1.4008 ms 1.4022 ms 1.4035 ms]
+                        thrpt:  [712.50 MiB/s 713.18 MiB/s 713.86 MiB/s]
+
+llvm/x86_elf/items/baseline/1MiB
+                        time:   [1.4555 ms 1.4565 ms 1.4575 ms]
+                        thrpt:  [36.462 Melem/s 36.487 Melem/s 36.512 Melem/s]
+Found 2 outliers among 100 measurements (2.00%)
+  1 (1.00%) low mild
+  1 (1.00%) high severe
+llvm/x86_elf/items/dense/1MiB
+                        time:   [1.6235 ms 1.6249 ms 1.6263 ms]
+                        thrpt:  [34.820 Melem/s 34.850 Melem/s 34.881 Melem/s]
+llvm/x86_elf/items/verbose/1MiB
+                        time:   [1.3815 ms 1.3821 ms 1.3828 ms]
+                        thrpt:  [33.985 Melem/s 34.001 Melem/s 34.018 Melem/s]
+Found 3 outliers among 100 measurements (3.00%)
+  2 (2.00%) low mild
+  1 (1.00%) high mild
+llvm/x86_elf/items/debug/1MiB
+                        time:   [1.3975 ms 1.3986 ms 1.3998 ms]
+                        thrpt:  [37.662 Melem/s 37.694 Melem/s 37.725 Melem/s]
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high mild
+
+llvm/x86_elf/collect/dense/1MiB
+                        time:   [1.5691 ms 1.5710 ms 1.5731 ms]
+                        thrpt:  [635.66 MiB/s 636.52 MiB/s 637.31 MiB/s]
+Found 17 outliers among 100 measurements (17.00%)
+  16 (16.00%) high mild
+  1 (1.00%) high severe
+
