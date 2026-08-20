@@ -1,5 +1,6 @@
 mod args;
 mod comment;
+mod inline_asm_marker;
 mod line_comment;
 mod line_separator;
 mod linemarker;
@@ -7,4 +8,3 @@ mod preamble;
 mod quoted;
 mod slash_star;
 mod symbol_kind;
-mod inline_asm_marker;

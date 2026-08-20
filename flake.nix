@@ -124,6 +124,17 @@
             ];
             hardeningDisable = [ "all" ];
           };
+
+          bench-fixtures = pkgs.mkShell {
+            nativeBuildInputs =  [
+              pkgs.gcc
+              pkgs.llvmPackages_21.clang
+              pkgs.curl
+              pkgs.unzip
+              pkgs.cacert
+              rustLatest
+            ];
+          };
         };
       }
     );
