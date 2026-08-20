@@ -3,3 +3,7 @@ name = "xtask"
 version = "0.0.0"
 edition = "2021"
 publish = false
+
+[dependencies]
+sha3 = "0.10"
+asm-lex = { path = "../asm-lex" }

@@ -1,3 +1,7 @@
+#![allow(clippy::must_use_candidate)]
+
+mod bench;
+
 use std::path::PathBuf;
 use std::process::Command;
 
@@ -97,28 +101,12 @@ const TARGETS: &[Target] = &[
 
 const BASE: &[&str] = &["-ffreestanding"];
 
-fn root() -> PathBuf {
+/// # Panics
+pub fn root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .parent()
         .unwrap()
         .to_path_buf()
-}
-
-fn normalize(s: &str) -> String {
-    let mut out: String = s
-        .lines()
-        .map(|line| {
-            if line.trim_start().starts_with(".ident") {
-                let indent = &line[..line.len() - line.trim_start().len()];
-                format!("{indent}.ident\t\"<toolchain>\"")
-            } else {
-                line.to_string()
-            }
-        })
-        .collect::<Vec<_>>()
-        .join("\n");
-    out.push('\n');
-    out
 }
 
 fn generate(t: &Target, v: &Variant) -> Result<String, String> {
@@ -138,31 +126,24 @@ fn generate(t: &Target, v: &Variant) -> Result<String, String> {
         .map_err(|e| format!("failed to run {}: {e}", t.cc))?;
 
     if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
         return Err(format!(
             "{} {} {}: {}",
             t.cc,
             t.dir,
             v.name,
-            String::from_utf8_lossy(&output.stderr).trim()
+            stderr.trim().lines().next_back().unwrap_or("(no stderr)")
         ));
     }
-    Ok(normalize(&String::from_utf8_lossy(&output.stdout)))
+    Ok(String::from_utf8_lossy(&output.stdout).into_owned())
 }
 
-fn main() {
-    let check = std::env::args().any(|a| a == "--check");
-    let filter: Option<String> = std::env::args().skip(1).find(|a| !a.starts_with("--"));
-
-    for (var, value) in std::env::vars() {
-        println!("{var}: {value}");
-    }
-
-    let mut failures = Vec::new();
-    let mut stale = Vec::new();
+fn fixtures(check: bool, filter: Option<&str>) -> Vec<String> {
+    let mut errors = Vec::new();
 
     for t in TARGETS {
-        if let Some(f) = &filter {
-            if !t.dir.contains(f.as_str()) && t.dialect != f.as_str() {
+        if let Some(f) = filter {
+            if !t.dir.contains(f) && t.dialect != f {
                 continue;
             }
         }
@@ -174,14 +155,13 @@ fn main() {
                 .join(format!("{}.s", v.name));
 
             match generate(t, v) {
-                Err(e) => failures.push(e),
+                Err(e) => errors.push(e),
                 Ok(content) => {
-                    let existing = std::fs::read_to_string(&path).ok();
-                    if existing.as_deref() == Some(content.as_str()) {
+                    if std::fs::read_to_string(&path).ok().as_deref() == Some(content.as_str()) {
                         continue;
                     }
                     if check {
-                        stale.push(path.display().to_string());
+                        errors.push(format!("out of date: {}", path.display()));
                     } else {
                         std::fs::create_dir_all(path.parent().unwrap()).unwrap();
                         std::fs::write(&path, &content).unwrap();
@@ -191,14 +171,39 @@ fn main() {
             }
         }
     }
+    errors
+}
 
-    for f in &failures {
-        eprintln!("error: {f}");
+const HELP: &str = "\
+cargo xtask <command> [--check] [--force] [filter]
+
+  fixtures   regenerate committed snapshot fixtures
+  bench      download, compile, and slice benchmark inputs
+";
+
+fn main() {
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    let check = args.iter().any(|a| a == "--check");
+    let force = args.iter().any(|a| a == "--force");
+    let filter: Option<&str> = args
+        .iter()
+        .skip(1)
+        .find(|a| !a.starts_with("--"))
+        .map(String::as_str);
+
+    let errors = match args.first().map_or("help", String::as_str) {
+        "fixtures" => fixtures(check, filter),
+        "bench" => bench::run(force, filter),
+        _ => {
+            print!("{HELP}");
+            return;
+        }
+    };
+
+    for e in &errors {
+        eprintln!("error: {e}");
     }
-    for s in &stale {
-        eprintln!("out of date: {s}");
-    }
-    if !failures.is_empty() || !stale.is_empty() {
+    if !errors.is_empty() {
         std::process::exit(1);
     }
 }
