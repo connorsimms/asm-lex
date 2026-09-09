@@ -8,7 +8,7 @@ For example, `#` starts a comment on x86 ELF but not on ARM, where `@` does. `$`
 
 Tools that want to read or analyze assembly from more than one compiler usually end up with a mess of per-target special cases, or with a catch-all regular expression that is wrong for many edge cases.
 
-`asm-lex` aims to move these idiosyncrasies into the type system. Targets are configured by a set of associated constants on a trait, and the lexer is generic over it.
+`asm-lex` aims to move these idiosyncrasies into the type system. Targets are configured by a set of associated constants on the `asm_lex::source::Dialect` trait that `asm_lex::source::Lexer` is generic over.
 
 ```rust
 use asm_lex::source::gas::{targets::X86LinuxElf, Gas};
@@ -47,11 +47,11 @@ Malformed input does not produce errors. It produces `Unknown` instead.
 
 ## Targets
 
-**GNU assembler** — `X86GenericElf`, `X86LinuxElf`, `X86Darwin`, `X86Pe`,
+**GNU assembler**: `X86GenericElf`, `X86LinuxElf`, `X86Darwin`, `X86Pe`,
 `Aarch64GenericElf`, `Aarch64LinuxElf`, `Aarch64Pe`, `ArmGenericElf`, `ArmLinuxElf`,
 `ArmLinuxEabiElf`, `ArmPe`, `RiscvGenericElf`
 
-**LLVM** — `X86Elf`, `X86Darwin`, `X86Microsoft`, `X86GnuCoff`, `Aarch64Elf`,
+**LLVM**: `X86Elf`, `X86Darwin`, `X86Microsoft`, `X86GnuCoff`, `Aarch64Elf`,
 `Aarch64Darwin`, `Aarch64MicrosoftCoff`, `Aarch64GnuCoff`, `ArmElf`, `ArmDarwin`,
 `ArmMicrosoftCoff`, `ArmGnuCoff`, `RiscvElf`, `RiscvDarwin`
 
